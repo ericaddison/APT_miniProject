@@ -17,15 +17,27 @@
 
     <a href="create">Create Stream</a><br>
 
-    Streams I own:<br>
+    <b>Streams I own:</b><br>
             {% for stream in streams %}
+               {% if stream.coverImageURL %}
+                <img src = "{{ stream.coverImageURL }}"  style="width:100px;height:100px;">
+               {% endif %}
                 Name: {{ stream.name }}  User: {{ stream.user }} Number of Views: {{ stream.numViews }}<br>
+    
+                <br>
             {% endfor %}
     
             
     <p>
         
-    Streams I subscribe to:<br>
+    <b>Streams I subscribe to:</b><br>
+            {% for stream in subscribe %}
+                {% if stream.coverImageURL %}
+                    <img src = "{{ stream.coverImageURL }}"  style="width:100px;height:100px;">
+                {% endif %}
+                Name: {{ stream.name }}  User: {{ stream.user }}  Number of Views: {{ stream.numViews }}<br>
+                <br>
+            {% endfor %}
     
         
     <p>

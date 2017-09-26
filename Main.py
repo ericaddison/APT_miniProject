@@ -79,17 +79,36 @@ class ManagePage(webapp2.RequestHandler):
             login_url = users.create_login_url('/manage')
             login_text = 'Sign in'
 
-        #Need to pull a list of streams owned by 'user'
-        #and a list of streams which 'user' subscribes to.
-        #Display both on the management page.
         
-        streams = Stream.query(Stream.user == user.email()) 
+        #NUCLEAR OPTION:
+        #allSubs = StreamSubscriber.query()
+        #for sub in allSubs:
+        #    sub.key.delete()
+        #    
+        #allSubs = Stream.query()
+        #for sub in allSubs:
+        #    sub.key.delete()
+
+        
+        
+        streamsOwn = Stream.query(Stream.user == user.email()) 
+        streamKeysList = StreamSubscriber.query(StreamSubscriber.user == user.email())
+        
+        print "StreamKeysList = ", streamKeysList
+        
+        subbedStreams = []
+        for streamKey in streamKeysList:
+            subbedStreams.append(Stream.query(Stream.name == streamKey.stream.name).get())
+            #print "streamKey = ", streamKey
+
+        print "Streamkeyslist: ", streamKeysList
 
         template_values = {
             'user': user,
             'login_url': login_url,
             'login_text': login_text,
-            'streams': streams,
+            'streams': streamsOwn,
+            'subscribe': subbedStreams,
             'app': app_identity.get_application_id()}
 
 
@@ -110,12 +129,11 @@ class CreatePage(webapp2.RequestHandler):
         coverImageUrl = self.request.get('coverUrl')
         
         subscriberArray = subscribers.split(";")
-        
-        #print "tags = ", tags
-        
         tagArray = str(tags.split(";"))
         
-       
+           
+    
+    
         #Create a new Stream entity then redirect to /view the new stream
         #id = streamname:email, this will be unique
         
@@ -123,13 +141,18 @@ class CreatePage(webapp2.RequestHandler):
         newStream = Stream(id = myKey, name=streamname, user=user.email(), coverImageURL=coverImageUrl, numViews=0)
         newStream.put()
         
+        for subby in subscriberArray:
+            newID = streamname + ":" + user.email()
+            newSub = StreamSubscriber(id = newID, stream = newStream, user = user.email())
+            newSub.put()
+        
         for myTag in tagArray:
             newTag = Tag.get_or_insert(myTag)
             newStreamTag = StreamTag(stream = newStream, tag = newTag)
             newStreamTag.put()
             
         #Redirect to /view for this stream
-    
+        self.redirect('/manage')
     
     def get(self):
     
