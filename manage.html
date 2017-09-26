@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+  
+    <title>Connexion Management Page!</title>
+</head>
+<body>
+    Connexion Management Page!<br>
+
+    {% if user %}
+        You're signed in as {{ user }} <br>
+    <a href="{{ login_url }}"> {{ login_text }}</a> <br>
+    {% endif %}
+
+    <a href="create">Create Stream</a><br>
+
+    Streams I own:<br>
+            {% for stream in streams %}
+                Name: {{ stream.name }}  User: {{ stream.user }} Number of Views: {{ stream.numViews }}<br>
+            {% endfor %}
+    
+            
+    <p>
+        
+    Streams I subscribe to:<br>
+    
+        
+    <p>
+
+
+</body>
+</html>

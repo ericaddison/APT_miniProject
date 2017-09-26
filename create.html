@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    
+  
+    <title>Connexion</title>
+</head>
+<body>
+    Create New Stream!<br>
+
+    {% if user %}
+        You're signed in as {{ user }} <br>
+    <a href="{{ login_url }}"> {{ login_text }}</a> <br>
+    {% endif %}
+    <a href="manage">Back to Management Page</a><br>
+
+    <p>
+    Create a new stream:<br>
+        Add a bunch of input boxes:  Name, Tags, Subscriber emails, url to cover image.<br>
+    </p>
+    <form action="create" method="post">
+        Stream Name:<br>
+        <input type="text" name="streamname"><br>
+        Subscriber Emails (semicolon delimited):<br>
+        <input type="text" name="subs"><br>
+        Tags (semicolon delimited):<br>
+        <input type="text" name="tags"><br>
+        URL of cover image:<br>
+        <input type="text" name="coverUrl"><br>
+        <input type="submit" value="Create">
+    </form>
+
+
+</body>
+</html>
