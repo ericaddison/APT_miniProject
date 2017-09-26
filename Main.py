@@ -109,7 +109,7 @@ class CreatePage(webapp2.RequestHandler):
         tags = self.request.get('tags')
         coverImageUrl = self.request.get('coverUrl')
         
-        subscriberArray = subscribers.split(";")
+        subscriberArray = str(subscribers.split(";"))
         
         #print "tags = ", tags
         
@@ -143,10 +143,6 @@ class CreatePage(webapp2.RequestHandler):
             login_url = users.create_login_url('/manage')
             login_text = 'Sign in'
 
-        #Need to pull a list of streams owned by 'user'
-        #and a list of streams which 'user' subscribes to.
-        #Display both on the management page.
-
         template_values = {
             'user': user,
             'login_url': login_url,
@@ -154,7 +150,6 @@ class CreatePage(webapp2.RequestHandler):
             'app': app_identity.get_application_id()}
 
 
-                
         self.response.content_type = 'text/html'
         path = os.path.join(os.path.dirname(__file__), 'create.html')
         self.response.write(template.render(path, template_values))        
