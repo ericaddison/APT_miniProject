@@ -6,16 +6,8 @@ service: service1
 
 handlers:
 
-- url: /manage/.*
-  script: Main.app
-  login: required
-  auth_fail_action: redirect
-
-
 - url: /.*
   script: Main.app
-
-
 
 
 libraries:
