@@ -12,28 +12,33 @@ import os
 #If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
 
+class StreamUser(ndb.Model):
+    email = ndb.StringProperty(indexed=True)
+    fname = ndb.StringProperty
+    lname = ndb.StringProperty
+
 class Stream(ndb.Model):
     name = ndb.StringProperty(indexed=True)
-    user = ndb.StringProperty(indexed=True)
+    user = ndb.KeyProperty(kind=StreamUser)
     coverImageURL = ndb.StringProperty(indexed=False)
     numViews = ndb.IntegerProperty(indexed=False)
 
 class StreamItem(ndb.Model):
-    stream = ndb.StructuredProperty(Stream)
+    stream = ndb.KeyProperty(kind=Stream)
     name = ndb.StringProperty(indexed=False)
     image = ndb.BlobProperty(indexed=False)
     dateAdded = ndb.DateProperty(indexed=False)
 
 class Tag(ndb.Model):
-    name = ndb.StringProperty(indexed=False)
+    name = ndb.StringProperty(indexed=True)
 
 class StreamTag(ndb.Model):
-    stream = ndb.StructuredProperty(Stream)
-    tag = ndb.StructuredProperty(Tag)
+    stream = ndb.KeyProperty(kind=Stream)
+    tag = ndb.KeyProperty(kind=Tag)
 
 class StreamSubscriber(ndb.Model):
-    stream = ndb.StructuredProperty(Stream)
-    user = ndb.StringProperty(indexed=True)
+    stream = ndb.KeyProperty(kind=Stream)
+    user = ndb.KeyProperty(kind=StreamUser)
     
     
     
@@ -47,6 +52,7 @@ class MainPage(webapp2.RequestHandler):
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
+            
         else:
             login_url = users.create_login_url('/manage')
             login_text = 'Sign in'
@@ -75,6 +81,10 @@ class ManagePage(webapp2.RequestHandler):
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
+            
+            #Check to see if user is present in StreamUser table, if not add them.
+            
+            
         else:
             login_url = users.create_login_url('/manage')
             login_text = 'Sign in'
