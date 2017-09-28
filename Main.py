@@ -50,7 +50,6 @@ class ManagePage(webapp2.RequestHandler):
             
             #Check to see if user is present in StreamUser table, if not add them.
             stream_user = StreamUser.query(StreamUser.key == ndb.Key('StreamUser',user.user_id())).get()
-            #print("\n\nmyStreamUser query: {}\n\n".format(stream_user))
             if not stream_user:
                 print("\n\nAdding new StreamUser by email: {}\n\n".format(str(user.email())))
                 stream_user = StreamUser(email = user.email(), nickName = nickname, id=user.user_id())

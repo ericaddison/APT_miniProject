@@ -6,6 +6,11 @@ service: service1
 
 handlers:
 
+- url: /admin/notadmin
+  static_files: templates/NotAdmin.html
+  upload: templates/NotAdmin.html
+- url: /admin/.*
+  script: Admin.app
 - url: /.*
   script: Main.app
 
