@@ -12,7 +12,10 @@
 
     {% if user %}
         You're signed in as {{ user }} <br>
-    <a href="{{ login_url }}"> {{ login_text }}</a> <br>
+        <a href="{{ login_url }}"> {{ login_text }}</a> <br>
+        {% if isAdmin %}
+            <a href="/admin/menu">Admin Menu</a> <br>
+        {% endif %}
     {% endif %}
 
     <a href="create">Create Stream</a><br>
@@ -41,6 +44,7 @@
     
         
     <p>
+
 
 
 </body>

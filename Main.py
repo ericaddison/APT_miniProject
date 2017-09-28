@@ -50,15 +50,18 @@ class ManagePage(webapp2.RequestHandler):
             
             #Check to see if user is present in StreamUser table, if not add them.
             stream_user = StreamUser.query(StreamUser.key == ndb.Key('StreamUser',user.user_id())).get()
+            email_dup_check = len(StreamUser.query(StreamUser.email == user.email()).fetch())!=0
             if not stream_user:
+                if email_dup_check:
+                    self.response.write("Uh oh! Duplicate email!!!")
+                    return
                 print("\n\nAdding new StreamUser by email: {}\n\n".format(str(user.email())))
                 stream_user = StreamUser(email = user.email(), nickName = nickname, id=user.user_id())
                 stream_user.put()
 
-
         else:
-            login_url = users.create_login_url('/manage')
-            login_text = 'Sign in'
+            self.redirect("/")
+            return
 
         # get streams owned by this user
         user_streams = Stream.query(Stream.owner == stream_user.key).fetch()
@@ -70,6 +73,7 @@ class ManagePage(webapp2.RequestHandler):
 
         template_values = {
             'user': user,
+            'isAdmin': users.IsCurrentUserAdmin(),
             'login_url': login_url,
             'login_text': login_text,
             'streams': user_streams,
@@ -80,7 +84,7 @@ class ManagePage(webapp2.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), 'manage.html')
         self.response.write(template.render(path, template_values))
         
-        
+
 class CreatePage(webapp2.RequestHandler):
     def post(self):
         
@@ -90,19 +94,14 @@ class CreatePage(webapp2.RequestHandler):
         subscribers = self.request.get('subs')
         tags = self.request.get('tags')
         coverImageUrl = self.request.get('coverUrl')
-        myStreamUser = StreamUser.query(StreamUser.email==user.email()).get()
+        myStreamUser = StreamUser.query(StreamUser.key==ndb.Key('StreamUser',user.user_id())).get()
         
         
         subscriberArray = subscribers.split(";") 
         tagArray = tags.split(";")
-        
-           
-    
-        #Create a new Stream entity then redirect to /view the new stream
 
-        
-        
-        newStream = Stream(name=streamname, user=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0)
+        #Create a new Stream entity then redirect to /view the new stream
+        newStream = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0)
         newStream.put()
         
         print "len(subscriberArray) = ", len(subscriberArray)
@@ -110,13 +109,19 @@ class CreatePage(webapp2.RequestHandler):
         for subby in subscriberArray:
             print "subby = ", subby
             myUser = StreamUser.query(StreamUser.email == subby).get()
-            newSub = StreamSubscriber(stream = newStream.key, user = myUser.key)
-            newSub.put()
-        
+            if myUser:
+                newSub = StreamSubscriber(stream = newStream.key, user = myUser.key)
+                newSub.put()
+            else:
+                print("\nNo user found with email {}".format(subby))
+
+        print("\n\ntags = {}\n\n".format(tagArray))
+
         for myTag in tagArray:
-            newTag = Tag.get_or_insert(myTag)
-            newStreamTag = StreamTag(stream = newStream.key, tag = newTag.key)
-            newStreamTag.put()
+            if myTag:
+                newTag = Tag.get_or_insert(myTag)
+                newStreamTag = StreamTag(stream = newStream.key, tag = newTag.key)
+                newStreamTag.put()
             
         #Redirect to /view for this stream
         self.redirect('/manage')

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+{% autoescape true %}
+<html>
+  <head>
+    <style>
+      th {
+        text-align: left;
+      }
+    </style>
+    <title>List All Streams</title>
+  </head>
+  <body>
+    <h1>List All Streams</h1>
+    <table style="width:800px">
+      <tr>
+        <th>streamID</th>
+        <th>name</th>
+        <th>owner</th>
+        <th>cover image URL</th>
+        <th>number of views</th>
+      </tr>
+      {% for stream in streams %}
+      <tr>
+        <td>{{ stream.key.id() }}</td>
+        <td>{{ stream.name }}</td>
+        <td>{{ stream.owner.get().nickName }}</td>
+        <td>{{ stream.coverImageURL }}</td>
+        <td>{{ stream.numViews }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <br><br>
+    <a href="/admin/menu">Admin Menu</a>
+    <br>
+    <a href="/">Back Home</a>
+  </body>
+</html>
+{% endautoescape %}

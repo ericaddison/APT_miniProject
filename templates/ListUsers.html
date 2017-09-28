@@ -14,18 +14,24 @@
     <table style="width:800px">
       <tr>
         <th>userID</th>
+        <th>first name</th>
+        <th>last name</th>
         <th>email</th>
         <th>nickname</th>
       </tr>
       {% for user in users %}
       <tr>
         <td>{{ user.key.id() }}</td>
+        <td>{{ user.firstName }}</td>
+        <td>{{ user.lastName }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.nickName }}</td>
       </tr>
       {% endfor %}
     </table>
     <br><br>
+    <a href="/admin/menu">Admin Menu</a>
+    <br>
     <a href="/">Back Home</a>
   </body>
 </html>

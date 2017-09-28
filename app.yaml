@@ -9,6 +9,9 @@ handlers:
 - url: /admin/notadmin
   static_files: templates/NotAdmin.html
   upload: templates/NotAdmin.html
+- url: /admin/menu
+  static_files: templates/Admin.html
+  upload: templates/Admin.html
 - url: /admin/.*
   script: Admin.app
 - url: /.*
