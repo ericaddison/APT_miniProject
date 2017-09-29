@@ -5,6 +5,10 @@ service: default
 
 handlers:
 
+- url: /admindash/.*
+script: google.appengine.ext.admin.application
+
+
 - url: /admin/notadmin
   static_files: templates/admin/NotAdmin.html
   upload: templates/admin/NotAdmin.html
