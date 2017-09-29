@@ -1,8 +1,7 @@
 runtime: python27
 api_version: 1
 threadsafe: yes
-service: service1
-
+service: default
 
 handlers:
 
@@ -11,6 +10,11 @@ handlers:
   upload: templates/NotAdmin.html
 - url: /admin/.*
   script: Admin.app
+
+# [START services]
+- url: /services/.*
+  script: services.app
+# [END services]
 
 - url: /css
   static_dir: templates/css
@@ -22,9 +26,10 @@ handlers:
   script: Main.app
 
 
+# [START libraries]
 libraries:
 - name: webapp2
   version: latest
 - name: jinja2
   version: latest
-
+# [END libraries]

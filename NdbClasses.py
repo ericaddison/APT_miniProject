@@ -10,9 +10,11 @@ class Stream(ndb.Model):
 
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
+    owner = ndb.KeyProperty(indexed=True, kind='User')
     name = ndb.StringProperty(indexed=False)
-    image = ndb.BlobProperty(indexed=False)
-    dateAdded = ndb.DateProperty(indexed=False)
+    blobKey = ndb.BlobKeyProperty(indexed=False)
+    URL = ndb.StringProperty(indexed=False)
+    dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
 
 class Tag(ndb.Model):
