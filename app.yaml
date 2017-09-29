@@ -6,8 +6,8 @@ service: default
 handlers:
 
 - url: /admin/notadmin
-  static_files: templates/NotAdmin.html
-  upload: templates/NotAdmin.html
+  static_files: templates/admin/NotAdmin.html
+  upload: templates/admin/NotAdmin.html
 - url: /admin/.*
   script: Admin.app
 
