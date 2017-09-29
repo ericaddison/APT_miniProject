@@ -10,7 +10,7 @@ from NdbClasses import *
 
 class UploadFileForm(webapp2.RequestHandler):
     def get(self):
-        upload_url = blobstore.create_upload_url('/upload_photo')
+        upload_url = blobstore.create_upload_url('/services/upload')
 
         #TODO: Make the upload form prettier :)
         # should include stream that it is uploading to (come from request?)

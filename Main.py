@@ -2,6 +2,7 @@
 from google.appengine.api import app_identity
 from google.appengine.api import users
 
+from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
 from NdbClasses import *
@@ -49,7 +50,7 @@ class ManagePage(webapp2.RequestHandler):
             login_text = 'Sign out'
             
             #Check to see if user is present in StreamUser table, if not add them.
-            stream_user = StreamUser.query(StreamUser.key == ndb.Key('StreamUser',user.user_id())).get()
+            stream_user = ndb.Key('StreamUser',user.user_id()).get()
             email_dup_check = len(StreamUser.query(StreamUser.email == user.email()).fetch())!=0
             if not stream_user:
                 if email_dup_check:
