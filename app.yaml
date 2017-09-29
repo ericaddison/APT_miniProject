@@ -6,7 +6,7 @@ service: default
 handlers:
 
 - url: /admindash/.*
-script: google.appengine.ext.admin.application
+  script: google.appengine.ext.admin.application
 
 
 - url: /admin/notadmin
