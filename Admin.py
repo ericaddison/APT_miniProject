@@ -12,6 +12,16 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 from NdbClasses import *
 
 
+class AdminDashboard(webapp2.RequestHandler):
+    def get(self):
+
+        if not users.IsCurrentUserAdmin():
+            self.redirect("/admin/notadmin")
+
+        template = JINJA_ENVIRONMENT.get_template('templates/admin/AdminDashboard.html')
+        self.response.write(template.render({}))
+
+
 class ListUsers(webapp2.RequestHandler):
     def get(self):
 
@@ -25,7 +35,7 @@ class ListUsers(webapp2.RequestHandler):
             'users': all_users
         }
 
-        template = JINJA_ENVIRONMENT.get_template('templates/ListUsers.html')
+        template = JINJA_ENVIRONMENT.get_template('templates/admin/AdminListUsers.html')
         self.response.write(template.render(template_values))
 
 
@@ -42,12 +52,13 @@ class ListStreams(webapp2.RequestHandler):
             'streams': all_streams
         }
 
-        template = JINJA_ENVIRONMENT.get_template('templates/ListStreams.html')
+        template = JINJA_ENVIRONMENT.get_template('templates/admin/AdminListStreams.html')
         self.response.write(template.render(template_values))
 
 
 
 app = webapp2.WSGIApplication([
+    ('/admin/dashboard', AdminDashboard),
     ('/admin/listusers', ListUsers),
     ('/admin/liststreams', ListStreams)
 ], debug=True)

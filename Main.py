@@ -87,9 +87,9 @@ class ManagePage(webapp2.RequestHandler):
 
 class CreatePage(webapp2.RequestHandler):
     def post(self):
-        
+
         user = users.get_current_user()
-        
+
         streamname = self.request.get('streamname')
         subscribers = self.request.get('subs')
         tags = self.request.get('tags')
