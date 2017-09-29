@@ -18,6 +18,8 @@ class MainPage(webapp2.RequestHandler):
         
         user = users.get_current_user()
         
+        print "MainPage: users.get_current_user(): ", user
+        
         if user:
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
@@ -44,6 +46,9 @@ class ManagePage(webapp2.RequestHandler):
     
         user = users.get_current_user()
         
+        print "ManagePage: users.get_current_user(): ", user
+        print "ManagePage: users.get_current_user().user_id(): ", user.user_id()
+        
         if user:
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
@@ -52,6 +57,10 @@ class ManagePage(webapp2.RequestHandler):
             #Check to see if user is present in StreamUser table, if not add them.
             stream_user = ndb.Key('StreamUser',user.user_id()).get()
             email_dup_check = len(StreamUser.query(StreamUser.email == user.email()).fetch())!=0
+            
+            print "ManagePage: stream_user: ", stream_user
+            print "ManagePage: email_dup_check: ", email_dup_check
+            
             if not stream_user:
                 if email_dup_check:
                     self.response.write("Uh oh! Duplicate email!!!")
@@ -90,6 +99,9 @@ class CreatePage(webapp2.RequestHandler):
     def post(self):
 
         user = users.get_current_user()
+        
+        print "CreatePage: users.get_current_user(): ", user
+        print "CreatePage: users.get_current_user().user_id(): ", user.user_id()
 
         streamname = self.request.get('streamname')
         subscribers = self.request.get('subs')
