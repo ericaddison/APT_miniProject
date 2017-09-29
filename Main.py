@@ -5,41 +5,12 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
+from NdbClasses import *
 import webapp2
-import re
 import os
 
 #If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
-
-class StreamUser(ndb.Model):
-    email = ndb.StringProperty(indexed=True)
-    name = ndb.StringProperty(indexed=False)
-
-class Stream(ndb.Model):
-    name = ndb.StringProperty(indexed=True)
-    user = ndb.StringProperty(indexed=True)
-    coverImageURL = ndb.StringProperty(indexed=False)
-    numViews = ndb.IntegerProperty(indexed=False)
-
-class StreamItem(ndb.Model):
-    streamName = ndb.StringProperty(indexed=True)
-    name = ndb.StringProperty(indexed=False)
-    image = ndb.BlobProperty(indexed=False)
-    dateAdded = ndb.DateProperty(indexed=False)
-
-class Tag(ndb.Model):
-    name = ndb.StringProperty(indexed=True)
-
-class StreamTag(ndb.Model):
-    streamName = ndb.StringProperty(indexed=True)
-    tagName = ndb.StringProperty(indexed=True)
-
-class StreamSubscriber(ndb.Model):
-    streamName = ndb.StringProperty(indexed=True)
-    userEmail = ndb.StringProperty(indexed=True)
-    
-    
     
 
 class MainPage(webapp2.RequestHandler):
@@ -56,15 +27,12 @@ class MainPage(webapp2.RequestHandler):
             login_url = users.create_login_url('/manage')
             login_text = 'Sign in'
 
-
         template_values = {
             'user': user,
             'login_url': login_url,
             'login_text': login_text,
             'app': app_identity.get_application_id()}
 
-
-                
         self.response.content_type = 'text/html'
         
         path = os.path.join(os.path.dirname(__file__), 'index.html')
@@ -82,99 +50,59 @@ class ManagePage(webapp2.RequestHandler):
             login_text = 'Sign out'
             
             #Check to see if user is present in StreamUser table, if not add them.
-            
-            myStreamUser = StreamUser.query(StreamUser.email == user.email()).get()
-            print "myStreamUser query: ", myStreamUser
-            if myStreamUser == None:
-                print "Creating new StreamUser: ", user.email()
-                myStreamUser = StreamUser(email = user.email(), name = nickname)
-                myStreamUser.put()
-            
-            
+            stream_user = ndb.Key('StreamUser',user.user_id()).get()
+            email_dup_check = len(StreamUser.query(StreamUser.email == user.email()).fetch())!=0
+            if not stream_user:
+                if email_dup_check:
+                    self.response.write("Uh oh! Duplicate email!!!")
+                    return
+                print("\n\nAdding new StreamUser by email: {}\n\n".format(str(user.email())))
+                stream_user = StreamUser(email = user.email(), nickName = nickname, id=user.user_id())
+                stream_user.put()
+
         else:
-            login_url = users.create_login_url('/manage')
-            login_text = 'Sign in'
+            self.redirect("/")
+            return
 
-        
-        #NUCLEAR OPTION:
-        #allSubs = StreamSubscriber.query()
-        #for sub in allSubs:
-        #    sub.key.delete()
-            
-        #allSubs = Stream.query()
-        #for sub in allSubs:
-        #    sub.key.delete()
-        
-        
-        allSubs = StreamSubscriber.query()
-        for sub in allSubs:
-            print "StreamSubscriber: ", sub
-            
-        #allSubs = Stream.query()
-        #for sub in allSubs:
-        #    sub.key.delete()
-        
+        # get streams owned by this user
+        user_streams = Stream.query(Stream.owner == stream_user.key).fetch()
+        print("\nstreams owned by {0}: {1}".format(str(user.nickname()), str(user_streams)))
 
-        
-        
-        
-        #streamsOwn = Stream.query(ancestor=myStreamUser.key).fetch()
-        streamsOwn = Stream.query(Stream.user == myStreamUser.key).fetch()
-        print "streamsOwn: ", streamsOwn
-        
-        
-        print "myStreamUser.key: ", myStreamUser.key
-        
-        myStreamSubscriber = StreamSubscriber.query(ancestor=myStreamUser.key).fetch()
-        
-        print "myStreamSubscriber: ", myStreamSubscriber
-        
-        mySubbedStreams = []
-        for streamSub in myStreamSubscriber:
-            mySubbedStreams.append(Stream.query(ancestor=streamSub.key).fetch())
-            
-            
-        print "mySubbedStreams: ", mySubbedStreams
-        
-        
+        # get streams subscribed by this user
+        user_subscriptions = StreamSubscriber.query(StreamSubscriber.user == stream_user.key).fetch()
+        print("\nstreams subscribed to by {0}: {1}".format(user.nickname(), user_subscriptions))
 
         template_values = {
             'user': user,
+            'isAdmin': users.IsCurrentUserAdmin(),
             'login_url': login_url,
             'login_text': login_text,
-            'streams': streamsOwn,
-            'subscribe': mySubbedStreams,
+            'streams': user_streams,
+            'subscribe': user_subscriptions,
             'app': app_identity.get_application_id()}
 
-
-                
         self.response.content_type = 'text/html'
         path = os.path.join(os.path.dirname(__file__), 'manage.html')
         self.response.write(template.render(path, template_values))
         
-        
+
 class CreatePage(webapp2.RequestHandler):
     def post(self):
-        
+
         user = users.get_current_user()
-        
+
         streamname = self.request.get('streamname')
         subscribers = self.request.get('subs')
         tags = self.request.get('tags')
         coverImageUrl = self.request.get('coverUrl')
-        myStreamUser = StreamUser.query(StreamUser.email==user.email()).get()
+        myStreamUser = StreamUser.query(StreamUser.key==ndb.Key('StreamUser',user.user_id())).get()
         
         
         subscriberArray = subscribers.split(";") 
         tagArray = tags.split(";")
-        
-           
-    
-        #Create a new Stream entity then redirect to /view the new stream
 
-        
-        
-        newStream = Stream(name=streamname, user=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0)
+        #Create a new Stream entity then redirect to /view the new stream
+        newStream = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0)
         newStream.put()
         
         print "len(subscriberArray) = ", len(subscriberArray)
@@ -182,13 +110,19 @@ class CreatePage(webapp2.RequestHandler):
         for subby in subscriberArray:
             print "subby = ", subby
             myUser = StreamUser.query(StreamUser.email == subby).get()
-            newSub = StreamSubscriber(stream = newStream.key, user = myUser.key)
-            newSub.put()
-        
+            if myUser:
+                newSub = StreamSubscriber(stream = newStream.key, user = myUser.key)
+                newSub.put()
+            else:
+                print("\nNo user found with email {}".format(subby))
+
+        print("\n\ntags = {}\n\n".format(tagArray))
+
         for myTag in tagArray:
-            newTag = Tag.get_or_insert(myTag)
-            newStreamTag = StreamTag(stream = newStream.key, tag = newTag.key)
-            newStreamTag.put()
+            if myTag:
+                newTag = Tag.get_or_insert(myTag)
+                newStreamTag = StreamTag(stream = newStream.key, tag = newTag.key)
+                newStreamTag.put()
             
         #Redirect to /view for this stream
         self.redirect('/manage')

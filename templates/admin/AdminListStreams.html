@@ -1,0 +1,34 @@
+{% extends "templates/admin/AdminTemplate.html" %}
+
+{% block title %}Connexion All Streams{% endblock %}
+
+{% block section_title %}All Streams{% endblock %}
+
+{% block liststreams_active%}active{% endblock %}
+
+{% block content %}
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>streamID</th>
+          <th>name</th>
+          <th>owner</th>
+          <th>cover image URL</th>
+          <th>number of views</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stream in streams %}
+          <tr>
+            <td>{{ stream.key.id() }}</td>
+            <td>{{ stream.name }}</td>
+            <td>{{ stream.owner.get().nickName }}</td>
+            <td><a href="{{ stream.coverImageURL }}" title="{{ stream.coverImageURL }}">link</a></td>
+            <td>{{ stream.numViews }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
