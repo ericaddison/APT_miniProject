@@ -187,11 +187,59 @@ class CreatePage(webapp2.RequestHandler):
         self.response.write(template.render(path, template_values))        
         
 
+        
+        
+class ViewPage(webapp2.RequestHandler):
+    def get(self):
+    
+        user = users.get_current_user()
+
+        streamID = self.request.get('id')
+        
+        print "ViewPage: streamID = ", streamID
+        
+        if user:
+            nickname = user.nickname()
+            login_url = users.create_logout_url('/')
+            login_text = 'Sign out'
+         
+        else:
+            self.redirect("/")
+            return
+
+        
+        thisStreamKey = ndb.Key('Stream', streamID)
+        print "thisStreamKey = ", thisStreamKey
+        
+        thisStream = Stream.query(Stream.key == thisStreamKey).fetch()
+        print "thisStream = ", thisStream
+        
+        
+        #user_streams = Stream.query(Stream.key == myuser).fetch()
+        #print("\nstreams owned by {0}: {1}".format(str(user.nickname()), str(user_streams)))
+        
+
+
+        template_values = {
+            'user': user,
+            'isAdmin': users.IsCurrentUserAdmin(),
+            'login_url': login_url,
+            'login_text': login_text,
+            'thisStream': thisStream,
+            'app': app_identity.get_application_id()}
+
+        self.response.content_type = 'text/html'
+        path = os.path.join(os.path.dirname(__file__), 'view.html')
+        self.response.write(template.render(path, template_values))        
+        
+        
+        
 # define the "app" that will be referenced from app.yaml
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/manage', ManagePage),
-    ('/create', CreatePage)
+    ('/create', CreatePage),
+    ('/view', ViewPage)
 ], debug=True)
 
 
