@@ -33,6 +33,7 @@ class ViewStreamService(webapp2.RequestHandler):
         # retrieve request parameters
         stream_id = self.request.GET[stream_id_parm]
         image_range = self.request.GET[image_range_parm]
+        response[stream_id_parm] = stream_id
 
         # verify image range format
         m = re.match("^([\d]+)-([\d]+)$", image_range)
@@ -50,6 +51,10 @@ class ViewStreamService(webapp2.RequestHandler):
             self.response.set_status(400)
             self.response.write(json.dumps(response))
             return
+
+        # write some stream info
+        response['streamName'] = stream.name
+        response['streamOwner'] = stream.owner.get().nickName
 
         # get the indices
         ind1, ind2 = sorted([int(ind) for ind in m.groups()])

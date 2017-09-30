@@ -52,6 +52,7 @@ class ListStreams(webapp2.RequestHandler):
 
         template_values = {
             'streams': all_streams,
+            'len': len
         }
 
         template = JINJA_ENVIRONMENT.get_template('templates/admin/AdminListStreams.html')
