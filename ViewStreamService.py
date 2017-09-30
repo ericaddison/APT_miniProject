@@ -54,20 +54,17 @@ class ViewStreamService(webapp2.RequestHandler):
         # get the indices
         ind1, ind2 = sorted([int(ind) for ind in m.groups()])
 
+        l = len(stream.items)
+        ind1 = max(1, min(l, ind1))
+        ind2 = max(1, min(l, ind2))
+
         # query for images
-        query1 = StreamItem.query()
-        query2 = query1.filter(StreamItem.index >= ind1)
-        query3 = query2.filter(StreamItem.index <= ind2)
-        images = query3.fetch()
+        image_urls = [key.get().URL for key in stream.items[ind1-1:ind2]]
 
-        images_sorted = sorted(images, key=(lambda x: x.index))
-
-        image_urls = [image.URL for image in images_sorted]
-
-        if len(images)==0:
+        if len(image_urls) == 0:
             response[image_range_parm] = None
         else:
-            response[image_range_parm] = "{}-{}".format(images_sorted[0].index, images_sorted[-1].index)
+            response[image_range_parm] = "{}-{}".format(ind1, ind2)
 
         response['urls'] = image_urls
         self.response.write(json.dumps(response))
