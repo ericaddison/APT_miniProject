@@ -190,11 +190,19 @@ class CreatePage(webapp2.RequestHandler):
         
         
 class ViewPage(webapp2.RequestHandler):
+    def post(self):
+        
+        #User will be adding a new image to the stream.
+        #GET the values they POSTED, create the new StreamItem, then redirect back to '/view?id=<<streamKeyID>>'
+    
+    
+    
     def get(self):
     
         user = users.get_current_user()
 
         streamID = self.request.get('id')
+        streamKey = ndb.Key('Stream', int(streamID))
         
         print "ViewPage: streamID = ", streamID
         
@@ -206,18 +214,11 @@ class ViewPage(webapp2.RequestHandler):
         else:
             self.redirect("/")
             return
-
         
-        thisStreamKey = ndb.Key('Stream', streamID)
-        print "thisStreamKey = ", thisStreamKey
+        thisStream = Stream.get_by_id(int(streamID))
+        streamItems = StreamItem.query(StreamItem.stream == streamKey).fetch()
         
-        thisStream = Stream.query(Stream.key == thisStreamKey).fetch()
-        print "thisStream = ", thisStream
-        
-        
-        #user_streams = Stream.query(Stream.key == myuser).fetch()
-        #print("\nstreams owned by {0}: {1}".format(str(user.nickname()), str(user_streams)))
-        
+        #TODO:  Form to let user add a new image to this stream.  Then reload page to display the updated stream
 
 
         template_values = {
