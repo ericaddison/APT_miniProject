@@ -23,7 +23,9 @@
     <b>Streams I own:</b><br>
             {% for stream in streams %}
                {% if stream.coverImageURL %}
+                <a href="/viewstream?streamID={{ stream.key.id }}">
                 <img src = "{{ stream.coverImageURL }}"  style="width:100px;height:100px;">
+                </a>
                {% endif %}
                Name: {{ stream.name }}  User: {{ stream.user }} Number of Views: {{ stream.numViews }}<br>
     

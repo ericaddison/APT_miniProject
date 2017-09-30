@@ -15,7 +15,7 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 stream_id_parm = 'streamID'
 
 
-class UploadFileForm(webapp2.RequestHandler):
+class ViewStream(webapp2.RequestHandler):
     def get(self):
 
         # retrieve request parameters
@@ -29,7 +29,6 @@ class UploadFileForm(webapp2.RequestHandler):
             return
 
         upload_url = blobstore.create_upload_url('/services/upload')
-
 
         # make call to viewimage service
         viewstream_service_url = 'http://localhost:8080/services/viewstream?streamID={0};imageRange={1}'.format(stream_id, '1-10')
@@ -50,5 +49,5 @@ class UploadFileForm(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/viewstream', UploadFileForm)
+    ('/viewstream', ViewStream)
 ], debug=True)
