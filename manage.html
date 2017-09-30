@@ -3,49 +3,70 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    
+
+    <style>
+        table {font-family: arial, sans-serif;border-collapse: collapse; width: 70%;}
+        td, th {border: 1px solid #dddddd;text-align: left; padding: 8px;}
+        tr:nth-child(even) {background-color: #dddddd;}
+    </style>
   
     <title>Connexion Management Page!</title>
 </head>
 <body>
-    Connexion Management Page!<br>
-
+    <h1>Connex.us</h1>
     {% if user %}
-        You're signed in as {{ user }} <br>
-        <a href="{{ login_url }}"> {{ login_text }}</a> <br>
-        {% if isAdmin %}
-            <a href="/admin/dashboard">Admin Menu</a> <br>
-        {% endif %}
+        You're signed in as {{ user }} | <a href="{{ login_url }}"> {{ login_text }}</a> 
+        {% if isAdmin %} | <a href="/admin/dashboard">Admin Menu</a> {% endif %} <br> 
     {% endif %}
-
-    <a href="create">Create Stream</a><br>
-
-    <b>Streams I own:</b><br>
+    <hr>
+    <a href="manage">Manage</a> |
+    <a href="create">Create</a> |
+    <a href="view">View</a> |
+    <a href="search">Search</a> |
+    <a href="trending">Trending</a>
+    <p>
+        
+         <table>
+             <tr><b>Owned Streams:</b></tr>
+            <tr>
+                <th>Name</th>
+                <th>Latest Update</th>
+                <th>Number of Pictures</th>
+                <th>Delete</th>
+            </tr>
             {% for stream in streams %}
-               {% if stream.coverImageURL %}
-                <img src = "{{ stream.coverImageURL }}"  style="width:100px;height:100px;">
-               {% endif %}
-               Name: {{ stream.name }}  User: {{ stream.user }} Number of Views: {{ stream.numViews }}<br>
-    
-                <br>
+            <tr>
+                <td><a href='view?id={{ stream.key }}'> {{ stream.streamName }} </a></td>
+                <td>{{ stream.newestDate }}</td>
+                <td>{{ stream.counter }}</td>
+                <td>[CHECKBOX]</td>
+            </tr>
             {% endfor %}
-    
+        </table>
+    TODO:  Button here to delete the checked streams.<br>
 
     <p>
         
-    <b>Streams I subscribe to:</b><br>
+         <table>
+             <tr><b>Subscribed Streams:</b></tr>
+            <tr>
+                <th>Name</th>
+                <th>Latest Update</th>
+                <th>Number of Pictures</th>
+                <th>Views</th>
+                <th>Unsubscribe</th>
+            </tr>
             {% for stream in subscribe %}
-                {% if stream.coverImageURL %}
-                    <img src = "{{ stream.coverImageURL }}"  style="width:100px;height:100px;">
-                {% endif %}
-                Name: {{ stream.name }}  User: {{ stream.user }}  Number of Views: {{ stream.numViews }}<br>
-                <br>
+            <tr>
+                <td><a href='view?id={{ stream.key }}'> {{ stream.streamName }}</a></td>
+                <td>{{ stream.newestDate }}</td>
+                <td>{{ stream.counter }}</td>
+                <td>{{ stream.views }}</td>
+                <td>[CHECKBOX]</td>
+            </tr>
             {% endfor %}
-    
-        
-    <p>
-
-
+        </table>
+    TODO: Button here to unsubscribe from the checked streams.<br>
 
 </body>
 </html>

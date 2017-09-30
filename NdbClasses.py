@@ -6,11 +6,12 @@ class Stream(ndb.Model):
     name = ndb.StringProperty(indexed=False)
     coverImageURL = ndb.StringProperty(indexed=False)
     numViews = ndb.IntegerProperty(indexed=False)
-
+    tags = ndb.StringProperty(repeated=True)
+    subscribers = ndb.KeyProperty(repeated=True, kind='StreamUser')
 
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
-    owner = ndb.KeyProperty(indexed=True, kind='User')
+    owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
     name = ndb.StringProperty(indexed=False)
     blobKey = ndb.BlobKeyProperty(indexed=False)
     URL = ndb.StringProperty(indexed=False)

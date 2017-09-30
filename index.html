@@ -13,8 +13,9 @@ Welcome to Connexion! <br>
 
         <a href= "{{ login_url }}" >  {{ login_text }}</a><br>
         <br><br>
+    {% if user %}
         <a href= "/manage">Manage Your Streams</a><br>
-    
+    {% endif %}
 
 </body>
 </html>
