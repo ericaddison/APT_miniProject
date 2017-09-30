@@ -47,9 +47,7 @@ class ManagePage(webapp2.RequestHandler):
     def get(self):
     
         user = users.get_current_user()
-        
-        print "ManagePage: users.get_current_user(): ", user
-        print "ManagePage: users.get_current_user().user_id(): ", user.user_id()
+
         
         if user:
             nickname = user.nickname()
@@ -140,9 +138,6 @@ class CreatePage(webapp2.RequestHandler):
     def post(self):
 
         user = users.get_current_user()
-        
-        print "CreatePage: users.get_current_user(): ", user
-        print "CreatePage: users.get_current_user().user_id(): ", user.user_id()
 
         streamname = self.request.get('streamname')
         subscribers = self.request.get('subs')
@@ -177,8 +172,8 @@ class CreatePage(webapp2.RequestHandler):
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
         else:
-            login_url = users.create_login_url('/manage')
-            login_text = 'Sign in'
+            self.redirect("/")
+            return
 
         template_values = {
             'user': user,
