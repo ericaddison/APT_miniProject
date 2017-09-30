@@ -10,7 +10,8 @@ class Stream(ndb.Model):
 
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
-    owner = ndb.KeyProperty(indexed=True, kind='User')
+    owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
+    index = ndb.IntegerProperty(indexed=True)
     name = ndb.StringProperty(indexed=False)
     blobKey = ndb.BlobKeyProperty(indexed=False)
     URL = ndb.StringProperty(indexed=False)

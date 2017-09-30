@@ -16,6 +16,10 @@ handlers:
   script: Admin.app
 
 # [START services]
+- url: /services/viewstream
+  script: ViewStreamService.app
+- url: /services/insertteststream
+  script: InsertTestStream.app
 - url: /services/.*
   script: services.app
 # [END services]

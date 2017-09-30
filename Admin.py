@@ -35,6 +35,8 @@ class ListUsers(webapp2.RequestHandler):
             'users': all_users
         }
 
+
+
         template = JINJA_ENVIRONMENT.get_template('templates/admin/AdminListUsers.html')
         self.response.write(template.render(template_values))
 
@@ -49,12 +51,11 @@ class ListStreams(webapp2.RequestHandler):
         all_streams = Stream.query().fetch()
 
         template_values = {
-            'streams': all_streams
+            'streams': all_streams,
         }
 
         template = JINJA_ENVIRONMENT.get_template('templates/admin/AdminListStreams.html')
         self.response.write(template.render(template_values))
-
 
 
 app = webapp2.WSGIApplication([
