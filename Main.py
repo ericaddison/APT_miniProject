@@ -194,31 +194,57 @@ class ViewPage(webapp2.RequestHandler):
         
         #User will be adding a new image to the stream.
         #GET the values they POSTED, create the new StreamItem, then redirect back to '/view?id=<<streamKeyID>>'
-    
+        return
     
     
     def get(self):
     
         user = users.get_current_user()
 
-        streamID = self.request.get('id')
-        streamKey = ndb.Key('Stream', int(streamID))
-        
-        print "ViewPage: streamID = ", streamID
-        
         if user:
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
-         
         else:
             self.redirect("/")
             return
+
         
-        thisStream = Stream.get_by_id(int(streamID))
-        streamItems = StreamItem.query(StreamItem.stream == streamKey).fetch()
+        streamID = self.request.get('id')
+
+        allStreams = Stream.query().fetch()
+        all_streams = []
+
+
+        for parentStream in allStreams:
+            streamItems = StreamItem.query(StreamItem.stream == parentStream.key).fetch()
+            counter =  0
+            newestItemDate = datetime.date(1900,1, 1)
+            streamDict = {}
+            for item in streamItems:
+                counter += 1
+                if item.dateAdded > newestItemDate:
+                    newestItemDate = item.dateAdded
+            streamDict = {'streamName': parentStream.name, 'counter': counter, 'newestDate': newestItemDate, 'views': parentStream.numViews, 'key': parentStream.key.id()}
+            all_streams.append(streamDict)
+
+            
+        thisStream = None            
+        if streamID != "":    
+            streamKey = ndb.Key('Stream', int(streamID))
         
-        #TODO:  Form to let user add a new image to this stream.  Then reload page to display the updated stream
+            print "ViewPage: streamID = ", streamID
+        
+            thisStream = Stream.get_by_id(int(streamID))
+            streamItems = StreamItem.query(StreamItem.stream == streamKey).fetch()
+        
+            #Increment the numViews counter on the Stream object.
+            thisStream.numViews = thisStream.numViews + 1
+            thisStream.put()
+        
+        
+        
+        #TODO:  Add form to let user add a new image to this stream.  Then reload page to display the updated stream
 
 
         template_values = {
@@ -227,6 +253,7 @@ class ViewPage(webapp2.RequestHandler):
             'login_url': login_url,
             'login_text': login_text,
             'thisStream': thisStream,
+            'streams': all_streams,
             'app': app_identity.get_application_id()}
 
         self.response.content_type = 'text/html'
