@@ -16,6 +16,7 @@
           <th>owner</th>
           <th>cover image URL</th>
           <th>number of views</th>
+          <th>number of items</th>
         </tr>
       </thead>
       <tbody>
@@ -26,6 +27,7 @@
             <td>{{ stream.owner.get().nickName }}</td>
             <td><a href="{{ stream.coverImageURL }}" title="{{ stream.coverImageURL }}">link</a></td>
             <td>{{ stream.numViews }}</td>
+            <td>{{ len(stream.items) }}</td>
           </tr>
         {% endfor %}
       </tbody>

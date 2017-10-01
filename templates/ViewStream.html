@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Stream {{ stream.name }}</title>
+</head>
+<body>
+
+Here is a stream!
+
+The first two images are:<br>
+{% for url in image_urls %}
+<img src="{{url}}">
+<br>
+{% endfor %}
+
+        <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+            <br>
+          Upload File: <br><input type="file" name="file"><br>
+          <input type="hidden" name="streamID" value="{{ stream.key.id() }}"><br>
+          <input type="submit" name="submit" value="Submit">
+        </form>
+
+
+
+</body>
+</html>
