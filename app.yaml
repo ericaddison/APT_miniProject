@@ -19,11 +19,13 @@ handlers:
 
 # [START services]
 - url: /services/viewstream
-  script: ViewStreamService.app
+  script: Service_ViewStream.app
 - url: /services/insertteststream
   script: InsertTestStream.app
 - url: /services/upload.*
-  script: UploadFileService.app
+  script: Service_UploadFile.app
+- url: /services/management
+  script: Service_Management.app
 # [END services]
 
 - url: /css
