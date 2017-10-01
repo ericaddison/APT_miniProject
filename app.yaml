@@ -8,6 +8,8 @@ handlers:
 - url: /admindash/.*
   script: google.appengine.ext.admin.application
 
+- url: /viewstream
+  script: ViewStream.app
 
 - url: /admin/notadmin
   static_files: templates/admin/NotAdmin.html
@@ -16,8 +18,12 @@ handlers:
   script: Admin.app
 
 # [START services]
-- url: /services/.*
-  script: services.app
+- url: /services/viewstream
+  script: ViewStreamService.app
+- url: /services/insertteststream
+  script: InsertTestStream.app
+- url: /services/upload.*
+  script: UploadFileService.app
 # [END services]
 
 - url: /css
