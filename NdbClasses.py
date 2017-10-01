@@ -9,7 +9,6 @@ class Stream(ndb.Model):
     items = ndb.KeyProperty(indexed=False, kind='StreamItem', repeated=True)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
-
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
@@ -20,7 +19,7 @@ class StreamItem(ndb.Model):
 
 
 class Tag(ndb.Model):
-    name = ndb.StringProperty(indexed=False)
+    name = ndb.StringProperty(indexed=True)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
 

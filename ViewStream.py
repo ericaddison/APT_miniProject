@@ -22,7 +22,11 @@ class ViewStream(webapp2.RequestHandler):
         stream_id = self.request.GET[stream_id_parm]
 
         # retrieve the stream from the ID
-        stream = (ndb.Key('Stream', int(stream_id))).get()
+        try:
+            stream = (ndb.Key('Stream', int(stream_id))).get()
+        except:
+            self.redirect('/')
+            return
 
         if stream is None:
             self.redirect('/')

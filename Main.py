@@ -9,6 +9,8 @@ from NdbClasses import *
 import webapp2
 import os
 
+import datetime
+
 #If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
     
@@ -45,9 +47,7 @@ class ManagePage(webapp2.RequestHandler):
     def get(self):
     
         user = users.get_current_user()
-        
-        print "ManagePage: users.get_current_user(): ", user
-        print "ManagePage: users.get_current_user().user_id(): ", user.user_id()
+
         
         if user:
             nickname = user.nickname()
@@ -74,20 +74,49 @@ class ManagePage(webapp2.RequestHandler):
             return
 
         # get streams owned by this user
-        user_streams = Stream.query(Stream.owner == stream_user.key).fetch()
+        myuser = ndb.Key('StreamUser', stream_user.key.id())
+        user_streams = Stream.query(Stream.owner == myuser).fetch()
         print("\nstreams owned by {0}: {1}".format(str(user.nickname()), str(user_streams)))
+        
+        
+        owned_streams = []
+
+        for stream in user_streams:
+            print("parentStream: {}".format(stream))
+            newestDate = ""
+            if len(stream.items) > 0:
+                newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
+            streamDict = {'streamName': stream.name, 'counter': len(stream.items), 'newestDate': newestDate, 'id': stream.key.id()}
+            owned_streams.append(streamDict)
+        
+        
+        
 
         # get streams subscribed by this user
         user_subscriptions = StreamSubscriber.query(StreamSubscriber.user == stream_user.key).fetch()
         print("\nstreams subscribed to by {0}: {1}".format(user.nickname(), user_subscriptions))
+        
+        subbed_streams = []
+
+        for stream in user_streams:
+            print("parentStream: {}".format(stream))
+            newestDate = ""
+            if len(stream.items) > 0:
+                newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
+            streamDict = {'streamName': stream.name, 'counter': len(stream.items), 'newestDate': newestDate,
+                          'id': stream.key.id()}
+            subbed_streams.append(streamDict)
+        
+        print("owned_streams: {}".format(owned_streams))
+        print("subbed_streams: {}".format(subbed_streams))
 
         template_values = {
             'user': user,
             'isAdmin': users.IsCurrentUserAdmin(),
             'login_url': login_url,
             'login_text': login_text,
-            'streams': user_streams,
-            'subscribe': user_subscriptions,
+            'streams': owned_streams,
+            'subscribe': subbed_streams,
             'app': app_identity.get_application_id()}
 
         self.response.content_type = 'text/html'
@@ -99,43 +128,42 @@ class CreatePage(webapp2.RequestHandler):
     def post(self):
 
         user = users.get_current_user()
-        
-        print "CreatePage: users.get_current_user(): ", user
-        print "CreatePage: users.get_current_user().user_id(): ", user.user_id()
 
         streamname = self.request.get('streamname')
         subscribers = self.request.get('subs')
         tags = self.request.get('tags')
         coverImageUrl = self.request.get('coverUrl')
-        myStreamUser = StreamUser.query(StreamUser.key==ndb.Key('StreamUser',user.user_id())).get()
+        myStreamUser = ndb.Key('StreamUser', user.user_id()).get()
         
         
         subscriberArray = subscribers.split(";") 
         tagArray = tags.split(";")
 
+        subUserArray = StreamUser.query(StreamUser.email.IN(subscriberArray)).fetch()
+        subUserKeys = [sub.key for sub in subUserArray]
+
+        tagEntityArray = Tag.query(Tag.name.IN(tagArray)).fetch()
+        tagKeys = [tag.key for tag in tagEntityArray]
+        tagNames = [tag.name for tag in tagEntityArray]
+
         #Create a new Stream entity then redirect to /view the new stream
-        newStream = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0)
-        newStream.put()
-        
-        print "len(subscriberArray) = ", len(subscriberArray)
-        
-        for subby in subscriberArray:
-            print "subby = ", subby
-            myUser = StreamUser.query(StreamUser.email == subby).get()
-            if myUser:
-                newSub = StreamSubscriber(stream = newStream.key, user = myUser.key)
-                newSub.put()
-            else:
-                print("\nNo user found with email {}".format(subby))
+        newStreamKey = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0).put()
 
-        print("\n\ntags = {}\n\n".format(tagArray))
 
-        for myTag in tagArray:
-            if myTag:
-                newTag = Tag.get_or_insert(myTag)
-                newStreamTag = StreamTag(stream = newStream.key, tag = newTag.key)
-                newStreamTag.put()
-            
+        # create new subscriptions for the given users
+        for sub in subUserKeys:
+            StreamSubscriber(stream=newStreamKey, user=sub).put()
+
+        # associate current tags
+        for tag in tagKeys:
+            StreamTag(stream=newStreamKey, tag=tag).put()
+
+        # create any new tags
+        for tag in tagArray:
+            if tag not in tagNames:
+                tagKey = Tag(name=tag).put()
+                StreamTag(stream=newStreamKey, tag=tagKey).put()
+
         #Redirect to /view for this stream
         self.redirect('/manage')
     
@@ -148,8 +176,8 @@ class CreatePage(webapp2.RequestHandler):
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
         else:
-            login_url = users.create_login_url('/manage')
-            login_text = 'Sign in'
+            self.redirect("/")
+            return
 
         template_values = {
             'user': user,
