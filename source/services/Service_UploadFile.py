@@ -1,11 +1,11 @@
-from google.appengine.api import users
-from google.appengine.api import images
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext import ndb
-import json
 import webapp2
-from NdbClasses import *
-from Service_Utils import *
+from google.appengine.api import images
+from google.appengine.api import users
+from google.appengine.ext import ndb
+from google.appengine.ext.webapp import blobstore_handlers
+
+from source.models.NdbClasses import *
+from source.services.Service_Utils import *
 
 
 # expects a POST parameter 'streamID' containing the stream ID

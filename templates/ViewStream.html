@@ -25,8 +25,8 @@ Here is stream: {{ stream.name }}!
     <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
         <br>
       Upload File: <br><input type="file" name="file"><br>
-      <input type="hidden" name="streamID" value="{{ stream.key.id() }}"><br>
-      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream.key.id() }}">
+      <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
+      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream.key.id }}">
       <input type="submit" name="submit" value="Submit">
     </form>
 

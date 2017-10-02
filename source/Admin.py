@@ -1,15 +1,15 @@
-from google.appengine.api import users
-from google.appengine.ext.webapp import template
-import webapp2
-
 import os
+
 import jinja2
+import webapp2
+from google.appengine.api import users
+
 JINJA_ENVIRONMENT = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'],
     autoescape=True)
 
-from NdbClasses import *
+from source.models.NdbClasses import *
 
 
 class AdminDashboard(webapp2.RequestHandler):

@@ -1,7 +1,7 @@
 import webapp2
-import json
-from NdbClasses import *
-from Service_Utils import *
+
+from source.models.NdbClasses import *
+from source.services.Service_Utils import *
 
 stream_id_parm = 'streamID'
 user_id_parm = 'userID'

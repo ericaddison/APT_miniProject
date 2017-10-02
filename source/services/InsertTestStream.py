@@ -1,6 +1,6 @@
-from google.appengine.ext import ndb
 import webapp2
-from NdbClasses import *
+
+from source.models.NdbClasses import *
 
 
 # create a test stream in the database
