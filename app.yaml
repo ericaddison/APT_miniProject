@@ -37,6 +37,8 @@ handlers:
   script: source.services.Service_Subscribe.app
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
+- url: /services/search
+  script: source.services.Service_TextSearch.app
 # [END services]
 
 - url: /css
