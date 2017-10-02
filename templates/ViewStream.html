@@ -6,21 +6,36 @@
 </head>
 <body>
 
-Here is a stream!
+    <h1>Connex.us</h1>
+    {% if user %}
+        You're signed in as {{ user }} | <a href="{{ login_url }}"> {{ login_text }}</a>
+        {% if isAdmin %} | <a href="/admin/dashboard">Admin Menu</a> {% endif %} <br>
+    {% endif %}
+    <hr>
+    <a href="manage">Manage</a> |
+    <a href="create">Create</a> |
+    <a href="view">View</a> |
+    <a href="search">Search</a> |
+    <a href="trending">Trending</a> |
+    <a href="social">Social</a>
 
-The first two images are:<br>
+<br><br>
+Here is stream: {{ stream.name }}!
+
+    <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+        <br>
+      Upload File: <br><input type="file" name="file"><br>
+      <input type="hidden" name="streamID" value="{{ stream.key.id() }}"><br>
+      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream.key.id() }}">
+      <input type="submit" name="submit" value="Submit">
+    </form>
+
+    <br><br>
+The first ten images are:<br><br>
 {% for url in image_urls %}
 <img src="{{url}}">
 <br>
 {% endfor %}
-
-        <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-            <br>
-          Upload File: <br><input type="file" name="file"><br>
-          <input type="hidden" name="streamID" value="{{ stream.key.id() }}"><br>
-          <input type="submit" name="submit" value="Submit">
-        </form>
-
 
 
 </body>

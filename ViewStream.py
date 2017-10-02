@@ -48,6 +48,7 @@ class ViewStream(webapp2.RequestHandler):
         result = urllib2.urlopen(viewstream_service_url)
         response = json.loads("".join(result.readlines()))
         image_urls = [str(url) for url in response['urls']]
+        image_urls.reverse()
 
         template_values = {
                     'stream': stream,
