@@ -1,8 +1,8 @@
-from google.appengine.ext import ndb
 import webapp2
-import json
-from NdbClasses import *
-from Service_Utils import *
+from google.appengine.ext import ndb
+
+from source.models.NdbClasses import *
+from source.services.Service_Utils import *
 
 
 # subscribe to a stream

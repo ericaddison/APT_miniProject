@@ -1,10 +1,6 @@
-from google.appengine.api import users
-from google.appengine.ext import ndb
 import webapp2
-import re
-import json
-from NdbClasses import *
-from Service_Utils import *
+
+from source.services.Service_Utils import *
 
 
 # view a stream
