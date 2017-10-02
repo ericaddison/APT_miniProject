@@ -5,6 +5,33 @@ from google.appengine.ext import ndb
 stream_id_parm = 'streamID'
 user_id_parm = 'userID'
 image_range_parm = 'imageRange'
+tag_name_parm = 'tagName'
+
+
+def get_tag_param(handler, response):
+    # request parameter error checking
+    tag_name = handler.request.get(tag_name_parm)
+    if tag_name is None:
+        response['error'] = "No tagName found"
+        handler.response.set_status(400)
+        handler.response.write(json.dumps(response))
+        return
+
+    response[tag_name_parm] = tag_name
+
+    if tag_name == "":
+        tag_name = "empty_tag"
+
+    # retrieve the stream from the ID
+    tag = ndb.Key('Tag', tag_name).get()
+
+    if tag is None:
+        response['error'] = "Invalid tag name"
+        handler.response.set_status(400)
+        handler.response.write(json.dumps(response))
+        return
+
+    return tag
 
 
 def get_stream_param(handler, response):
