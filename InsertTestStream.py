@@ -7,7 +7,6 @@ from NdbClasses import *
 class TestStreamService(webapp2.RequestHandler):
     def get(self):
 
-
         # see if the owner user has already been created
         owner_email = 'tester@test.com'
         owner = StreamUser.query(StreamUser.email == owner_email).get()
@@ -15,7 +14,8 @@ class TestStreamService(webapp2.RequestHandler):
             owner = StreamUser(email=owner_email,
                                firstName='Test',
                                lastName='the Tester',
-                               nickName='testy')
+                               nickName='testy',
+                               id=str(12345))
             owner.put()
 
         # see if this test stream has already been created

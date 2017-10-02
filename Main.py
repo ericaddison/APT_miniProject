@@ -66,7 +66,7 @@ class ManagePage(webapp2.RequestHandler):
                     self.response.write("Uh oh! Duplicate email!!!")
                     return
                 print("\n\nAdding new StreamUser by email: {}\n\n".format(str(user.email())))
-                stream_user = StreamUser(email = user.email(), nickName = nickname, id=user.user_id())
+                stream_user = StreamUser(email = user.email(), nickName = nickname, id=str(user.user_id()))
                 stream_user.put()
 
         else:

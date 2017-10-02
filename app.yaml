@@ -26,6 +26,8 @@ handlers:
   script: Service_UploadFile.app
 - url: /services/management
   script: Service_Management.app
+- url: /services/deletestream
+  script: Service_DeleteStream.app
 # [END services]
 
 - url: /css
