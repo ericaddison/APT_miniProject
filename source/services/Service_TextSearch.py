@@ -5,8 +5,10 @@ from source.services.Service_Utils import *
 
 search_parm = 'searchString'
 
+
 # search for streams
 # takes a text string, returns streams that have the string in the name or tags
+# do better ... use the google search API...
 class StreamTextSearchService(webapp2.RequestHandler):
     def get(self):
 
@@ -25,7 +27,6 @@ class StreamTextSearchService(webapp2.RequestHandler):
         all_tags = Tag.query().fetch()
         matching_tags = [tag.key.id() for tag in all_tags if search_string.lower() in tag.name.lower()]
         response['tags'] = matching_tags
-
 
         # search all streams
         all_streams = Stream.query().fetch()
