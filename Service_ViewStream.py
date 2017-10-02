@@ -4,9 +4,7 @@ import webapp2
 import re
 import json
 from NdbClasses import *
-
-stream_id_parm = 'streamID'
-image_range_parm = 'imageRange'
+from Service_Utils import *
 
 
 # view a stream
@@ -17,39 +15,8 @@ class ViewStreamService(webapp2.RequestHandler):
         self.response.content_type = 'text/plain'
         response = {}
 
-        # request parameter error checking
-        if stream_id_parm not in self.request.GET.keys():
-            response['error'] = "No streamID found"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        if image_range_parm not in self.request.GET.keys():
-            response['error'] = "No image range found"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        # retrieve request parameters
-        stream_id = self.request.GET[stream_id_parm]
-        image_range = self.request.GET[image_range_parm]
-        response[stream_id_parm] = stream_id
-
-        # verify image range format
-        m = re.match("^([\d]+)-([\d]+)$", image_range)
-        if m is None:
-            response['error'] = "Incorrect image range format. Expected <number>-<number>"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        # retrieve the stream from the ID
-        stream = (ndb.Key('Stream', int(stream_id))).get()
-
+        stream = get_stream_param(self, response)
         if stream is None:
-            response['error'] = "Invalid stream ID"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
             return
 
         # write some stream info
@@ -57,7 +24,10 @@ class ViewStreamService(webapp2.RequestHandler):
         response['streamOwner'] = stream.owner.get().nickName
 
         # get the indices
-        ind1, ind2 = sorted([int(ind) for ind in m.groups()])
+        ind1, ind2 = get_image_range_param(self, response)
+
+        if ind1 is None or ind2 is None:
+            return
 
         l = len(stream.items)
         ind1 = max(1, min(l, ind1))

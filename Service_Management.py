@@ -4,8 +4,7 @@ import webapp2
 import re
 import json
 from NdbClasses import *
-
-user_id_parm = 'userID'
+from Service_Utils import *
 
 
 # stream management service
@@ -16,30 +15,8 @@ class ManagementService(webapp2.RequestHandler):
         self.response.content_type = 'text/plain'
         response = {}
 
-        # request parameter error checking
-        if user_id_parm not in self.request.GET.keys():
-            response['error'] = "No userID found"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        # retrieve request parameters
-        user_id = self.request.GET[user_id_parm]
-        response[user_id_parm] = user_id
-
-        # retrieve user
-        try:
-            user = ndb.Key('StreamUser', int(user_id)).get()
-        except:
-            response['error'] = "Error looking up userID = ".format(user_id)
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        if not user:
-            response['error'] = "No user found for userID = {}".format(user_id)
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
+        user = get_user_param(self, response)
+        if user is None:
             return
 
         # query for all streams owned by user

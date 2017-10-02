@@ -7,8 +7,7 @@ from google.appengine.api import urlfetch
 import json
 import webapp2
 from NdbClasses import *
-
-stream_id_parm = 'streamID'
+from Service_Utils import *
 
 
 # expects a GET parameter 'streamID' containing the stream ID
@@ -16,13 +15,9 @@ class UploadFileHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
         try:
 
-            # check valid streamID
-            stream_id = self.request.POST[stream_id_parm]
-            stream = ndb.Key('Stream', int(stream_id)).get()
-
-            # if stream not found
-            if not stream:
-                self.redirect("/?error=badStreamID")
+            stream = get_stream_param(self, {})
+            if stream is None:
+                return
 
             upload = self.get_uploads()[0]
             image_url = images.get_serving_url(upload.key())
@@ -41,7 +36,7 @@ class UploadFileHandler(blobstore_handlers.BlobstoreUploadHandler):
             stream.put()
 
             # go back to viewstream page
-            self.redirect("/viewstream?streamID={}".format(stream_id))
+            self.redirect("/viewstream?streamID={}".format(stream.key.id()))
 
         except Exception as e:
             print(e)

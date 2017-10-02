@@ -1,9 +1,7 @@
-from google.appengine.api import users
-from google.appengine.ext import ndb
 import webapp2
-import re
 import json
 from NdbClasses import *
+from Service_Utils import *
 
 stream_id_parm = 'streamID'
 user_id_parm = 'userID'
@@ -17,41 +15,12 @@ class DeleteStreamService(webapp2.RequestHandler):
         self.response.content_type = 'text/plain'
         response = {}
 
-        # request parameter error checking
-        if stream_id_parm not in self.request.GET.keys():
-            response['error'] = "No streamID found"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        if user_id_parm not in self.request.GET.keys():
-            response['error'] = "No userID found"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
-            return
-
-        # retrieve request parameters
-        stream_id = self.request.GET[stream_id_parm]
-        user_id = self.request.GET[user_id_parm]
-        response[stream_id_parm] = stream_id
-        response[user_id_parm] = user_id
-
-        # retrieve the stream from the ID
-        stream = (ndb.Key('Stream', int(stream_id))).get()
-
+        stream = get_stream_param(self, response)
         if stream is None:
-            response['error'] = "Invalid stream ID"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
             return
 
-        # retrieve the user from the ID
-        user = (ndb.Key('StreamUser', user_id)).get()
-
+        user = get_user_param(self, response)
         if user is None:
-            response['error'] = "Invalid user ID"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
             return
 
         # check that user is the owner of the stream
