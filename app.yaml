@@ -28,6 +28,10 @@ handlers:
   script: Service_Management.app
 - url: /services/deletestream
   script: Service_DeleteStream.app
+- url: /services/subscribe
+  script: Service_Subscribe.app
+- url: /services/unsubscribe
+  script: Service_Subscribe.app
 # [END services]
 
 - url: /css
