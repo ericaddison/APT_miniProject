@@ -6,10 +6,10 @@ from google.appengine.api import search
 from source.services.Service_Utils import get_search_string_param, tag_index_name, search_index_namespace
 
 
-# search for streams
-# takes a text string, returns streams that have the string in the name or tags
+# search for tags
+# takes a text string, returns tags that have the string in the name or tags
 # do better ... use the google search API...
-class StreamTextSearchService(webapp2.RequestHandler):
+class TagTextSearchService(webapp2.RequestHandler):
     def get(self):
 
         self.response.content_type = 'text/plain'
@@ -28,5 +28,5 @@ class StreamTextSearchService(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-    ('/services/search', StreamTextSearchService)
+    ('/services/searchtags', TagTextSearchService)
 ], debug=True)

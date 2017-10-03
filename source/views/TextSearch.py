@@ -31,13 +31,13 @@ class TextSearch(webapp2.RequestHandler):
         response = {}
 
         search_string = get_search_string_param(self, response)
-        if search_string is None:
-            self.redirect('/')
+        if search_string is None or search_string == "":
+            self.redirect('/search')
             return
 
         # TODO: can we add a range here? like, give me search results 1-10, 11-20, etc?
         # make call to textSearch service
-        search_service_url = 'http://{0}/services/search?searchString={1}'.format(os.environ['HTTP_HOST'], urllib.quote(search_string))
+        search_service_url = 'http://{0}/services/searchtags?searchString={1}'.format(os.environ['HTTP_HOST'], urllib.quote(search_string))
         result = urllib2.urlopen(search_service_url)
         search_response = json.loads("".join(result.readlines()))
         self.redirect('/search?{}'.format(urllib.urlencode(search_response)))

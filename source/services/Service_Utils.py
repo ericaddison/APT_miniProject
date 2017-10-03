@@ -17,9 +17,10 @@ stream_index_name = 'stream_index'
 
 
 # meant to be called for a tag or stream object
+# must provide the index name
 # hack to get partial string searching
-def searchablize_tag(item, response):
-    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+def searchablize_tag_or_stream(item, index_name, response):
+    index = search.Index(name=index_name, namespace=search_index_namespace)
     toks = item.name.split()
 
     try:
@@ -34,6 +35,7 @@ def searchablize_tag(item, response):
     except search.PutError, e:
         result = e.results[0]
         response['errResult'] = str(result)
+
 
 def get_tag_param(handler, response):
     # request parameter error checking
