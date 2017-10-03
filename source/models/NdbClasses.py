@@ -42,3 +42,4 @@ class StreamUser(ndb.Model):
     lastName = ndb.StringProperty(indexed=False)
     nickName = ndb.StringProperty(indexed=False)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+    trendEmails = ndb.StringProperty(indexed=True)
