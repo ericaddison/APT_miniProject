@@ -184,7 +184,7 @@ class CreatePage(webapp2.RequestHandler):
         self.response.write(template.render(path, template_values))
 
 
-class ViewPage(webapp2.RequestHandler):
+class ViewAllStreamsPage(webapp2.RequestHandler):
     def get(self):
 
         user = users.get_current_user()
@@ -213,5 +213,5 @@ app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/manage', ManagePage),
     ('/create', CreatePage),
-    ('/view', ViewPage)
+    ('/view', ViewAllStreamsPage)
 ], debug=True)
