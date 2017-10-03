@@ -3,8 +3,7 @@ import webapp2
 from source.models.NdbClasses import *
 from source.services.Service_Utils import *
 from google.appengine.api import search
-from source.services.Service_CreateTag import tag_index_name, search_index_namespace
-from source.services.Service_Utils import get_search_string_param
+from source.services.Service_Utils import get_search_string_param, tag_index_name, search_index_namespace
 
 
 # search for streams
@@ -21,7 +20,8 @@ class StreamTextSearchService(webapp2.RequestHandler):
             return
 
         index = search.Index(name=tag_index_name, namespace=search_index_namespace)
-        results = index.search(search_string)
+        results = index.search("string: {}".format(search_string))
+        print(results)
         response['tags'] = [str(res.fields[0].value) for res in results.results]
         self.response.set_status(200)
         self.response.write(json.dumps(response))

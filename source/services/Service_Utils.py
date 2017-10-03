@@ -1,6 +1,8 @@
 import json
 import re
 from google.appengine.ext import ndb
+from google.appengine.api import search
+import datetime
 
 stream_id_parm = 'streamID'
 user_id_parm = 'userID'
@@ -9,6 +11,29 @@ tag_name_parm = 'tagName'
 search_parm = 'searchString'
 search_results_parm = 'searchResults'
 
+search_index_namespace = 'connexion'
+tag_index_name = 'tag_index'
+stream_index_name = 'stream_index'
+
+
+# meant to be called for a tag or stream object
+# hack to get partial string searching
+def searchablize_tag(item, response):
+    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    toks = item.name.split()
+
+    try:
+        for tok in toks:
+            for i in range(len(tok)):
+                substr = tok[0:i+1]
+                doc = search.Document(fields=[search.TextField(name='name', value=item.name),
+                                              search.TextField(name='string', value=substr),
+                                              search.DateField(name='date_added', value=datetime.datetime.now().date())])
+                # Index the document.
+                index.put(doc)
+    except search.PutError, e:
+        result = e.results[0]
+        response['errResult'] = str(result)
 
 def get_tag_param(handler, response):
     # request parameter error checking
