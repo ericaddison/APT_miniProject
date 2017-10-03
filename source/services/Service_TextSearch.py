@@ -2,8 +2,9 @@ import webapp2
 
 from source.models.NdbClasses import *
 from source.services.Service_Utils import *
-
-search_parm = 'searchString'
+from google.appengine.api import search
+from source.services.Service_CreateTag import tag_index_name, search_index_namespace
+from source.services.Service_Utils import get_search_string_param
 
 
 # search for streams
@@ -15,24 +16,14 @@ class StreamTextSearchService(webapp2.RequestHandler):
         self.response.content_type = 'text/plain'
         response = {}
 
-        search_string = self.request.get(search_parm)
-        response['searchString'] = search_string
-        if search_string is None or search_string == "":
-            response['error'] = "No search string found"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
+        search_string = get_search_string_param(self, response)
+        if search_string is None:
             return
 
-        # search all tags
-        all_tags = Tag.query().fetch()
-        matching_tags = [tag.key.id() for tag in all_tags if search_string.lower() in tag.name.lower()]
-        response['tags'] = matching_tags
-
-        # search all streams
-        all_streams = Stream.query().fetch()
-        matching_streams = [st.key.id() for st in all_streams if search_string.lower() in st.name.lower()]
-        response['streams'] = matching_streams
-
+        index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+        results = index.search(search_string)
+        response['tags'] = [str(res.fields) for res in results.results]
+        print("\n\n{}\n\n".format(results))
         self.response.set_status(200)
         self.response.write(json.dumps(response))
 

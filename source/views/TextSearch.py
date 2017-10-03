@@ -1,34 +1,50 @@
 import json
 import os
 
-import jinja2
 import urllib2
+import urllib
 import webapp2
-from google.appengine.ext import blobstore
-from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
+from source.services.Service_Utils import get_search_string_param, get_tags_param
 
 
 class TextSearchForm(webapp2.RequestHandler):
     def get(self):
 
-        self.response.write('Search form!')
+        template_values = {'search_url': '/searchexe'}
 
-        # urlopen here
+        search_string = get_search_string_param(self, {})
+        if search_string is not None:
+            template_values['search_string'] = search_string
 
-        # send results to template
+        tags = get_tags_param(self, {})
+        if tags is not None and tags != "":
+            print("\n\ntags = {}\n\n".format(tags))
+            s = urllib.unquote(tags).decode('utf8')
+            template_values['search_tags'] = eval(s)
+
+        path = os.path.join(os.path.dirname(__file__), '../../templates/StreamSearch.html')
+        self.response.write(template.render(path, template_values))
 
 
-#        template_values = {
-#                    'stream': stream,
-#                    'upload_url': upload_url,
-#                    'image_urls': image_urls
-#                }
+class TextSearch(webapp2.RequestHandler):
+    def post(self):
+        self.response.content_type = 'text/plain'
+        response = {}
 
-#        path = os.path.join(os.path.dirname(__file__), '../../templates/ViewStream.html')
-#        self.response.write(template.render(path, template_values))
+        search_string = get_search_string_param(self, response)
+        if search_string is None:
+            self.redirect('/')
+            return
+
+        # make call to viewimage service
+        search_service_url = 'http://{0}/services/search?searchString={1}'.format(os.environ['HTTP_HOST'], urllib.quote(search_string))
+        result = urllib2.urlopen(search_service_url)
+        search_response = json.loads("".join(result.readlines()))
+        self.redirect('/search?{}'.format(urllib.urlencode(search_response)))
 
 
 app = webapp2.WSGIApplication([
-    ('/search', TextSearchForm)
+    ('/search', TextSearchForm),
+    ('/searchexe', TextSearch)
 ], debug=True)

@@ -6,6 +6,8 @@ stream_id_parm = 'streamID'
 user_id_parm = 'userID'
 image_range_parm = 'imageRange'
 tag_name_parm = 'tagName'
+search_parm = 'searchString'
+search_results_parm = 'searchResults'
 
 
 def get_tag_param(handler, response):
@@ -32,6 +34,33 @@ def get_tag_param(handler, response):
         return
 
     return tag
+
+
+def get_search_string_param(handler, response):
+    # request parameter error checking
+    search_string = handler.request.get(search_parm)
+    if search_string is None:
+        response['error'] = "No searchString found"
+        handler.response.set_status(400)
+        handler.response.write(json.dumps(response))
+        return
+
+    response[search_parm] = search_string
+    return search_string
+
+
+def get_search_results_param(handler, response):
+    # request parameter error checking
+    search_results = handler.request.get(search_results_parm)
+    response['search_results'] = search_results
+    return search_results
+
+
+def get_tags_param(handler, response):
+    # request parameter error checking
+    tags = handler.request.get('tags')
+    response['tags'] = tags
+    return tags
 
 
 def get_stream_param(handler, response):
