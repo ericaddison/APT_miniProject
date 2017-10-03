@@ -1,0 +1,10 @@
+cron:
+- description: 5min trending email
+  url: /services/crontrends?int=5min
+  schedule: every 5 minutes
+- description: hourly trending email
+  url: /services/crontrends?int=1hr
+  schedule: every 1 hours
+- description: daily summary job
+  url: /services/crontrends?int=daily
+  schedule: every 24 hours

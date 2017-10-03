@@ -37,11 +37,7 @@
             </tr>
             {% for stream in streams %}
             <tr>
-				<td>
-                	<a href="/viewstream?streamID={{ stream.id }}">
-                	<img src = "{{ stream.coverImageURL }}"  style="width:100px;height:100px;">
-                </a>
-				</td>
+				<td><a href="/viewstream?streamID={{ stream.id }}">{{ stream.streamName }}</a></td>
                 <td>{{ stream.newestDate }}</td>
                 <td>{{ stream.counter }}</td>
                 <td>[CHECKBOX]</td>

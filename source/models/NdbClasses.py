@@ -8,7 +8,8 @@ class Stream(ndb.Model):
     numViews = ndb.IntegerProperty(indexed=False)
     items = ndb.KeyProperty(indexed=False, kind='StreamItem', repeated=True)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
-
+    viewList = ndb.DateTimeProperty(indexed=True, repeated=True)
+    
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
