@@ -17,8 +17,6 @@ handlers:
 # [START views]
 - url: /viewstream
   script: source.views.ViewStream.app
-- url: /view
-  script: source.Main.app
 # [START views]
 
 
