@@ -4,6 +4,9 @@ import os
 import jinja2
 import urllib2
 import webapp2
+
+from datetime import datetime
+
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
@@ -28,6 +31,11 @@ class ViewStream(webapp2.RequestHandler):
             self.redirect('/')
             return
 
+        #Increment view counter
+        stream.viewList.append(datetime.now())
+        stream.numViews = stream.numViews+1
+        stream.put()
+        
         upload_url = blobstore.create_upload_url('/services/upload')
 
 

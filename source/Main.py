@@ -102,7 +102,7 @@ class ManagePage(webapp2.RequestHandler):
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
             streamDict = {'streamName': stream.name, 'counter': len(stream.items), 'newestDate': newestDate,
-                          'id': stream.key.id()}
+                          'id': stream.key.id(), 'views': stream.numViews}
             subbed_streams.append(streamDict)
         
         print("owned_streams: {}".format(owned_streams))
