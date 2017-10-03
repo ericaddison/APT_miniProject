@@ -44,7 +44,7 @@ class CronTrendsService(webapp2.RequestHandler):
         return top3StreamIDs
     
     def sendEmails(self, emailList):
-        for email_rcpt_address in userEmailList:    
+        for email_rcpt_address in emailList:    
             try:
                 mail.send_mail(sender=email_sender_address,
                            to=email_rcpt_address,
