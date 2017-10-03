@@ -1,4 +1,4 @@
-{% extends "templates/admin/AdminTemplate.html" %}
+{% extends templatepath %}
 
 {% block title %}Connexion All Streams{% endblock %}
 
@@ -22,12 +22,12 @@
       <tbody>
         {% for stream in streams %}
           <tr>
-            <td>{{ stream.key.id() }}</td>
+            <td>{{ stream.key.id }}</td>
             <td>{{ stream.name }}</td>
-            <td>{{ stream.owner.get().nickName }}</td>
+            <td>{{ stream.owner.get.nickName }}</td>
             <td><a href="{{ stream.coverImageURL }}" title="{{ stream.coverImageURL }}">link</a></td>
             <td>{{ stream.numViews }}</td>
-            <td>{{ len(stream.items) }}</td>
+            <td>{{ stream.items|length }}</td>
           </tr>
         {% endfor %}
       </tbody>

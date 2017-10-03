@@ -7,25 +7,34 @@ handlers:
 
 - url: /admindash/.*
   script: google.appengine.ext.admin.application
-
-- url: /viewstream
-  script: ViewStream.app
-
 - url: /admin/notadmin
   static_files: templates/admin/NotAdmin.html
   upload: templates/admin/NotAdmin.html
 - url: /admin/.*
-  script: Admin.app
+  script: source.Admin.app
+
+
+# [START views]
+- url: /viewstream
+  script: source.views.ViewStream.app
+# [START views]
+
 
 # [START services]
 - url: /services/viewstream
-  script: Service_ViewStream.app
+  script: source.services.Service_ViewStream.app
 - url: /services/insertteststream
-  script: InsertTestStream.app
+  script: source.services.InsertTestStream.app
 - url: /services/upload.*
-  script: Service_UploadFile.app
+  script: source.services.Service_UploadFile.app
 - url: /services/management
-  script: Service_Management.app
+  script: source.services.Service_Management.app
+- url: /services/deletestream
+  script: source.services.Service_DeleteStream.app
+- url: /services/subscribe
+  script: source.services.Service_Subscribe.app
+- url: /services/unsubscribe
+  script: source.services.Service_Subscribe.app
 # [END services]
 
 - url: /css
@@ -35,7 +44,7 @@ handlers:
 
 
 - url: /.*
-  script: Main.app
+  script: source.Main.app
 
 
 # [START libraries]

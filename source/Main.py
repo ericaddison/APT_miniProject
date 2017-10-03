@@ -1,15 +1,13 @@
 
+import os
+
+import webapp2
 from google.appengine.api import app_identity
 from google.appengine.api import users
-
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 
-from NdbClasses import *
-import webapp2
-import os
-
-import datetime
+from source.models.NdbClasses import *
 
 #If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
@@ -39,7 +37,7 @@ class MainPage(webapp2.RequestHandler):
 
         self.response.content_type = 'text/html'
         
-        path = os.path.join(os.path.dirname(__file__), 'index.html')
+        path = os.path.join(os.path.dirname(__file__), '../index.html')
         self.response.out.write(template.render(path, template_values))
         
         
@@ -66,7 +64,7 @@ class ManagePage(webapp2.RequestHandler):
                     self.response.write("Uh oh! Duplicate email!!!")
                     return
                 print("\n\nAdding new StreamUser by email: {}\n\n".format(str(user.email())))
-                stream_user = StreamUser(email = user.email(), nickName = nickname, id=user.user_id())
+                stream_user = StreamUser(email = user.email(), nickName = nickname, id=str(user.user_id()))
                 stream_user.put()
 
         else:
@@ -120,7 +118,7 @@ class ManagePage(webapp2.RequestHandler):
             'app': app_identity.get_application_id()}
 
         self.response.content_type = 'text/html'
-        path = os.path.join(os.path.dirname(__file__), 'manage.html')
+        path = os.path.join(os.path.dirname(__file__), '../manage.html')
         self.response.write(template.render(path, template_values))
         
 
@@ -187,7 +185,7 @@ class CreatePage(webapp2.RequestHandler):
 
 
         self.response.content_type = 'text/html'
-        path = os.path.join(os.path.dirname(__file__), 'create.html')
+        path = os.path.join(os.path.dirname(__file__), '../create.html')
         self.response.write(template.render(path, template_values))        
         
 

@@ -1,28 +1,23 @@
-from google.appengine.api import users
-from google.appengine.ext import blobstore
-from google.appengine.api import images
-from google.appengine.ext.webapp import blobstore_handlers
-from google.appengine.ext import ndb
-from google.appengine.api import urlfetch
-import json
 import webapp2
-from NdbClasses import *
+from google.appengine.api import images
+from google.appengine.api import users
+from google.appengine.ext import ndb
+from google.appengine.ext.webapp import blobstore_handlers
 
-stream_id_parm = 'streamID'
+from source.models.NdbClasses import *
+from source.services.Service_Utils import *
 
 
-# expects a GET parameter 'streamID' containing the stream ID
+# expects a POST parameter 'streamID' containing the stream ID
+# if a 'redirect' POST parameter is provided, this service will redirect to the give URL
+# otherwise a JSON status message will be returned
 class UploadFileHandler(blobstore_handlers.BlobstoreUploadHandler):
     def post(self):
         try:
 
-            # check valid streamID
-            stream_id = self.request.POST[stream_id_parm]
-            stream = ndb.Key('Stream', int(stream_id)).get()
-
-            # if stream not found
-            if not stream:
-                self.redirect("/?error=badStreamID")
+            stream = get_stream_param(self, {})
+            if stream is None:
+                return
 
             upload = self.get_uploads()[0]
             image_url = images.get_serving_url(upload.key())
@@ -41,7 +36,15 @@ class UploadFileHandler(blobstore_handlers.BlobstoreUploadHandler):
             stream.put()
 
             # go back to viewstream page
-            self.redirect("/viewstream?streamID={}".format(stream_id))
+            redirect = self.request.get('redirect')
+            if redirect:
+                self.redirect(redirect)
+                return
+            else:
+                self.response.content_type = 'text/plain'
+                response = {'status': 'Upload successful'}
+                self.response.write(json.dumps(response))
+                return
 
         except Exception as e:
             print(e)

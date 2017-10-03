@@ -1,16 +1,12 @@
+import json
+import os
+
+import jinja2
+import urllib2
+import webapp2
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
-import webapp2
-import json
-import urllib2
-from NdbClasses import Stream
-
-import os
-import jinja2
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
-    extensions=['jinja2.ext.autoescape'],
-    autoescape=True)
+from google.appengine.ext.webapp import template
 
 stream_id_parm = 'streamID'
 
@@ -48,6 +44,7 @@ class ViewStream(webapp2.RequestHandler):
         result = urllib2.urlopen(viewstream_service_url)
         response = json.loads("".join(result.readlines()))
         image_urls = [str(url) for url in response['urls']]
+        image_urls.reverse()
 
         template_values = {
                     'stream': stream,
@@ -55,8 +52,8 @@ class ViewStream(webapp2.RequestHandler):
                     'image_urls': image_urls
                 }
 
-        template = JINJA_ENVIRONMENT.get_template('templates/ViewStream.html')
-        self.response.write(template.render(template_values))
+        path = os.path.join(os.path.dirname(__file__), '../../templates/ViewStream.html')
+        self.response.write(template.render(path, template_values))
 
 
 app = webapp2.WSGIApplication([
