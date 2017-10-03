@@ -8,6 +8,7 @@ from source.models.NdbClasses import Tag
 search_index_namespace = 'connexion'
 tag_index_name = 'tag_index'
 
+
 # create a Tag
 # takes a tag name and attempts to create a new tag. Returns status in json response
 class CreateTagService(webapp2.RequestHandler):

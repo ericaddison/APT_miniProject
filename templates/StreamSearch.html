@@ -27,11 +27,19 @@
       <input type="submit" value="Submit">
     </form>
 
-    <br><br>
+    {% if search_streams %}
+        <br>
+        <h3>Matching Stream</h3>
+        {% for stream in search_streams %}
+            <p>{{ stream }}</p><br>
+        {% endfor %}
+    {% endif %}
 
     {% if search_tags %}
+        <br>
+        <h3>Matching Tags</h3>
         {% for tag in search_tags %}
-            <p>{{ tag }}</p><br>
+            <a href="/viewtag?tagName={{ tag }}">{{ tag }}</a><br>
         {% endfor %}
     {% endif %}
 <br>

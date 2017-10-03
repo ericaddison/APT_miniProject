@@ -22,8 +22,7 @@ class StreamTextSearchService(webapp2.RequestHandler):
 
         index = search.Index(name=tag_index_name, namespace=search_index_namespace)
         results = index.search(search_string)
-        response['tags'] = [str(res.fields) for res in results.results]
-        print("\n\n{}\n\n".format(results))
+        response['tags'] = [str(res.fields[0].value) for res in results.results]
         self.response.set_status(200)
         self.response.write(json.dumps(response))
 
