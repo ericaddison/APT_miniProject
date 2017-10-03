@@ -43,6 +43,19 @@ class CronTrendsService(webapp2.RequestHandler):
                 
         return top3StreamIDs
     
+    def sendEmails(self, emailList):
+        for email_rcpt_address in userEmailList:    
+            try:
+                mail.send_mail(sender=email_sender_address,
+                           to=email_rcpt_address,
+                           subject="WhiteTeam Trending Streams",
+                           body="Check out these streams: {0}".format(trendingStreams))
+            except:
+                print "Email failed to: ", email_rcpt_address
+                continue
+                
+        return
+    
         
     def get(self):
 
@@ -76,11 +89,8 @@ class CronTrendsService(webapp2.RequestHandler):
             for user in userList:
                 userEmailList.append(user.email)
 
-            for email_rcpt_address in userEmailList:    
-                mail.send_mail(sender=email_sender_address,
-                               to=email_rcpt_address,
-                               subject="WhiteTeam Trending Streams - 5 Minute Update",
-                               body="Check out these streams: {0}".format(trendingStreams))
+            self.sendEmails(userEmailList)
+
                 
         #/services/crontrends?int=1hr       
         if intervalParam == '1hr':
@@ -93,11 +103,7 @@ class CronTrendsService(webapp2.RequestHandler):
             for user in userList:
                 userEmailList.append(user.email)
                 
-            for email_rcpt_address in userEmailList:    
-                mail.send_mail(sender=email_sender_address,
-                               to=email_rcpt_address,
-                               subject="WhiteTeam Trending Streams - Hourly Update",
-                               body="Check out these streams: {0}".format(trendingStreams))            
+            self.sendEmails(userEmailList)           
             
         #/services/crontrends?int=1day            
         if intervalParam == '1day':
@@ -110,11 +116,7 @@ class CronTrendsService(webapp2.RequestHandler):
             for user in userList:
                 userEmailList.append(user.email)  
 
-            for email_rcpt_address in userEmailList:    
-                mail.send_mail(sender=email_sender_address,
-                               to=email_rcpt_address,
-                               subject="WhiteTeam Trending Streams - Daily Update",
-                               body="Check out these streams: {0}".format(trendingStreams))                
+            self.sendEmails(userEmailList)               
 
             
         #/services/crontrends    
