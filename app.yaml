@@ -15,10 +15,12 @@ handlers:
 
 
 # [START views]
-- url: /viewstream
-  script: source.views.ViewStream.app
 - url: /search.*
   script: source.views.TextSearch.app
+- url: /viewstream
+  script: Routes.app
+- url: /create
+  script: Routes.app
 # [START views]
 
 
@@ -32,7 +34,7 @@ handlers:
 - url: /services/management
   script: source.services.Service_Management.app
 - url: /services/deletestream
-  script: source.services.Service_DeleteStream.app
+  script: Routes.app
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
 - url: /services/search.*

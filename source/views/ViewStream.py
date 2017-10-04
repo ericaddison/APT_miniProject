@@ -12,10 +12,10 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 
-stream_id_parm = 'streamID'
+import source.Framework.Framework_Helpers as fh
+from source.Framework.BaseHandler import BaseHandler
 
-
-class ViewStream(webapp2.RequestHandler):
+class ViewStream(BaseHandler):
     def get(self):
         user = users.get_current_user()
 
@@ -29,7 +29,7 @@ class ViewStream(webapp2.RequestHandler):
 
 
         # retrieve request parameters
-        stream_id = self.request.GET[stream_id_parm]
+        stream_id = self.get_request_param(fh.stream_id_parm)
 
         # retrieve the stream from the ID
         try:

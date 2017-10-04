@@ -25,6 +25,22 @@ class Stream(ndb.Model):
     def get_owner_from_db(self):
         return self.owner.get()
 
+    def delete(self):
+        # delete the StreamTags associated with this stream
+        StreamTag.delete_by_stream(self)
+
+        # delete StreamSubscribers associated with this stream
+        StreamSubscriber.delete_by_stream(self)
+
+        # delete blobs owned by the items of this stream
+        [it.blobKey.delete() for it in self.items if it.blobKey is not None]
+
+        # delete the items owned by this stream
+        ndb.delete_multi(self.items)
+
+        # delete the stream itself
+        self.key.delete()
+
     @classmethod
     # argument owner should be a StreamUser
     def create(cls, **kwargs):
@@ -39,6 +55,7 @@ class Stream(ndb.Model):
 
         # check for existing stream
         if Stream.get_by_owner_and_name(owner, name):
+            print("\n{}\n".format("FOUNR STRAMS!"))
             return None
 
         # create and return stream
@@ -75,6 +92,13 @@ class StreamItem(ndb.Model):
     blobKey = ndb.BlobKeyProperty(indexed=False)
     URL = ndb.StringProperty(indexed=False)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+
+    def delete(self):
+        # remove the blob
+        self.blobKey.delete()
+
+        # delete self
+        self.key.delete()
 
     @classmethod
     def create(cls, **kwargs):
@@ -119,28 +143,56 @@ class Tag(ndb.Model):
             return None
         return ndb.Key('Tag', tag_name).get()
 
+    @classmethod
+    def get_key_from_name(cls, tag_name):
+        print('MATHING KEY! ... ' + tag_name)
+        key = ndb.Key('Tag', tag_name)
+        return key
+
 
 class StreamTag(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
     tag = ndb.KeyProperty(indexed=True, kind='Tag')
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
+    @classmethod
+    # stream is a Stream object
+    def get_by_stream(cls, stream):
+        return StreamTag.query(StreamTag.stream == stream.key).fetch()
+
+    @classmethod
+    def delete_by_stream(cls, stream):
+        stream_tags = StreamTag.query(StreamTag.stream == stream.key).fetch()
+        keys = [st.key for st in stream_tags]
+        ndb.delete_multi(keys)
+
+    @classmethod
+    # stream is a Stream object
+    # tag is a Tag object
+    def get_key_value(cls, stream, tag):
+        return "{0}{1}".format(stream.key.id(), tag.key.id())
+
+    @classmethod
+    # stream is a Stream object
+    # tag is a Tag object
+    def get_key_value_with_tagname(cls, stream, tag):
+        return "{0}{1}".format(stream.key.id(), tag)
+
+    @classmethod
+    def add_tags_to_stream(cls, stream, tag_name_list):
+        tag_keys = [Tag.get_key_from_name(tag) for tag in tag_name_list if tag not in [None, '']]
+        streamtags = [StreamTag(stream=stream.key,
+                                tag=Tag.get_key_from_name(tag),
+                                id=StreamTag.get_key_value_with_tagname(stream, tag))
+                      for tag in tag_name_list if tag not in [None, '']]
+        ndb.put_multi(tag_keys)
+        ndb.put_multi(streamtags)
+
 
 class StreamSubscriber(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
     user = ndb.KeyProperty(indexed=True, kind='StreamUser')
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
-
-    @classmethod
-    # stream is a Stream object
-    # user is a StreamUser object
-    def get_key_value(cls, stream, user):
-        return "{0}{1}".format(user.key.id(), stream.key.id())
-
-    @classmethod
-    def get_by_stream_and_user(cls, stream, user):
-        key_val = StreamSubscriber.get_key_value(stream, user)
-        return ndb.Key('StreamSubscriber', key_val).get()
 
     @classmethod
     def create(cls, stream, user):
@@ -162,6 +214,27 @@ class StreamSubscriber(ndb.Model):
         sub.key.delete()
         return True
 
+    @classmethod
+    # stream is a Stream object
+    # user is a StreamUser object
+    def get_key_value(cls, stream, user):
+        return "{0}{1}".format(user.key.id(), stream.key.id())
+
+    @classmethod
+    def get_by_stream_and_user(cls, stream, user):
+        key_val = StreamSubscriber.get_key_value(stream, user)
+        return ndb.Key('StreamSubscriber', key_val).get()
+
+    @classmethod
+    # stream is a Stream object
+    def get_by_stream(cls, stream):
+        return StreamTag.query(StreamTag.stream == stream.key).fetch()
+
+    @classmethod
+    def delete_by_stream(cls, stream):
+        stream_tags = StreamSubscriber.query(StreamSubscriber.stream == stream.key).fetch()
+        keys = [st.key for st in stream_tags]
+        ndb.delete_multi(keys)
 
     @classmethod
     # add subscribers to a stream from a list of email strings
@@ -185,3 +258,10 @@ class StreamUser(ndb.Model):
     nickName = ndb.StringProperty(indexed=False)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
     trendEmails = ndb.StringProperty(indexed=True)
+
+    def user_id(self):
+        return self.key.id()
+
+    @classmethod
+    def get_by_id(cls, user_id):
+        return ndb.Key('StreamUser', user_id).get()

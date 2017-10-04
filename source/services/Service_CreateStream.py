@@ -1,7 +1,7 @@
 import json
-import source.Framework.Framework_Helpers as FH
+import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
-from source.models.NdbClasses import Stream
+from source.models.NdbClasses import Stream, StreamSubscriber, StreamTag, StreamUser
 
 
 # create a Tag
@@ -9,25 +9,29 @@ from source.models.NdbClasses import Stream
 class CreateStreamService(BaseHandler):
     def get(self):
 
-        FH.set_content_text_plain(self)
+        self.set_content_text_plain()
         response = {}
 
         # get current user
-        owner = FH.get_current_user(self)
+        owner_id = self.get_request_param(fh.user_id_parm)
+        owner = StreamUser.get_by_id(owner_id)
+
         if owner is None:
-            FH.bad_request_error(self, response, 'Not logged in')
+            print("\n{}\n".format("LOG"))
+            fh.bad_request_error(self, response, 'Not logged in')
             return
 
         # get stream name
-        stream_name = FH.get_stream_name_param(self)
-        response[FH.stream_name_parm] = stream_name
+        stream_name = self.get_request_param(fh.stream_name_parm)
+        response[fh.stream_name_parm] = stream_name
         if stream_name is None or stream_name == "":
-            FH.bad_request_error(self, response, 'No parameter {} found'.format(stream_name_parm))
+            print("\n{}\n".format("SNAME"))
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_name_parm))
             return
 
         # get cover image URL
-        cover_url = FH.get_cover_url_param(self)
-        response[FH.cover_url_parm] = cover_url
+        cover_url = self.get_request_param(fh.cover_url_parm)
+        response[fh.cover_url_parm] = cover_url
 
         # create new stream
         stream = Stream.create(name=stream_name,
@@ -36,21 +40,26 @@ class CreateStreamService(BaseHandler):
                                )
 
         if stream is None:
-            FH.bad_request_error(self, response, 'Stream {0} already exists for user {1}'.format(stream_name, owner.nickName))
+            print("\n{}\n".format("NO S"))
+            fh.bad_request_error(self, response, 'Stream {0} already exists for user {1}'.format(stream_name, owner.nickName))
             return
 
+        response[fh.stream_id_parm] = stream.key.id()
+
         # add stream to document index for searching
-        FH.searchablize_stream(stream, response)
+        fh.searchablize_stream(stream, response)
 
         # process subscribers list
-        subs = FH.get_subscribers_param(self)
-        response[FH.subscribers_parm] = subs
-        num_added = FH.add_subscribers(stream, subs.split(';'))
+        subs = self.get_request_param(fh.subscribers_parm)
+        response[fh.subscribers_parm] = subs
+        num_added = StreamSubscriber.add_subscribers_by_emails(stream, subs.split(';'))
         response['num_new_subscribers'] = num_added
 
         # process tags list
-        tags = FH.get_tags_param(self)
-        response[FH.tags_parm] = tags
+        #TODO: tags list in create
+        tags = self.get_request_param(fh.tags_parm)
+        StreamTag.add_tags_to_stream(stream, tags.split(';'))
+        response[fh.tags_parm] = tags
 
         response['status'] = "Created new stream: {}".format(stream_name)
-        FH.write_response(self, json.dumps(response))
+        self.write_response(json.dumps(response))

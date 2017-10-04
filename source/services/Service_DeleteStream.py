@@ -1,49 +1,43 @@
-import webapp2
-
-from source.Framework.Framework_Helpers import *
-from source.models.NdbClasses import *
+import json
+import source.Framework.Framework_Helpers as fh
+from source.models.NdbClasses import Stream, StreamTag, StreamSubscriber
+from source.Framework.BaseHandler import BaseHandler
 
 
 # delete a stream
 # takes a stream id and a user id. Deletes stream ID and returns status code
-class DeleteStreamService(webapp2.RequestHandler):
+class DeleteStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
-        stream = get_stream_param(self, response)
-        if stream is None:
+        # get stream name
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        response[fh.stream_id_parm] = stream_id
+        if stream_id is None or stream_id == "":
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(FH.stream_id_parm))
             return
 
-        user = get_user_param(self, response)
+        # get the stream
+        stream = Stream.get_by_id(stream_id)
+
+        if stream is None:
+            fh.bad_request_error(self, response, 'Invalid Stream ID')
+            return
+
+        # get current user
+        user = fh.get_current_user(self)
         if user is None:
+            fh.bad_request_error(self, response, 'Not logged in')
             return
 
         # check that user is the owner of the stream
-        if user.key != stream.owner:
-            response['error'] = "Not stream owner"
-            self.response.set_status(400)
-            self.response.write(json.dumps(response))
+        if user != stream.get_owner_from_db():
+            fh.bad_request_error(self, response, 'Not stream owner')
             return
 
-        # delete the StreamTags associated with this stream
-        tags = StreamTag.query(StreamTag.stream == stream.key).fetch()
-        for tag in tags:
-            tag.key.delete()
+        # delete the stream
+        stream.delete()
 
-        # delete StreamSubscribers associated with this stream
-        subs = StreamSubscriber.query(StreamSubscriber.stream == stream.key)
-        for sub in subs:
-            sub.key.delete()
-
-        # delete the stream itself
-        stream.key.delete()
-
-        self.response.set_status(200)
-        self.response.write(json.dumps(response))
-
-
-app = webapp2.WSGIApplication([
-    ('/services/deletestream', DeleteStreamService)
-], debug=True)
+        self.write_response(json.dumps(response))

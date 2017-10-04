@@ -6,6 +6,7 @@ from google.appengine.api import images
 from google.appengine.api import search
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.ext.webapp import template
 
 # [START HTTP request parameter names]
 stream_id_parm = 'streamID'
@@ -51,6 +52,7 @@ def get_file_url(myfile):
 
 # [END file handling]
 
+
 # returns the current google user for now
 # but could be extended to work with non-google user types
 # e.g. Facebook login, plain email login, etc
@@ -59,11 +61,22 @@ def get_current_user(handler):
     # get google user
     google_user = users.get_current_user()
 
+    if google_user is None:
+        return None
+
     # look up our user
     stream_user = ndb.Key('StreamUser', google_user.user_id()).get()
 
     # return
     return stream_user
+
+
+def get_logout_url(handler, redirect):
+    return users.create_logout_url(redirect)
+
+
+def get_login_url(handler, redirect):
+    return users.create_login_url(redirect)
 
 
 def searchablize_tag(tag, response):
@@ -115,29 +128,6 @@ def get_search_results_param(handler, response):
     return search_results
 
 
-def get_user_param(handler, response):
-    user_id = handler.request.get(user_id_parm)
-    if user_id is None:
-        response['error'] = "No userID found"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
-
-    # retrieve request parameters
-    response[user_id_parm] = user_id
-
-    # retrieve the user from the ID
-    user = (ndb.Key('StreamUser', user_id)).get()
-
-    if user is None:
-        response['error'] = "Invalid user ID"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
-
-    return user
-
-
 def get_image_range_param(handler):
     image_range = handler.get_request_param(image_range_parm)
     if image_range is None:
@@ -152,3 +142,6 @@ def get_image_range_param(handler):
     inds = sorted([int(ind) for ind in m.groups()])
     return inds[0], inds[1], "good range"
 
+
+def render_html_template(path, template_values_dict):
+    return template.render(path, template_values_dict)

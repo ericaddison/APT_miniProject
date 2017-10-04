@@ -13,6 +13,8 @@ import Framework.Framework_Helpers as fh
 
 from source.models.NdbClasses import *
 
+from source.Framework.BaseHandler import BaseHandler
+
 # If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
 
@@ -127,44 +129,6 @@ class ManagePage(webapp2.RequestHandler):
         self.response.write(template.render(path, template_values))
 
 
-class CreatePage(webapp2.RequestHandler):
-    def get(self):
-
-        user = users.get_current_user()
-
-        if user:
-            nickname = user.nickname()
-            login_url = users.create_logout_url('/')
-            login_text = 'Sign out'
-        else:
-            self.redirect("/")
-            return
-
-        template_values = {
-            'html_template': 'MasterTemplate.html',
-            'user': user,
-            'login_url': login_url,
-            'login_text': login_text,
-            'stream_name_parm': stream_name_parm,
-            'tags_parm': tags_parm,
-            'cover_url_parm': cover_url_parm,
-            'subs_parm': subscribers_parm
-            }
-
-        self.response.content_type = 'text/html'
-        path = os.path.join(os.path.dirname(__file__), '../templates/Create.html')
-        self.response.write(template.render(path, template_values))
-
-    def post(self):
-        # make call to createStream service
-        parm_dict = get_request_parameter_dictionary(self)
-        create_stream_url = 'http://{0}/services/createstream?{1}'.format(os.environ['HTTP_HOST'], urllib.urlencode(parm_dict))
-        print("\n\n{}\n\n".format(create_stream_url))
-        result = urllib2.urlopen(create_stream_url)
-        response = json.loads("".join(result.readlines()))
-        write_response(self, response)
-
-
 class ViewAllStreamsPage(webapp2.RequestHandler):
     def get(self):
 
@@ -194,6 +158,5 @@ class ViewAllStreamsPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/manage', ManagePage),
-    ('/create', CreatePage),
     ('/view', ViewAllStreamsPage)
 ], debug=True)
