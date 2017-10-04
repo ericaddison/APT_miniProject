@@ -37,7 +37,7 @@ class MainPage(webapp2.RequestHandler):
 
         self.response.content_type = 'text/html'
 
-        path = os.path.join(os.path.dirname(__file__), '../templates/index.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/Index.html')
         self.response.out.write(template.render(path, template_values))
 
 
@@ -116,7 +116,7 @@ class ManagePage(webapp2.RequestHandler):
             'app': app_identity.get_application_id()}
 
         self.response.content_type = 'text/html'
-        path = os.path.join(os.path.dirname(__file__), '../templates/manage.html')
+        path = os.path.join(os.path.dirname(__file__), '../templates/Manage.html')
         self.response.write(template.render(path, template_values))
 
 
