@@ -16,6 +16,29 @@ tag_index_name = 'tag_index'
 stream_index_name = 'stream_index'
 
 
+def bad_request_error(handler, response_dict, error_msg):
+    response_dict['error'] = error_msg
+    handler.response.set_status(400)
+    handler.response.write(json.dumps(response_dict))
+    return
+
+
+def write_response(handler, response_text):
+    handler.response.write(response_text)
+
+
+def get_tag_param(handler):
+    return handler.request.get(tag_name_parm)
+
+
+def searchablize_tag(tag, response):
+    searchablize_tag_or_stream(tag, tag_index_name, response)
+
+
+def searchablize_stream(stream, response):
+    searchablize_tag_or_stream(stream, stream_index_name, response)
+
+
 # meant to be called for a tag or stream object
 # must provide the index name
 # hack to get partial string searching
@@ -35,32 +58,6 @@ def searchablize_tag_or_stream(item, index_name, response):
     except search.PutError, e:
         result = e.results[0]
         response['errResult'] = str(result)
-
-
-def get_tag_param(handler, response):
-    # request parameter error checking
-    tag_name = handler.request.get(tag_name_parm)
-    if tag_name is None:
-        response['error'] = "No tagName found"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
-
-    response[tag_name_parm] = tag_name
-
-    if tag_name == "":
-        tag_name = "empty_tag"
-
-    # retrieve the stream from the ID
-    tag = ndb.Key('Tag', tag_name).get()
-
-    if tag is None:
-        response['error'] = "Invalid tag name"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
-
-    return tag
 
 
 def get_search_string_param(handler, response):

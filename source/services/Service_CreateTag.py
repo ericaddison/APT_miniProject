@@ -1,42 +1,32 @@
-import webapp2
 import json
-from source.services.Service_Utils import get_tag_param, tag_name_parm, searchablize_tag_or_stream, tag_index_name
+from source.Framework.BaseHandler import BaseHandler
 from source.models.NdbClasses import Tag
+from source.services.Service_Utils import bad_request_error, write_response
+from source.services.Service_Utils import get_tag_param, tag_name_parm, searchablize_tag
 
 
 # create a Tag
 # takes a tag name and attempts to create a new tag. Returns status in json response
-class CreateTagService(webapp2.RequestHandler):
+class CreateTagService(BaseHandler):
     def get(self):
 
         self.response.content_type = 'text/plain'
         response = {}
 
-        tag = get_tag_param(self, response)
-        tag_name = response[tag_name_parm]
+        tag_name = get_tag_param(self)
+        response[tag_name_parm] = tag_name
 
         if tag_name is None:
+            bad_request_error(self, response, "No tag name found")
             return
 
-        self.response.set_status(200)
-        if tag is not None:
-            response['status'] = "Tag {} already exists".format(tag.name)
-            self.response.write(json.dumps(response))
+        tag = Tag.create_tag(tag_name)
+        if not tag:
+            bad_request_error(self, response, "Tag {} already exists".format(tag_name))
             return
-
-        response.pop('error', None)
-        tag = Tag(name=tag_name, id=tag_name)
-        tag.put()
 
         # add tag to document index for searching
-        searchablize_tag_or_stream(tag, tag_index_name, response)
+        searchablize_tag(tag, response)
 
-        response['status'] = "Created new tag: {}".format(tag.name)
-        self.response.clear()
-        self.response.write(json.dumps(response))
-        return
-
-
-app = webapp2.WSGIApplication([
-    ('/services/createtag', CreateTagService)
-], debug=True)
+        response['status'] = "Created new tag: {}".format(tag_name)
+        write_response(self, json.dumps(response))
