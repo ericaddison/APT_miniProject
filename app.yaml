@@ -16,7 +16,7 @@ handlers:
 
 # [START views]
 - url: /search.*
-  script: source.views.TextSearch.app
+  script: Routes.app
 
 - url: /viewstream
   script: Routes.app

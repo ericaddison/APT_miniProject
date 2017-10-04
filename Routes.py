@@ -8,6 +8,7 @@ from source.services.Service_UploadFile import UploadFileHandler
 from source.services.Service_ViewStream import ViewStreamService
 from source.views.Create import CreatePage
 from source.views.ViewStream import ViewStream
+from source.views.TextSearch import TextSearch, TextSearchForm
 
 config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 
@@ -16,6 +17,8 @@ app = webapp2.WSGIApplication([
     # [START views]
     ('/create', CreatePage),
     ('/viewstream', ViewStream),
+    ('/search', TextSearchForm),
+    ('/searchexe', TextSearch),
     # [END views]
 
     # [START services]

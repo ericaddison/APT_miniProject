@@ -14,7 +14,7 @@ stream_name_parm = 'streamname'
 user_id_parm = 'userID'
 image_range_parm = 'imageRange'
 tag_name_parm = 'tagName'
-search_parm = 'searchString'
+search_string_parm = 'searchString'
 search_results_parm = 'searchResults'
 subscribers_parm = 'subs'
 tags_parm = 'tags'
@@ -110,14 +110,14 @@ def searchablize_tag_or_stream(item, index_name, response):
 
 def get_search_string_param(handler, response):
     # request parameter error checking
-    search_string = handler.request.get(search_parm)
+    search_string = handler.request.get(search_string_parm)
     if search_string is None:
         response['error'] = "No searchString found"
         handler.response.set_status(400)
         handler.response.write(json.dumps(response))
         return
 
-    response[search_parm] = search_string
+    response[search_string_parm] = search_string
     return search_string
 
 
