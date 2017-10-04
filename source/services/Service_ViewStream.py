@@ -30,13 +30,12 @@ class ViewStreamService(BaseHandler):
 
         # get the indices
         ind1, ind2, status = fh.get_image_range_param(self)
-
         if ind1 is None or ind2 is None:
             fh.bad_request_error(self, response, status)
             return
 
         # query for images
-        items = stream.get_items(ind1, ind2)
+        items, in1, ind2 = stream.get_items(ind1, ind2)
         image_urls = [item.URL for item in items]
 
         if len(image_urls) == 0:

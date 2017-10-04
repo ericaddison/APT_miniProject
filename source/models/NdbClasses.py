@@ -19,8 +19,8 @@ class Stream(ndb.Model):
         ind1, ind2 = sorted([ind1, ind2])
         ind1 = max(1, min(l, ind1))
         ind2 = max(1, min(l, ind2))
-        item_keys = self.items[ind1:(ind2+1)]
-        return ndb.get_multi(item_keys)
+        item_keys = self.items[(ind1-1):ind2]
+        return ndb.get_multi(item_keys), ind1, ind2
 
     def get_owner_from_db(self):
         return self.owner.get()
@@ -87,12 +87,12 @@ class StreamItem(ndb.Model):
         owner = kwargs['owner']
         url = kwargs['URL']
         stream = kwargs['stream']
-        blob_key = kwargs['blobKey'] if 'blobKey' in kwargs.keys() else None
+        blob = kwargs['file'] if 'file' in kwargs.keys() else None
 
         # create and return stream
         item = StreamItem(
-                owner=owner,
-                blobKey=blob_key,
+                owner=owner.key,
+                blobKey=blob.key(),
                 URL=url,
                 name=name,
                 stream=stream.key)

@@ -39,7 +39,6 @@ def bad_request_error(handler, response_dict, error_msg):
 # [END HTTP request methods]
 
 
-
 # [START file handling]
 # currently using blobstore and images API for file handling
 
@@ -47,8 +46,8 @@ def get_upload_from_filehandler(filehandler, index):
     return filehandler.get_uploads()[index]
 
 
-def get_file_url(file):
-    images.get_serving_url(file.key())
+def get_file_url(myfile):
+    return images.get_serving_url(myfile.key())
 
 # [END file handling]
 

@@ -28,7 +28,7 @@ handlers:
 - url: /services/insertteststream
   script: source.services.InsertTestStream.app
 - url: /services/upload.*
-  script: source.services.Service_UploadFile.app
+  script: Routes.app
 - url: /services/management
   script: source.services.Service_Management.app
 - url: /services/deletestream

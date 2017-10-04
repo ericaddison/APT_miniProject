@@ -41,7 +41,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.response.content_type = 'text/html'
 
     def redirect(self, url):
-        self.redirect(url)
+        super(BaseHandler, self).redirect(url)
 
 
 # file handler. Currently just extends BaseHandler and google blobstoreUpload handler
