@@ -161,7 +161,9 @@ class CreatePage(webapp2.RequestHandler):
                 StreamTag(stream=newStreamKey, tag=tagKey).put()
 
         # Redirect to /view for this stream
-        self.redirect('/manage')
+        #self.redirect('/manage')
+        self.redirect('/viewstream?streamID={}'.format(newStreamKey.id()))
+
 
     def get(self):
 
