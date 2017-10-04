@@ -43,6 +43,8 @@ handlers:
   script: source.services.Service_TextSearch.app
 - url: /services/createtag
   script: source.services.Service_CreateTag.app
+- url: /services/createstream
+  script: source.services.Service_CreateStream.app
 # [END services]
 
 - url: /css
