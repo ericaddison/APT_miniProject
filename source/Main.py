@@ -30,6 +30,7 @@ class MainPage(webapp2.RequestHandler):
             login_text = 'Sign in'
 
         template_values = {
+            'html_template': 'MasterTemplate.html',
             'user': user,
             'login_url': login_url,
             'login_text': login_text,
@@ -107,6 +108,7 @@ class ManagePage(webapp2.RequestHandler):
         print("subbed_streams: {}".format(subbed_streams))
 
         template_values = {
+            'html_template': 'MasterTemplate.html',
             'user': user,
             'isAdmin': users.IsCurrentUserAdmin(),
             'login_url': login_url,
@@ -174,6 +176,7 @@ class CreatePage(webapp2.RequestHandler):
             return
 
         template_values = {
+            'html_template': 'MasterTemplate.html',
             'user': user,
             'login_url': login_url,
             'login_text': login_text,
@@ -198,6 +201,7 @@ class ViewAllStreamsPage(webapp2.RequestHandler):
             return
 
         template_values = {
+            'html_template': 'MasterTemplate.html',
             'user': user,
             'login_url': login_url,
             'login_text': login_text,

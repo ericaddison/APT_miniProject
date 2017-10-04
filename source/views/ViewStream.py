@@ -66,6 +66,7 @@ class ViewStream(webapp2.RequestHandler):
         image_urls.reverse()
 
         template_values = {
+                    'html_template': 'MasterTemplate.html',
                     'stream': stream,
                     'upload_url': upload_url,
                     'image_urls': image_urls,

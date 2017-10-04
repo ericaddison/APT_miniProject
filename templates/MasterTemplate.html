@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/baseStyle.css">
+
+
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    <div class="container">
+
+        <header>
+           <h1>Connex.us</h1>
+        </header>
+
+        {% if user %}
+            You're signed in as {{ user }} | <a href="{{ login_url }}"> {{ login_text }}</a>
+            {% if isAdmin %} | <a href="/admin/dashboard">Admin Menu</a> {% endif %} <br>
+        {% endif %}
+
+        <hr>
+
+        <div class="topnav">
+            <a href="manage" class="active">Manage</a>
+            <a href="create">Create</a>
+            <a href="view">View All</a>
+            <a href="search">Search</a>
+            <a href="trending">Trending</a>
+            <a href="social">Social</a>
+        </div>
+        <div id="content">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>
