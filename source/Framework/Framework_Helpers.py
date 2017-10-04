@@ -34,38 +34,6 @@ def bad_request_error(handler, response_dict, error_msg):
     handler.response.write(json.dumps(response_dict))
     return
 
-
-def get_request_parameter_dictionary(handler):
-    return handler.request.params
-
-
-def write_response(handler, response_text):
-    handler.response.write(response_text)
-
-
-def get_tag_name_param(handler):
-    return handler.request.get(tag_name_parm)
-
-
-def get_stream_name_param(handler):
-    return handler.request.get(stream_name_parm)
-
-
-def get_stream_id_param(handler):
-    return handler.request.get(stream_id_parm)
-
-
-def get_subscribers_param(handler):
-    return handler.request.get(subscribers_parm)
-
-
-def get_cover_url_param(handler):
-    return handler.request.get(cover_url_parm)
-
-
-def get_tags_param(handler):
-    return handler.request.get(tags_parm)
-
 # [END HTTP request methods]
 
 

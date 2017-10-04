@@ -9,7 +9,7 @@ from source.models.NdbClasses import Stream
 class CreateStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        FH.set_content_text_plain(self)
         response = {}
 
         # get current user

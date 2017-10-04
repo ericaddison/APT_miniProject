@@ -1,8 +1,7 @@
 import json
 
 from source.Framework.BaseHandler import BaseHandler
-from source.Framework.Framework_Helpers import bad_request_error, write_response
-from source.Framework.Framework_Helpers import get_tag_name_param, tag_name_parm, searchablize_tag
+import source.Framework.Framework_Helpers as FH
 from source.models.NdbClasses import Tag
 
 
@@ -11,23 +10,23 @@ from source.models.NdbClasses import Tag
 class CreateTagService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
-        tag_name = get_tag_name_param(self)
-        response[tag_name_parm] = tag_name
+        tag_name = self.get_request_param(FH.tag_name_parm)
+        response[FH.tag_name_parm] = tag_name
 
         if tag_name is None:
-            bad_request_error(self, response, "No tag name found")
+            FH.bad_request_error(self, response, "No tag name found")
             return
 
         tag = Tag.create(tag_name)
         if not tag:
-            bad_request_error(self, response, "Tag {} already exists".format(tag_name))
+            FH.bad_request_error(self, response, "Tag {} already exists".format(tag_name))
             return
 
         # add tag to document index for searching
-        searchablize_tag(tag, response)
+        FH.searchablize_tag(tag, response)
 
         response['status'] = "Created new tag: {}".format(tag_name)
-        write_response(self, json.dumps(response))
+        self.write_response(json.dumps(response))

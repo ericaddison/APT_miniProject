@@ -24,3 +24,23 @@ class BaseHandler(webapp2.RequestHandler):
         if not sess.get('test_session_prop'):
             sess['test_session_prop']='howdy!'
         return sess
+
+    def get_request_param(self, param_name):
+        return self.request.get(param_name)
+
+    def write_response(self, response_text):
+        self.response.write(response_text)
+
+    def get_request_parameter_dictionary(self):
+        return self.request.params
+
+    def set_content_text_plain(self):
+        self.response.content_type = 'text/plain'
+
+    def set_content_text_html(self):
+        self.response.content_type = 'text/html'
+
+
+
+
+

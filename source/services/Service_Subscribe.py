@@ -1,19 +1,18 @@
-import webapp2
 import json
 import source.Framework.Framework_Helpers as FH
 from source.models.NdbClasses import *
-
+from source.Framework.BaseHandler import BaseHandler
 
 # subscribe to a stream
 # takes a stream id and a user id. Creates a new StreamSubscription
-class SubscribeToStreamService(webapp2.RequestHandler):
+class SubscribeToStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
         # get stream name
-        stream_id = FH.get_stream_id_param(self)
+        stream_id = self.get_request_param(FH.stream_id_parm)
         response[FH.stream_id_parm] = stream_id
         if stream_id is None or stream_id == "":
             FH.bad_request_error(self, response, 'No parameter {} found'.format(FH.stream_id_parm))
@@ -39,19 +38,19 @@ class SubscribeToStreamService(webapp2.RequestHandler):
         else:
             response['status'] = "Subscription created"
 
-        FH.write_response(self, json.dumps(response))
+        self.write_response(json.dumps(response))
 
 
 # unsubscribe from a stream
 # takes a stream id and a user id. Deletes a StreamSubscription
-class UnsubscribeFromStreamService(webapp2.RequestHandler):
+class UnsubscribeFromStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
         # get stream name
-        stream_id = FH.get_stream_id_param(self)
+        stream_id = self.get_request_param(FH.stream_id_parm)
         response[FH.stream_id_parm] = stream_id
         if stream_id is None:
             FH.bad_request_error(self, response, 'No parameter {} found'.format(FH.stream_id_parm))
@@ -73,10 +72,4 @@ class UnsubscribeFromStreamService(webapp2.RequestHandler):
         else:
             response['status'] = "Subscription not found"
 
-        FH.write_response(self, json.dumps(response))
-
-
-app = webapp2.WSGIApplication([
-    ('/services/subscribe', SubscribeToStreamService),
-    ('/services/unsubscribe', UnsubscribeFromStreamService)
-], debug=True)
+        self.write_response(json.dumps(response))
