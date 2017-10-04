@@ -17,6 +17,7 @@ handlers:
 # [START views]
 - url: /search.*
   script: source.views.TextSearch.app
+
 - url: /viewstream
   script: Routes.app
 - url: /create
@@ -25,21 +26,22 @@ handlers:
 
 
 # [START services]
-- url: /services/viewstream
-  script: Routes.app
 - url: /services/insertteststream
   script: source.services.InsertTestStream.app
-- url: /services/upload.*
-  script: Routes.app
-- url: /services/management
-  script: source.services.Service_Management.app
-- url: /services/deletestream
-  script: Routes.app
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
 - url: /services/search.*
   script: source.services.Service_TextSearch.app
-- url: /services/subscribe
+- url: /services/management
+  script: source.services.Service_Management.app
+
+- url: /services/viewstream
+  script: Routes.app
+- url: /services/upload.*
+  script: Routes.app
+- url: /services/deletestream
+  script: Routes.app
+- url: /services/subcribe
   script: Routes.app
 - url: /services/unsubscribe
   script: Routes.app
