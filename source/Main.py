@@ -5,6 +5,8 @@ from google.appengine.api import app_identity
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
+import urllib
+import urllib2
 
 from source.models.NdbClasses import *
 
@@ -139,9 +141,12 @@ class CreatePage(webapp2.RequestHandler):
         subUserArray = StreamUser.query(StreamUser.email.IN(subscriberArray)).fetch()
         subUserKeys = [sub.key for sub in subUserArray]
 
-        tagEntityArray = Tag.query(Tag.name.IN(tagArray)).fetch()
-        tagKeys = [tag.key for tag in tagEntityArray]
-        tagNames = [tag.name for tag in tagEntityArray]
+        # create tags (or not if they already exist)
+        url_base = 'http://{0}/services/createtag?tagName='.format(os.environ['HTTP_HOST'])
+        for tag_name in tagArray:
+            tag_service_url = '{0}{1}'.format(url_base, urllib.quote(tag_name))
+            resp = urllib2.urlopen(tag_service_url)
+            print("\n{}\n".format(resp))
 
         # Create a new Stream entity then redirect to /view the new stream
         newStreamKey = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0).put()
@@ -151,14 +156,8 @@ class CreatePage(webapp2.RequestHandler):
             StreamSubscriber(stream=newStreamKey, user=sub).put()
 
         # associate current tags
-        for tag in tagKeys:
-            StreamTag(stream=newStreamKey, tag=tag).put()
-
-        # create any new tags
-        for tag in tagArray:
-            if tag not in tagNames:
-                tagKey = Tag(name=tag).put()
-                StreamTag(stream=newStreamKey, tag=tagKey).put()
+        for tag_name in tagArray:
+            StreamTag(stream=newStreamKey, tag=ndb.Key('Tag', tag_name)).put()
 
         # Redirect to /view for this stream
         #self.redirect('/manage')
