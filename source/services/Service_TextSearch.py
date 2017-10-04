@@ -1,9 +1,8 @@
 import webapp2
-
-from source.models.NdbClasses import *
-from source.services.Service_Utils import *
 from google.appengine.api import search
-from source.services.Service_Utils import get_search_string_param, tag_index_name, search_index_namespace
+
+from source.Framework.Framework_Helpers import *
+from source.Framework.Framework_Helpers import get_search_string_param, tag_index_name, search_index_namespace
 
 
 # search for tags

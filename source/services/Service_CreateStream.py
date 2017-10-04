@@ -1,53 +1,56 @@
-import os
-import urllib
-import urllib2
+import json
+import source.Framework.Framework_Helpers as FH
+from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import Stream
 
-import webapp2
-from google.appengine.api import users
 
-from source.models.NdbClasses import *
-from source.services.Service_Utils import *
+# create a Tag
+# takes a tag name and attempts to create a new tag. Returns status in json response
+class CreateStreamService(BaseHandler):
+    def get(self):
 
-# create a stream
-class CreateStreamService(webapp2.RequestHandler):
-    def post(self):
+        self.response.content_type = 'text/plain'
+        response = {}
 
-        user = users.get_current_user()
+        # get current user
+        owner = FH.get_current_user(self)
+        if owner is None:
+            FH.bad_request_error(self, response, 'Not logged in')
+            return
 
-        streamname = self.request.get('streamname')
-        subscribers = self.request.get('subs')
-        tags = self.request.get('tags')
-        coverImageUrl = self.request.get('coverUrl')
-        myStreamUser = ndb.Key('StreamUser', user.user_id()).get()
+        # get stream name
+        stream_name = FH.get_stream_name_param(self)
+        response[FH.stream_name_parm] = stream_name
+        if stream_name is None or stream_name == "":
+            FH.bad_request_error(self, response, 'No parameter {} found'.format(stream_name_parm))
+            return
 
-        subscriberArray = subscribers.split(";")
-        tagArray = tags.split(";")
+        # get cover image URL
+        cover_url = FH.get_cover_url_param(self)
+        response[FH.cover_url_parm] = cover_url
 
-        subUserArray = StreamUser.query(StreamUser.email.IN(subscriberArray)).fetch()
-        subUserKeys = [sub.key for sub in subUserArray]
+        # create new stream
+        stream = Stream.create(name=stream_name,
+                               owner=owner,
+                               cover_url=cover_url
+                               )
 
-        # create tags (or not if they already exist)
-        url_base = 'http://{0}/services/createtag?tagName='.format(os.environ['HTTP_HOST'])
-        for tag_name in tagArray:
-            tag_service_url = '{0}{1}'.format(url_base, urllib.quote(tag_name))
-            resp = urllib2.urlopen(tag_service_url)
-            print("\n{}\n".format(resp))
+        if stream is None:
+            FH.bad_request_error(self, response, 'Stream {0} already exists for user {1}'.format(stream_name, owner.nickName))
+            return
 
-        # Create a new Stream entity then redirect to /view the new stream
-        newStreamKey = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0).put()
+        # add stream to document index for searching
+        FH.searchablize_stream(stream, response)
 
-        # create new subscriptions for the given users
-        for sub in subUserKeys:
-            StreamSubscriber(stream=newStreamKey, user=sub).put()
+        # process subscribers list
+        subs = FH.get_subscribers_param(self)
+        response[FH.subscribers_parm] = subs
+        num_added = FH.add_subscribers(stream, subs.split(';'))
+        response['num_new_subscribers'] = num_added
 
-        # associate current tags
-        for tag_name in tagArray:
-            StreamTag(stream=newStreamKey, tag=ndb.Key('Tag', tag_name)).put()
+        # process tags list
+        tags = FH.get_tags_param(self)
+        response[FH.tags_parm] = tags
 
-        # Redirect to /view for this stream
-        #self.redirect('/manage')
-        self.redirect('/viewstream?streamID={}'.format(newStreamKey.id()))
-
-app = webapp2.WSGIApplication([
-    ('/services/createstream', CreateStreamService)
-], debug=True)
+        response['status'] = "Created new stream: {}".format(stream_name)
+        FH.write_response(self, json.dumps(response))

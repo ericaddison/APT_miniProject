@@ -1,6 +1,5 @@
 import webapp2
 from webapp2_extras import sessions
-from source.services import *
 
 
 # a base class for all request handlers in our app

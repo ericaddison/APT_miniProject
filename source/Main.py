@@ -1,12 +1,16 @@
 import os
-
+import json
 import webapp2
+import urllib
+import urllib2
+
 from google.appengine.api import app_identity
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
-import urllib
-import urllib2
+
+from Framework.Framework_Helpers import stream_name_parm, cover_url_parm, tags_parm, subscribers_parm
+from Framework.Framework_Helpers import get_request_parameter_dictionary, write_response
 
 from source.models.NdbClasses import *
 
@@ -142,11 +146,24 @@ class CreatePage(webapp2.RequestHandler):
             'user': user,
             'login_url': login_url,
             'login_text': login_text,
-            'app': app_identity.get_application_id()}
+            'stream_name_parm': stream_name_parm,
+            'tags_parm': tags_parm,
+            'cover_url_parm': cover_url_parm,
+            'subs_parm': subscribers_parm
+            }
 
         self.response.content_type = 'text/html'
         path = os.path.join(os.path.dirname(__file__), '../templates/Create.html')
         self.response.write(template.render(path, template_values))
+
+    def post(self):
+        # make call to createStream service
+        parm_dict = get_request_parameter_dictionary(self)
+        create_stream_url = 'http://{0}/services/createstream?{1}'.format(os.environ['HTTP_HOST'], urllib.urlencode(parm_dict))
+        print("\n\n{}\n\n".format(create_stream_url))
+        result = urllib2.urlopen(create_stream_url)
+        response = json.loads("".join(result.readlines()))
+        write_response(self, response)
 
 
 class ViewAllStreamsPage(webapp2.RequestHandler):

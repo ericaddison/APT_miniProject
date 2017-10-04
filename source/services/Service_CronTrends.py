@@ -1,10 +1,11 @@
 from datetime import datetime
 from datetime import timedelta
-import webapp2
 
+import webapp2
 from google.appengine.api import mail
+
+from source.Framework.Framework_Helpers import *
 from source.models.NdbClasses import *
-from source.services.Service_Utils import *
 
 
 # Cron jobs for Trending service

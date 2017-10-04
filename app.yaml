@@ -33,18 +33,18 @@ handlers:
   script: source.services.Service_Management.app
 - url: /services/deletestream
   script: source.services.Service_DeleteStream.app
-- url: /services/subscribe
-  script: source.services.Service_Subscribe.app
-- url: /services/unsubscribe
-  script: source.services.Service_Subscribe.app
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
 - url: /services/search.*
   script: source.services.Service_TextSearch.app
+- url: /services/subscribe
+  script: Routes.app
+- url: /services/unsubscribe
+  script: Routes.app
 - url: /services/createtag
   script: Routes.app
 - url: /services/createstream
-  script: source.services.Service_CreateStream.app
+  script: Routes.app
 # [END services]
 
 - url: /css

@@ -1,12 +1,13 @@
 import json
 import os
-
-import urllib2
 import urllib
+import urllib2
+
 import webapp2
 from google.appengine.api import users
 from google.appengine.ext.webapp import template
-from source.services.Service_Utils import get_search_string_param, get_tags_param
+
+from source.Framework.Framework_Helpers import get_search_string_param, get_tags_param
 
 
 class TextSearchForm(webapp2.RequestHandler):

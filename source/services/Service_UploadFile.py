@@ -4,8 +4,8 @@ from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import blobstore_handlers
 
+from source.Framework.Framework_Helpers import *
 from source.models.NdbClasses import *
-from source.services.Service_Utils import *
 
 
 # expects a POST parameter 'streamID' containing the stream ID

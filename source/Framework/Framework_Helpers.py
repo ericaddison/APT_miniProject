@@ -1,20 +1,32 @@
 import json
 import re
-from google.appengine.ext import ndb
-from google.appengine.api import search
 import datetime
 
+from google.appengine.api import search
+from google.appengine.api import users
+from google.appengine.ext import ndb
+
+# [START HTTP request parameter names]
 stream_id_parm = 'streamID'
+stream_name_parm = 'streamname'
 user_id_parm = 'userID'
 image_range_parm = 'imageRange'
 tag_name_parm = 'tagName'
 search_parm = 'searchString'
 search_results_parm = 'searchResults'
+subscribers_parm = 'subs'
+tags_parm = 'tags'
+cover_url_parm = 'coverUrl'
+# [END HTTP request parameter names]
+
 
 search_index_namespace = 'connexion'
 tag_index_name = 'tag_index'
 stream_index_name = 'stream_index'
 
+
+# [START HTTP request methods]
+# currently using webapp2 request handlers
 
 def bad_request_error(handler, response_dict, error_msg):
     response_dict['error'] = error_msg
@@ -23,12 +35,53 @@ def bad_request_error(handler, response_dict, error_msg):
     return
 
 
+def get_request_parameter_dictionary(handler):
+    return handler.request.params
+
+
 def write_response(handler, response_text):
     handler.response.write(response_text)
 
 
-def get_tag_param(handler):
+def get_tag_name_param(handler):
     return handler.request.get(tag_name_parm)
+
+
+def get_stream_name_param(handler):
+    return handler.request.get(stream_name_parm)
+
+
+def get_stream_id_param(handler):
+    return handler.request.get(stream_id_parm)
+
+
+def get_subscribers_param(handler):
+    return handler.request.get(subscribers_parm)
+
+
+def get_cover_url_param(handler):
+    return handler.request.get(cover_url_parm)
+
+
+def get_tags_param(handler):
+    return handler.request.get(tags_parm)
+
+# [END HTTP request methods]
+
+
+# returns the current google user for now
+# but could be extended to work with non-google user types
+# e.g. Facebook login, plain email login, etc
+# return a StreamUser
+def get_current_user(handler):
+    # get google user
+    google_user = users.get_current_user()
+
+    # look up our user
+    stream_user = ndb.Key('StreamUser', google_user.user_id()).get()
+
+    # return
+    return stream_user
 
 
 def searchablize_tag(tag, response):
@@ -80,36 +133,6 @@ def get_search_results_param(handler, response):
     return search_results
 
 
-def get_tags_param(handler, response):
-    # request parameter error checking
-    tags = handler.request.get('tags')
-    response['tags'] = tags
-    return tags
-
-
-def get_stream_param(handler, response):
-    # request parameter error checking
-    stream_id = handler.request.get(stream_id_parm)
-    if stream_id is None:
-        response['error'] = "No streamID found"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
-
-    response[stream_id_parm] = stream_id
-
-    # retrieve the stream from the ID
-    stream = (ndb.Key('Stream', int(stream_id))).get()
-
-    if stream is None:
-        response['error'] = "Invalid stream ID"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
-
-    return stream
-
-
 def get_user_param(handler, response):
     user_id = handler.request.get(user_id_parm)
     if user_id is None:
@@ -151,3 +174,4 @@ def get_image_range_param(handler, response):
 
     # get the indices
     return sorted([int(ind) for ind in m.groups()])
+
