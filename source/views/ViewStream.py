@@ -10,12 +10,23 @@ from datetime import datetime
 from google.appengine.ext import blobstore
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
+from google.appengine.api import users
 
 stream_id_parm = 'streamID'
 
 
 class ViewStream(webapp2.RequestHandler):
     def get(self):
+        user = users.get_current_user()
+
+        if user:
+            nickname = user.nickname()
+            login_url = users.create_logout_url('/')
+            login_text = 'Sign out'
+        else:
+            self.redirect("/")
+            return
+
 
         # retrieve request parameters
         stream_id = self.request.GET[stream_id_parm]
@@ -57,7 +68,10 @@ class ViewStream(webapp2.RequestHandler):
         template_values = {
                     'stream': stream,
                     'upload_url': upload_url,
-                    'image_urls': image_urls
+                    'image_urls': image_urls,
+                    'user': user,
+                    'login_url': login_url,
+                    'login_text': login_text
                 }
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/ViewStream.html')

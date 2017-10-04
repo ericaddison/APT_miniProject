@@ -26,30 +26,31 @@
         <div class="topnav">
             <a href="manage">Manage</a>
             <a href="create">Create</a>
-            <a href="view">View All</a>
+            <a href="view" class="active">View All</a>
             <a href="search">Search</a>
             <a href="trending">Trending</a>
             <a href="social">Social</a>
         </div>
 
-<br><br>
-Here is stream: {{ stream.name }}!
+        <table>
+            <tr><b>View All Streams:</b></tr>
 
-    <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-        <br>
-      Upload File: <br><input type="file" name="file"><br>
-      <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
-      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream.key.id }}">
-      <input type="submit" name="submit" value="Submit">
-    </form>
+            <tr>
+                <th>Name</th>
+                <th>Latest Update</th>
+                <th>Number of Pictures</th>
+            </tr>
 
-    <br><br>
-The first ten images are:<br><br>
-{% for url in image_urls %}
-<img src="{{url}}">
-<br>
-{% endfor %}
+            <tr>
+                <td>testing_static_table1</td>
+                <td>test1</td>
+                <td>number1</td>
+            </tr>
+        </table>
 
+        <footer>Copyright &copy; Footnote Here</footer>
+
+    </div>
 
 </body>
 </html>
