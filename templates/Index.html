@@ -32,24 +32,16 @@
             <a href="social">Social</a>
         </div>
 
-<br><br>
-Here is stream: {{ stream.name }}!
+    <p>
 
-    <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-        <br>
-      Upload File: <br><input type="file" name="file"><br>
-      <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
-      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream.key.id }}">
-      <input type="submit" name="submit" value="Submit">
-    </form>
-
-    <br><br>
-The first ten images are:<br><br>
-{% for url in image_urls %}
-<img src="{{url}}">
-<br>
-{% endfor %}
-
+        <a href= "{{ login_url }}" >  {{ login_text }}</a><br>
+        <br><br>
+    {% if user %}
+        <a href= "/manage">Manage Your Streams</a><br>
+    {% endif %}
 
 </body>
 </html>
+
+
+
