@@ -18,16 +18,22 @@ class CronTrendsService(webapp2.RequestHandler):
 
     def trending(self, duration):
         #Cleanup old stream views:
-        compareDateTime = datetime.now() - timedelta(hours=int(duration))
+        
+        compareDateTime = datetime.datetime.now() - timedelta(hours=int(duration))
         oldStreams = Stream.query().filter(Stream.viewList <= compareDateTime).fetch()
-           
+        
+        print "Cleaning up views older than: ", compareDateTime
+        #DON'T MODIFY A LIST WHILE YOU'RE ITERATING THROUGH IT!!!!
         for stream in oldStreams:
             items = []
+            removeItems = []
             for viewTime in stream.viewList:
                 items.append(viewTime)
             for item in items:
                 if item <= compareDateTime:
-                    items.remove(item)
+                    removeItems.append(item)
+            for rmItem in removeItems:
+                items.remove(rmItem)
             stream.viewList = items
             stream.put()
         
