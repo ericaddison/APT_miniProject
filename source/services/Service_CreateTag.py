@@ -13,8 +13,9 @@ class CreateTagService(webapp2.RequestHandler):
         response = {}
 
         tag = get_tag_param(self, response)
+        tag_name = response[tag_name_parm]
 
-        if response[tag_name_parm] is None:
+        if tag_name is None:
             return
 
         self.response.set_status(200)
@@ -24,7 +25,7 @@ class CreateTagService(webapp2.RequestHandler):
             return
 
         response.pop('error', None)
-        tag = Tag(name=tag.name, id=tag.name)
+        tag = Tag(name=tag_name, id=tag_name)
         tag.put()
 
         # add tag to document index for searching

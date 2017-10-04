@@ -1,24 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Stream Search</title>
-</head>
-<body>
+{% extends html_template %}
 
-    <h1>Connex.us</h1>
-    {% if user %}
-        You're signed in as {{ user }} | <a href="{{ login_url }}"> {{ login_text }}</a>
-        {% if isAdmin %} | <a href="/admin/dashboard">Admin Menu</a> {% endif %} <br>
-    {% endif %}
-    <hr>
-    <a href="manage">Manage</a> |
-    <a href="create">Create</a> |
-    <a href="view">View</a> |
-    <a href="search">Search</a> |
-    <a href="trending">Trending</a> |
-    <a href="social">Social</a>
+{% block title %}Connexion: Search{% endblock %}
 
+{% block content %}
 <br><br>
 
     <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
@@ -43,6 +27,4 @@
         {% endfor %}
     {% endif %}
 <br>
-
-</body>
-</html>
+{% endblock %}
