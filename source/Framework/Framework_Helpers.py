@@ -2,6 +2,7 @@ import json
 import re
 import datetime
 
+from google.appengine.api import images
 from google.appengine.api import search
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -17,6 +18,7 @@ search_results_parm = 'searchResults'
 subscribers_parm = 'subs'
 tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
+redirect_parm = 'redirect'
 # [END HTTP request parameter names]
 
 
@@ -36,6 +38,19 @@ def bad_request_error(handler, response_dict, error_msg):
 
 # [END HTTP request methods]
 
+
+
+# [START file handling]
+# currently using blobstore and images API for file handling
+
+def get_upload_from_filehandler(filehandler, index):
+    return filehandler.get_uploads()[index]
+
+
+def get_file_url(file):
+    images.get_serving_url(file.key())
+
+# [END file handling]
 
 # returns the current google user for now
 # but could be extended to work with non-google user types
@@ -124,22 +139,17 @@ def get_user_param(handler, response):
     return user
 
 
-def get_image_range_param(handler, response):
-    image_range = handler.request.get(image_range_parm)
+def get_image_range_param(handler):
+    image_range = handler.get_request_param(image_range_parm)
     if image_range is None:
-        response['error'] = "No image range found"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
+        return None, None, "No image range found"
 
     # verify image range format
     m = re.match("^([\d]+)-([\d]+)$", image_range)
     if m is None:
-        response['error'] = "Incorrect image range format. Expected <number>-<number>"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
-        return
+        return None, None, "Incorrect image range format. Expected <number>-<number>"
 
     # get the indices
-    return sorted([int(ind) for ind in m.groups()])
+    inds = sorted([int(ind) for ind in m.groups()])
+    return inds[0], inds[1], "good range"
 

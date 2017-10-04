@@ -1,56 +1,61 @@
-import webapp2
-from google.appengine.api import images
-from google.appengine.api import users
-from google.appengine.ext import ndb
-from google.appengine.ext.webapp import blobstore_handlers
+import json
+from source.Framework.BaseHandler import FileUploadHandler
 
-from source.Framework.Framework_Helpers import *
-from source.models.NdbClasses import *
+import source.Framework.Framework_Helpers as fh
+from source.models.NdbClasses import Stream, StreamItem
 
 
 # expects a POST parameter 'streamID' containing the stream ID
 # if a 'redirect' POST parameter is provided, this service will redirect to the give URL
 # otherwise a JSON status message will be returned
-class UploadFileHandler(blobstore_handlers.BlobstoreUploadHandler):
+class UploadFileHandler(FileUploadHandler):
     def post(self):
         try:
+            response = {}
 
-            stream = get_stream_param(self, {})
-            if stream is None:
+            # get current user
+            user = fh.get_current_user(self)
+            if user is None:
+                fh.bad_request_error(self, response, 'Not logged in')
                 return
 
-            upload = self.get_uploads()[0]
-            image_url = images.get_serving_url(upload.key())
+            stream_id = self.get_request_param(fh.stream_id_parm)
+            if stream_id is None or stream_id == '':
+                fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
+                return
+
+            # get the stream
+            stream = Stream.get_by_id(stream_id)
+
+            if stream is None:
+                fh.bad_request_error(self, response, 'Invalid Stream ID')
+                return
+
+            upload = fh.get_upload_from_filehandler(0)
+            image_url = fh.get_file_url(upload)
 
             # create StreamItem entity
-            image = StreamItem(
-                owner=ndb.Key('StreamUser', users.get_current_user().user_id()),
+            item = StreamItem.create(
+                owner=user,
                 blobKey=upload.key(),
                 URL=image_url,
                 name=upload.filename,
                 stream=stream.key)
-            image.put()
 
             # update stream list of images
-            stream.items.append(image.key)
-            stream.put()
+            stream.add_item(item)
 
             # go back to viewstream page
-            redirect = self.request.get('redirect')
+            redirect = self.get_request_param(fh.redirect_parm)
             if redirect:
                 self.redirect(redirect)
                 return
             else:
-                self.response.content_type = 'text/plain'
+                self.set_content_text_plain()
                 response = {'status': 'Upload successful'}
-                self.response.write(json.dumps(response))
+                self.write_response(json.dumps(response))
                 return
 
         except Exception as e:
             print(e)
             self.error(500)
-
-
-app = webapp2.WSGIApplication([
-    ('/services/upload', UploadFileHandler)
-], debug=True)

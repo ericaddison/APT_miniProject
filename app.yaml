@@ -24,7 +24,7 @@ handlers:
 
 # [START services]
 - url: /services/viewstream
-  script: source.services.Service_ViewStream.app
+  script: Routes.app
 - url: /services/insertteststream
   script: source.services.InsertTestStream.app
 - url: /services/upload.*

@@ -1,6 +1,6 @@
 import webapp2
 from webapp2_extras import sessions
-
+from google.appengine.ext.webapp import blobstore_handlers
 
 # a base class for all request handlers in our app
 # includes session setup
@@ -40,7 +40,12 @@ class BaseHandler(webapp2.RequestHandler):
     def set_content_text_html(self):
         self.response.content_type = 'text/html'
 
+    def redirect(self, url):
+        self.redirect(url)
 
 
-
-
+# file handler. Currently just extends BaseHandler and google blobstoreUpload handler
+class FileUploadHandler(BaseHandler, blobstore_handlers.BlobstoreUploadHandler):
+    @classmethod
+    def nothing(cls):
+        print("place-holder")
