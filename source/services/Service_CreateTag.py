@@ -16,7 +16,7 @@ class CreateTagService(BaseHandler):
         tag_name = self.get_request_param(FH.tag_name_parm)
         response[FH.tag_name_parm] = tag_name
 
-        if tag_name is None:
+        if tag_name is None or tag_name == '':
             FH.bad_request_error(self, response, "No tag name found")
             return
 

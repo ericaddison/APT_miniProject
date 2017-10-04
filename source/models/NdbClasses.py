@@ -77,6 +77,8 @@ class Tag(ndb.Model):
 
     @classmethod
     def get_by_name(cls, tag_name):
+        if tag_name is None or tag_name == '':
+            return None
         return ndb.Key('Tag', tag_name).get()
 
 
