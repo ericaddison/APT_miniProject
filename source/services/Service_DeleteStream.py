@@ -3,9 +3,6 @@ import webapp2
 from source.models.NdbClasses import *
 from source.services.Service_Utils import *
 
-stream_id_parm = 'streamID'
-user_id_parm = 'userID'
-
 
 # delete a stream
 # takes a stream id and a user id. Deletes stream ID and returns status code

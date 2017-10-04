@@ -1,10 +1,93 @@
 import json
 import re
 from google.appengine.ext import ndb
+from google.appengine.api import search
+import datetime
 
 stream_id_parm = 'streamID'
 user_id_parm = 'userID'
 image_range_parm = 'imageRange'
+tag_name_parm = 'tagName'
+search_parm = 'searchString'
+search_results_parm = 'searchResults'
+
+search_index_namespace = 'connexion'
+tag_index_name = 'tag_index'
+stream_index_name = 'stream_index'
+
+
+# meant to be called for a tag or stream object
+# must provide the index name
+# hack to get partial string searching
+def searchablize_tag_or_stream(item, index_name, response):
+    index = search.Index(name=index_name, namespace=search_index_namespace)
+    toks = item.name.split()
+
+    try:
+        for tok in toks:
+            for i in range(len(tok)):
+                substr = tok[0:i+1]
+                doc = search.Document(fields=[search.TextField(name='name', value=item.name),
+                                              search.TextField(name='string', value=substr),
+                                              search.DateField(name='date_added', value=datetime.datetime.now().date())])
+                # Index the document.
+                index.put(doc)
+    except search.PutError, e:
+        result = e.results[0]
+        response['errResult'] = str(result)
+
+
+def get_tag_param(handler, response):
+    # request parameter error checking
+    tag_name = handler.request.get(tag_name_parm)
+    if tag_name is None:
+        response['error'] = "No tagName found"
+        handler.response.set_status(400)
+        handler.response.write(json.dumps(response))
+        return
+
+    response[tag_name_parm] = tag_name
+
+    if tag_name == "":
+        tag_name = "empty_tag"
+
+    # retrieve the stream from the ID
+    tag = ndb.Key('Tag', tag_name).get()
+
+    if tag is None:
+        response['error'] = "Invalid tag name"
+        handler.response.set_status(400)
+        handler.response.write(json.dumps(response))
+        return
+
+    return tag
+
+
+def get_search_string_param(handler, response):
+    # request parameter error checking
+    search_string = handler.request.get(search_parm)
+    if search_string is None:
+        response['error'] = "No searchString found"
+        handler.response.set_status(400)
+        handler.response.write(json.dumps(response))
+        return
+
+    response[search_parm] = search_string
+    return search_string
+
+
+def get_search_results_param(handler, response):
+    # request parameter error checking
+    search_results = handler.request.get(search_results_parm)
+    response['search_results'] = search_results
+    return search_results
+
+
+def get_tags_param(handler, response):
+    # request parameter error checking
+    tags = handler.request.get('tags')
+    response['tags'] = tags
+    return tags
 
 
 def get_stream_param(handler, response):
