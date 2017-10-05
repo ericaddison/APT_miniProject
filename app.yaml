@@ -39,7 +39,7 @@ handlers:
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
 - url: /services/management
-  script: source.services.Service_Management.app
+  script: Routes.app
 - url: /services/search.*
   script: Routes.app
 - url: /services/viewstream

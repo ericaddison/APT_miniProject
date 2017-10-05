@@ -102,6 +102,7 @@ class Stream(ndb.Model):
             return None
 
     # owner should be a StreamUser
+    @classmethod
     def get_ids_by_owner(cls, owner):
         stream_query0 = Stream.query()
         stream_query1 = stream_query0.filter(Stream.owner == owner.key)

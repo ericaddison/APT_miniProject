@@ -42,7 +42,7 @@ app = webapp2.WSGIApplication([
     ('/services/viewstream', ViewStreamService),
     ('/services/deletestream', DeleteStreamService),
     ('/services/searchtags', TagTextSearchService),
-    ('/services/searchstreams', StreamTextSearchService)
+    ('/services/searchstreams', StreamTextSearchService),
     ('/services/management', ManagementService)
     # [END services]
 
