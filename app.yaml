@@ -35,7 +35,7 @@ handlers:
 - url: /services/search.*
   script: source.services.Service_TextSearch.app
 - url: /services/management
-  script: source.services.Service_Management.app
+  script: Routes.app
 - url: /services/viewstream
   script: Routes.app
 - url: /services/upload.*

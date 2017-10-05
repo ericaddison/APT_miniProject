@@ -1,40 +1,29 @@
-import webapp2
-
-from source.Framework.Framework_Helpers import *
-from source.models.NdbClasses import *
+import json
+from source.Framework.BaseHandler import BaseHandler
+import source.Framework.Framework_Helpers as fh
+from source.models.NdbClasses import StreamSubscriber, Stream
 
 
 # stream management service
 # which takes a user id and returns two lists of streams: streams owned and streams subscribed
-class ManagementService(webapp2.RequestHandler):
+class ManagementService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
-        user = get_user_param(self, response)
+        user = fh.get_current_user(self)
         if user is None:
+            fh.bad_request_error(self, "Not logged in")
             return
 
         # query for all streams owned by user
-        stream_query0 = Stream.query()
-        stream_query1 = stream_query0.filter(Stream.owner == user.key)
-        stream_result = stream_query1.fetch()
-        my_streams = [s.key.id() for s in stream_result]
+        my_streams = Stream.get_by_owner(user)
 
         # query for all streams subscribed to by user
-        sub_query0 = StreamSubscriber.query()
-        sub_query1 = sub_query0.filter(StreamSubscriber.user == user.key)
-        sub_result = sub_query1.fetch()
-        sub_streams = [s.key.id() for s in sub_result]
-
+        sub_streams = StreamSubscriber.get_by_user(user)
 
         # write some stream info
         response['owned_streams'] = my_streams
         response['subscribed_streams'] = sub_streams
-        self.response.write(json.dumps(response))
-
-
-app = webapp2.WSGIApplication([
-    ('/services/management', ManagementService)
-], debug=True)
+        self.write_response(json.dumps(response))
