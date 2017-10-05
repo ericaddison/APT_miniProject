@@ -13,9 +13,9 @@
 
     {% if search_streams %}
         <br>
-        <h3>Matching Stream</h3>
+        <h3>Matching Streams</h3>
         {% for stream in search_streams %}
-            <p>{{ stream }}</p><br>
+            <a href="/viewstream?streamID={{ stream.0 }}">{{ stream.1 }}</a><br>
         {% endfor %}
     {% endif %}
 
@@ -26,5 +26,6 @@
             <a href="/viewtag?tagName={{ tag }}">{{ tag }}</a><br>
         {% endfor %}
     {% endif %}
+
 <br>
 {% endblock %}

@@ -28,7 +28,7 @@ class TextSearchForm(BaseHandler):
             'cover_url_parm': fh.cover_url_parm,
             'subs_parm': fh.subscribers_parm,
             'search_url': '/searchexe'
-            }
+        }
 
         search_string = self.get_request_param(fh.search_string_parm)
         if search_string is not None:
@@ -38,6 +38,15 @@ class TextSearchForm(BaseHandler):
         if tags not in [None, '']:
             s = urllib.unquote(tags).decode('utf8')
             template_values['search_tags'] = eval(s)
+
+        stream_names = self.get_request_param(fh.stream_name_parm)
+        stream_ids = self.get_request_param(fh.stream_id_parm)
+        if stream_names not in [None, ''] and stream_ids not in [None, '']:
+            s = urllib.unquote(stream_names).decode('utf8')
+            names = eval(s)
+            s = urllib.unquote(stream_ids).decode('utf8')
+            ids = eval(s)
+            template_values['search_streams'] = zip(names, ids)
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/StreamSearch.html')
         self.set_content_text_html()
@@ -56,6 +65,18 @@ class TextSearch(BaseHandler):
         # make call to textSearch service
         search_service_url = 'http://{0}/services/searchtags?searchString={1}'.format(os.environ['HTTP_HOST'], urllib.quote(search_string))
         result = urllib2.urlopen(search_service_url)
-        search_response = json.loads("".join(result.readlines()))
-        print("\n{}\n".format(search_response))
-        self.redirect('/search?{}'.format(urllib.urlencode(search_response)))
+        tag_search = json.loads("".join(result.readlines()))
+
+        search_service_url = 'http://{0}/services/searchstreams?searchString={1}'.format(os.environ['HTTP_HOST'],
+                                                                                      urllib.quote(search_string))
+        result = urllib2.urlopen(search_service_url)
+        stream_search = json.loads("".join(result.readlines()))
+
+        response = {
+                    'search_string': search_string,
+                    'tags': tag_search['tags'],
+                    fh.stream_name_parm: stream_search[fh.stream_name_parm],
+                    fh.stream_id_parm: stream_search[fh.stream_id_parm],
+                    }
+
+        self.redirect('/search?{}'.format(urllib.urlencode(response)))

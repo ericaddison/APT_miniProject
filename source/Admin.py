@@ -67,20 +67,21 @@ class ListStreams(webapp2.RequestHandler):
 class ClearSearchIndexes(webapp2.RequestHandler):
     def get(self):
         """Delete all the docs in the given index."""
-        index = search.Index(name=fh.tag_index_name, namespace=fh.search_index_namespace)
-
-        msg = 'Deleted all documents from tag index'
-        try:
-            while True:
-                # until no more documents, get a list of documents,
-                # constraining the returned objects to contain only the doc ids,
-                # extract the doc ids, and delete the docs.
-                document_ids = [document.doc_id for document in index.get_range(ids_only=True)]
-                if not document_ids:
-                    break
-                index.delete(document_ids)
-        except search.DeleteError:
-            msg = 'Error removing exceptions'
+        tagindex = search.Index(name=fh.tag_index_name, namespace=fh.search_index_namespace)
+        streamindex = search.Index(name=fh.stream_index_name, namespace=fh.search_index_namespace)
+        msg = 'Deleted all documents from indexes'
+        for index in [tagindex, streamindex]:
+            try:
+                while True:
+                    # until no more documents, get a list of documents,
+                    # constraining the returned objects to contain only the doc ids,
+                    # extract the doc ids, and delete the docs.
+                    document_ids = [document.doc_id for document in index.get_range(ids_only=True)]
+                    if not document_ids:
+                        break
+                    index.delete(document_ids)
+            except search.DeleteError:
+                msg = 'Error removing exceptions'
 
         template_values = {
             'simple_content': msg,
@@ -96,7 +97,7 @@ class DisplayTagIndex(webapp2.RequestHandler):
 
         res = index.get_range(limit=1000)
         prints = "<table>"
-        prints += "".join(['<tr><td>{0}</td><td>--</td><td>{1}</td></tr>'.format(r.fields[0].value, r.fields[1].value) for r in res.results])
+        prints += "".join(['<tr><td>{0}</td><td>--</td><td>{1}</td></tr>'.format(r.fields[1].value, r.fields[2].value) for r in res.results])
         prints += "</table>"
 
         template_values = {
@@ -107,12 +108,29 @@ class DisplayTagIndex(webapp2.RequestHandler):
         self.response.write(template.render(templatepath, template_values))
 
 
+class DisplayStreamIndex(webapp2.RequestHandler):
+    def get(self):
+        index = search.Index(name=fh.stream_index_name, namespace=fh.search_index_namespace)
+
+        res = index.get_range(limit=1000)
+        prints = "<table>"
+        prints += "".join(['{}<br><br>'.format(r.fields) for r in res.results])
+        prints += "</table>"
+
+        template_values = {
+            'simple_content': prints,
+            'showstreamindex_active': True
+        }
+
+        self.response.write(template.render(templatepath, template_values))
+
 app = webapp2.WSGIApplication([
     ('/admin/dashboard', AdminDashboard),
     ('/admin/listusers', ListUsers),
     ('/admin/liststreams', ListStreams),
     ('/admin/cleartagindex', ClearSearchIndexes),
-    ('/admin/displaytagindex', DisplayTagIndex)
+    ('/admin/displaytagindex', DisplayTagIndex),
+    ('/admin/displaystreamindex', DisplayStreamIndex)
 ], debug=True)
 
 

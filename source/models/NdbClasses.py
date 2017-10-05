@@ -49,7 +49,7 @@ class Stream(ndb.Model):
         for key in required_keys:
             if "name" not in kwargs.keys():
                 raise TypeError('Missing required key "{}"'.format(key))
-        name = kwargs['name']
+        name = kwargs['name'].strip()
         owner = kwargs['owner']
         cover_url = kwargs['cover_url'] if 'cover_url' in kwargs.keys() else None
 
@@ -131,6 +131,7 @@ class Tag(ndb.Model):
     @classmethod
     def create(cls, tag_name):
         # tags are indexed in Datastore by their name
+        tag_name = tag_name.strip()
         if Tag.get_by_name(tag_name):
             return None
         tag = Tag(name=tag_name, id=tag_name)
