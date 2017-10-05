@@ -4,10 +4,10 @@ import urllib2
 import os
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
-from source.models.NdbClasses import Stream
+from source.models.NdbClasses import Stream, StreamSubscriber
 
 
-class DeletePage(BaseHandler):
+class UnsubscribePage(BaseHandler):
     def post(self):
 
         user = fh.get_current_user(self)
@@ -27,16 +27,16 @@ class DeletePage(BaseHandler):
             'user': user.nickName,
             'login_url': login_url,
             'login_text': login_text,
-            'del_streams': zip(stream_ids, stream_names),
+            'unsub_streams': zip(stream_ids, stream_names),
             'stream_id_parm': fh.stream_id_parm
             }
 
         self.set_content_text_html()
-        path = os.path.join(os.path.dirname(__file__), '../../templates/Delete.html')
+        path = os.path.join(os.path.dirname(__file__), '../../templates/Unsubscribe.html')
         self.response.write(fh.render_html_template(path, template_values))
 
 
-class DeleteExe(BaseHandler):
+class UnsubscribeExe(BaseHandler):
     def post(self):
         user = fh.get_current_user(self)
 
@@ -44,35 +44,37 @@ class DeleteExe(BaseHandler):
             self.redirect("/")
             return
 
-        # make call to deleteStream service
+        # make call to unsubscribe service
 
         button = self.get_request_param('button')
         if button == "Cancel":
-            self.redirect('/manage?{0}=Delete cancelled'.format(fh.message_parm))
+            self.redirect('/manage?{0}=Unsubscribe cancelled'.format(fh.message_parm))
             return
 
-        reg = re.compile(r'^delete_(.*)')
+        reg = re.compile(r'^unsubscribe_(.*)')
 
         matches = [reg.match(key) for key in self.get_request_parameter_dictionary().keys()]
         stream_ids = [str(match.groups()[0]) for match in matches if match is not None]
 
         message = ""
         for id in stream_ids:
-            delete_stream_url = 'http://{0}/services/deletestream?{1}={2};{3}={4}'.format(os.environ['HTTP_HOST'],
-                                                                                          fh.stream_id_parm,
-                                                                                          id,
-                                                                                          fh.user_id_parm,
-                                                                                          fh.get_current_user(self).user_id())
+            base_url = "http://{0}/services/unsubscribe".format(os.environ['HTTP_HOST'])
+            delete_stream_url = '{0}?{1}={2};{3}={4}'.format(base_url,
+                                                             fh.stream_id_parm,
+                                                             id,
+                                                             fh.user_id_parm,
+                                                             fh.get_current_user(self).user_id())
             try:
                 result = urllib2.urlopen(delete_stream_url)
+                print("\n\n{}\n\n".format(result))
                 message = "{0}, {1}".format(message, result)
             except urllib2.HTTPError:
-                self.redirect('/error?{0}={1}'.format(fh.error_code_parm, 'Error deleting stream'))
+                self.redirect('/error?{0}={1}'.format(fh.error_code_parm, 'Error unsubscribing from stream'))
 
         # try to wait until streams are really gone...
-        for id in stream_ids:
-            while Stream.get_by_id(id):
-                pass
+        # for id in stream_ids:
+        #     while StreamSubscriber.
+        #         pass
 
-        self.redirect('http://{0}/manage?{1}={2}'.format(os.environ['HTTP_HOST'], fh.message_parm, 'Deleted streams'))
+        self.redirect('http://{0}/manage?{1}={2}'.format(os.environ['HTTP_HOST'], fh.message_parm, 'Unsubscribed from streams'))
 

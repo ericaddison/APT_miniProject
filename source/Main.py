@@ -49,7 +49,6 @@ class ManagePage(BaseHandler):
     def get(self):
 
         user = users.get_current_user()
-
         if user:
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
@@ -70,13 +69,18 @@ class ManagePage(BaseHandler):
             self.redirect("/")
             return
 
-        # get streams owned by this user
-        myuser = ndb.Key('StreamUser', stream_user.key.id())
-        user_streams = Stream.query(Stream.owner == myuser).fetch()
+        # call management service to get stream lists
+        management_service_url = 'http://{0}/services/management?{1}={2}'.format(os.environ['HTTP_HOST'],
+                                                                                 fh.user_id_parm, user.user_id())
+        print("\n\n{}\n\n".format(management_service_url))
+        result = urllib2.urlopen(management_service_url)
+        response = json.loads("".join(result.readlines()))
+        user_streams = response['owned_streams']
+        subby_streams = response['subscribed_streams']
 
         owned_streams = []
-
-        for stream in user_streams:
+        for stream_id in user_streams:
+            stream = Stream.get_by_id(stream_id)
             newestDate = ""
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
@@ -85,11 +89,9 @@ class ManagePage(BaseHandler):
             owned_streams.append(streamDict)
 
         # get streams subscribed by this user
-        user_subscriptions = StreamSubscriber.query(StreamSubscriber.user == stream_user.key).fetch()
-
         subbed_streams = []
-
-        for stream in user_streams:
+        for stream_id in subby_streams:
+            stream = Stream.get_by_id(stream_id)
             newestDate = ""
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded

@@ -1,22 +1,22 @@
 {% extends "ConfirmRemoveTemplate.html" %}
 
-{% block title %}Connexion: Confirm Delete{% endblock %}
+{% block title %}Connexion: Confirm Unsubscribe{% endblock %}
 
 {% block warning_message %}
-The following streams will be deleted!
+You will be unsubscribed from the following streams!
 {% endblock %}
 
 {% block action_url %}
-/deleteexe
+/unsubscribeexe
 {% endblock %}
 
 {% block confirm_content %}
-    {% for stream in del_streams %}
+    {% for stream in unsub_streams %}
         <input type="hidden" name="{{ stream.0 }}">
     <strong>{{ stream.1 }}</strong><br>
     {% endfor %}
 {% endblock %}
 
 {% block submit_text %}
-DELETE
+UNSUBSCRIBE
 {% endblock %}

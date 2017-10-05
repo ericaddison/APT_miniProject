@@ -83,4 +83,28 @@ $(document).ready(function(){
         $('#deleteform').append(name_input)
     });
 
+    // unsubscribe button click
+    // add items to form data
+    $('#unsubscribe_button').click(function(){
+        deleted = $('#unsubscribetable').find('.checked')
+        ids = deleted.map(function() { return $(this).attr('id'); }).get();
+        names = deleted.map(function() { return $(this).attr('name'); }).get();
+        rows = deleted.map(function() { return $(this).closest('tr'); }).get();
+        all = $('#unsubscribetable').find('.check_all').hasClass('checked');
+
+        // add items to the form
+        for(i=0; i<ids.length; i++){
+                id = String(ids[i]).replace('unsubscribe_','')
+        }
+
+        ids = JSON.stringify(ids)
+        names = JSON.stringify(names)
+
+        id_input = $("<input>").attr("type", "hidden").attr("name", "streamID").val(ids);
+        name_input = $("<input>").attr("type", "hidden").attr("name", "streamname").val(names);
+
+        $('#unsubscribeform').append(id_input)
+        $('#unsubscribeform').append(name_input)
+    });
+
 });

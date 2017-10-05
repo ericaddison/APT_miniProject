@@ -23,6 +23,9 @@ class Stream(ndb.Model):
         item_keys = self.items[(ind1-1):ind2]
         return ndb.get_multi(item_keys), ind1, ind2
 
+    def stream_id(self):
+        return self.key.id()
+
     def get_owner_from_db(self):
         return self.owner.get()
 
@@ -88,7 +91,7 @@ class Stream(ndb.Model):
 
     @classmethod
     # owner should be a StreamUser
-    def get_by_owner(cls, owner):
+    def get_ids_by_owner(cls, owner):
         stream_query0 = Stream.query()
         stream_query1 = stream_query0.filter(Stream.owner == owner.key)
         stream_result = stream_query1.fetch()
@@ -205,6 +208,9 @@ class StreamSubscriber(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
     user = ndb.KeyProperty(indexed=True, kind='StreamUser')
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+
+    def get_id(self):
+        return self.key.id()
 
     @classmethod
     def create(cls, stream, user):
