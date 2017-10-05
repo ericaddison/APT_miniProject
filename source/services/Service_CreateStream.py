@@ -1,53 +1,65 @@
-import os
-import urllib
-import urllib2
+import json
+import source.Framework.Framework_Helpers as fh
+from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import Stream, StreamSubscriber, StreamTag, StreamUser
 
-import webapp2
-from google.appengine.api import users
 
-from source.models.NdbClasses import *
-from source.services.Service_Utils import *
+# create a Tag
+# takes a tag name and attempts to create a new tag. Returns status in json response
+class CreateStreamService(BaseHandler):
+    def get(self):
 
-# create a stream
-class CreateStreamService(webapp2.RequestHandler):
-    def post(self):
+        self.set_content_text_plain()
+        response = {}
 
-        user = users.get_current_user()
+        # get current user
+        owner_id = self.get_request_param(fh.user_id_parm)
+        owner = StreamUser.get_by_id(owner_id)
 
-        streamname = self.request.get('streamname')
-        subscribers = self.request.get('subs')
-        tags = self.request.get('tags')
-        coverImageUrl = self.request.get('coverUrl')
-        myStreamUser = ndb.Key('StreamUser', user.user_id()).get()
+        if owner is None:
+            print("\n{}\n".format("LOG"))
+            fh.bad_request_error(self, response, 'Not logged in')
+            return
 
-        subscriberArray = subscribers.split(";")
-        tagArray = tags.split(";")
+        # get stream name
+        stream_name = self.get_request_param(fh.stream_name_parm)
+        response[fh.stream_name_parm] = stream_name
+        if stream_name is None or stream_name == "":
+            print("\n{}\n".format("SNAME"))
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_name_parm))
+            return
 
-        subUserArray = StreamUser.query(StreamUser.email.IN(subscriberArray)).fetch()
-        subUserKeys = [sub.key for sub in subUserArray]
+        # get cover image URL
+        cover_url = self.get_request_param(fh.cover_url_parm)
+        response[fh.cover_url_parm] = cover_url
 
-        # create tags (or not if they already exist)
-        url_base = 'http://{0}/services/createtag?tagName='.format(os.environ['HTTP_HOST'])
-        for tag_name in tagArray:
-            tag_service_url = '{0}{1}'.format(url_base, urllib.quote(tag_name))
-            resp = urllib2.urlopen(tag_service_url)
-            print("\n{}\n".format(resp))
+        # create new stream
+        stream = Stream.create(name=stream_name,
+                               owner=owner,
+                               cover_url=cover_url
+                               )
 
-        # Create a new Stream entity then redirect to /view the new stream
-        newStreamKey = Stream(name=streamname, owner=myStreamUser.key, coverImageURL=coverImageUrl, numViews=0).put()
+        if stream is None:
+            print("\n{}\n".format("NO S"))
+            fh.bad_request_error(self, response, 'Stream {0} already exists for user {1}'.format(stream_name, owner.nickName))
+            return
 
-        # create new subscriptions for the given users
-        for sub in subUserKeys:
-            StreamSubscriber(stream=newStreamKey, user=sub).put()
+        response[fh.stream_id_parm] = stream.key.id()
 
-        # associate current tags
-        for tag_name in tagArray:
-            StreamTag(stream=newStreamKey, tag=ndb.Key('Tag', tag_name)).put()
+        # add stream to document index for searching
+        fh.searchablize_stream(stream, response)
 
-        # Redirect to /view for this stream
-        #self.redirect('/manage')
-        self.redirect('/viewstream?streamID={}'.format(newStreamKey.id()))
+        # process subscribers list
+        subs = self.get_request_param(fh.subscribers_parm)
+        response[fh.subscribers_parm] = subs
+        num_added = StreamSubscriber.add_subscribers_by_emails(stream, subs.split(';'))
+        response['num_new_subscribers'] = num_added
 
-app = webapp2.WSGIApplication([
-    ('/services/createstream', CreateStreamService)
-], debug=True)
+        # process tags list
+        #TODO: tags list in create
+        tags = self.get_request_param(fh.tags_parm)
+        StreamTag.add_tags_to_stream(stream, tags.split(';'))
+        response[fh.tags_parm] = tags
+
+        response['status'] = "Created new stream: {}".format(stream_name)
+        self.write_response(json.dumps(response))

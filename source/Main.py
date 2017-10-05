@@ -1,14 +1,19 @@
 import os
-
+import json
 import webapp2
+import urllib
+import urllib2
+
 from google.appengine.api import app_identity
 from google.appengine.api import users
 from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
-import urllib
-import urllib2
+
+import Framework.Framework_Helpers as fh
 
 from source.models.NdbClasses import *
+
+from source.Framework.BaseHandler import BaseHandler
 
 # If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
@@ -124,31 +129,6 @@ class ManagePage(webapp2.RequestHandler):
         self.response.write(template.render(path, template_values))
 
 
-class CreatePage(webapp2.RequestHandler):
-    def get(self):
-
-        user = users.get_current_user()
-
-        if user:
-            nickname = user.nickname()
-            login_url = users.create_logout_url('/')
-            login_text = 'Sign out'
-        else:
-            self.redirect("/")
-            return
-
-        template_values = {
-            'html_template': 'MasterTemplate.html',
-            'user': user,
-            'login_url': login_url,
-            'login_text': login_text,
-            'app': app_identity.get_application_id()}
-
-        self.response.content_type = 'text/html'
-        path = os.path.join(os.path.dirname(__file__), '../templates/Create.html')
-        self.response.write(template.render(path, template_values))
-
-
 class ViewAllStreamsPage(webapp2.RequestHandler):
     def get(self):
 
@@ -178,6 +158,5 @@ class ViewAllStreamsPage(webapp2.RequestHandler):
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/manage', ManagePage),
-    ('/create', CreatePage),
     ('/view', ViewAllStreamsPage)
 ], debug=True)

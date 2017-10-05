@@ -1,56 +1,58 @@
-import webapp2
-from google.appengine.api import images
-from google.appengine.api import users
-from google.appengine.ext import ndb
-from google.appengine.ext.webapp import blobstore_handlers
+import json
+from source.Framework.BaseHandler import FileUploadHandler
 
-from source.models.NdbClasses import *
-from source.services.Service_Utils import *
+import source.Framework.Framework_Helpers as fh
+from source.models.NdbClasses import Stream, StreamItem
 
 
 # expects a POST parameter 'streamID' containing the stream ID
 # if a 'redirect' POST parameter is provided, this service will redirect to the give URL
 # otherwise a JSON status message will be returned
-class UploadFileHandler(blobstore_handlers.BlobstoreUploadHandler):
+class UploadFileHandler(FileUploadHandler):
     def post(self):
-        try:
+        response = {}
 
-            stream = get_stream_param(self, {})
-            if stream is None:
-                return
+        # get current user
+        user = fh.get_current_user(self)
+        if user is None:
+            fh.bad_request_error(self, response, 'Not logged in')
+            return
 
-            upload = self.get_uploads()[0]
-            image_url = images.get_serving_url(upload.key())
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        if stream_id is None or stream_id == '':
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
+            return
 
-            # create StreamItem entity
-            image = StreamItem(
-                owner=ndb.Key('StreamUser', users.get_current_user().user_id()),
-                blobKey=upload.key(),
-                URL=image_url,
-                name=upload.filename,
-                stream=stream.key)
-            image.put()
+        # get the stream
+        stream = Stream.get_by_id(stream_id)
 
-            # update stream list of images
-            stream.items.append(image.key)
-            stream.put()
+        if stream is None:
+            fh.bad_request_error(self, response, 'Invalid Stream ID')
+            return
 
-            # go back to viewstream page
-            redirect = self.request.get('redirect')
-            if redirect:
-                self.redirect(redirect)
-                return
-            else:
-                self.response.content_type = 'text/plain'
-                response = {'status': 'Upload successful'}
-                self.response.write(json.dumps(response))
-                return
+        upload = fh.get_upload_from_filehandler(self, 0)
+        image_url = fh.get_file_url(upload)
 
-        except Exception as e:
-            print(e)
-            self.error(500)
+        # create StreamItem entity
+        item = StreamItem.create(
+            owner=user,
+            file=upload,
+            URL=image_url,
+            name=upload.filename,
+            stream=stream)
 
+        # update stream list of images
+        stream.add_item(item)
 
-app = webapp2.WSGIApplication([
-    ('/services/upload', UploadFileHandler)
-], debug=True)
+        # go back to viewstream page
+        redirect = self.get_request_param(fh.redirect_parm)
+        if redirect:
+            self.redirect(redirect)
+            return
+        else:
+            self.set_content_text_plain()
+            response = {'status': 'Upload successful',
+                        'image_url': image_url
+                        }
+            self.write_response(json.dumps(response))
+            return

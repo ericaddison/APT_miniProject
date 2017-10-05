@@ -12,10 +12,10 @@ from google.appengine.ext import ndb
 from google.appengine.ext.webapp import template
 from google.appengine.api import users
 
-stream_id_parm = 'streamID'
+import source.Framework.Framework_Helpers as fh
+from source.Framework.BaseHandler import BaseHandler
 
-
-class ViewStream(webapp2.RequestHandler):
+class ViewStream(BaseHandler):
     def get(self):
         user = users.get_current_user()
 
@@ -29,7 +29,7 @@ class ViewStream(webapp2.RequestHandler):
 
 
         # retrieve request parameters
-        stream_id = self.request.GET[stream_id_parm]
+        stream_id = self.get_request_param(fh.stream_id_parm)
 
         # retrieve the stream from the ID
         try:
@@ -59,12 +59,14 @@ class ViewStream(webapp2.RequestHandler):
         viewstream_service_url = 'http://{0}/services/viewstream?streamID={1};imageRange={2}'.format(os.environ['HTTP_HOST'],stream_id, '1-10')
         result = urllib2.urlopen(viewstream_service_url)
         response = json.loads("".join(result.readlines()))
-        image_urls = [str(url) for url in response['urls']]
-        image_urls.reverse()
+        image_urls = response['urls']
+
+        print("\n{}\n".format(image_urls))
 
         template_values = {
                     'html_template': 'MasterTemplate.html',
                     'stream': stream,
+                    'stream_id': stream.key.id(),
                     'upload_url': upload_url,
                     'image_urls': image_urls,
                     'user': user,

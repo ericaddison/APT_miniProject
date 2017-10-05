@@ -1,72 +1,76 @@
-import webapp2
-from google.appengine.ext import ndb
-
+import json
+import source.Framework.Framework_Helpers as fh
 from source.models.NdbClasses import *
-from source.services.Service_Utils import *
+from source.Framework.BaseHandler import BaseHandler
 
 
 # subscribe to a stream
 # takes a stream id and a user id. Creates a new StreamSubscription
-class SubscribeToStreamService(webapp2.RequestHandler):
+class SubscribeToStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
-        stream = get_stream_param(self, response)
-        if stream is None:
+        # get stream name
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        response[fh.stream_id_parm] = stream_id
+        if stream_id is None or stream_id == "":
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
             return
 
-        user = get_user_param(self, response)
+        # get the stream
+        stream = Stream.get_by_id(stream_id)
+
+        if stream is None:
+            fh.bad_request_error(self, response, 'Invalid Stream ID')
+            return
+
+        # get current user
+        user = fh.get_current_user(self)
         if user is None:
+            fh.bad_request_error(self, response, 'Not logged in')
             return
 
         # create new subscription
-        key_value = "{}-{}".format(user.key.id(), stream.key.id())
-        sub = ndb.Key('StreamSubscriber', key_value).get()
-        print("\n\n\n{}\n\n".format(sub))
+        sub = StreamSubscriber.create(stream, user)
         if sub is None:
-            StreamSubscriber(user=user.key,
-                             stream=stream.key,
-                             id=key_value).put()
-            response['status'] = "Subscription created"
-        else:
             response['status'] = "Already subscribed"
+        else:
+            response['status'] = "Subscription created"
 
-        self.response.set_status(200)
-        self.response.write(json.dumps(response))
+        self.write_response(json.dumps(response))
 
 
 # unsubscribe from a stream
 # takes a stream id and a user id. Deletes a StreamSubscription
-class UnsubscribeFromStreamService(webapp2.RequestHandler):
+class UnsubscribeFromStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
-        stream = get_stream_param(self, response)
-        if stream is None:
+        # get stream name
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        response[fh.stream_id_parm] = stream_id
+        if stream_id is None:
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
             return
 
-        user = get_user_param(self, response)
+        # get the stream
+        stream = Stream.get_by_id(stream_id)
+
+        # get current user
+        user = fh.get_current_user(self)
         if user is None:
+            fh.bad_request_error(self, response, 'Not logged in')
             return
 
         # delete subscription
-        key_value = "{}-{}".format(user.key.id(), stream.key.id())
-        sub = ndb.Key('StreamSubscriber', key_value).get()
-        if sub is None:
-            response['status'] = "Subscription not found"
-        else:
-            sub.key.delete()
+        result = StreamSubscriber.delete(stream, user)
+        if result:
             response['status'] = "Subscription deleted"
+        else:
+            response['status'] = "Subscription not found"
 
-        self.response.set_status(200)
-        self.response.write(json.dumps(response))
-
-
-app = webapp2.WSGIApplication([
-    ('/services/subscribe', SubscribeToStreamService),
-    ('/services/unsubscribe', UnsubscribeFromStreamService)
-], debug=True)
+        self.write_response(json.dumps(response))

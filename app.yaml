@@ -15,36 +15,40 @@ handlers:
 
 
 # [START views]
-- url: /viewstream
-  script: source.views.ViewStream.app
 - url: /search.*
-  script: source.views.TextSearch.app
+  script: Routes.app
+
+- url: /viewstream
+  script: Routes.app
+- url: /create
+  script: Routes.app
 # [START views]
 
 
 # [START services]
-- url: /services/viewstream
-  script: source.services.Service_ViewStream.app
 - url: /services/insertteststream
   script: source.services.InsertTestStream.app
-- url: /services/upload.*
-  script: source.services.Service_UploadFile.app
-- url: /services/management
-  script: source.services.Service_Management.app
-- url: /services/deletestream
-  script: source.services.Service_DeleteStream.app
-- url: /services/subscribe
-  script: source.services.Service_Subscribe.app
-- url: /services/unsubscribe
-  script: source.services.Service_Subscribe.app
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
 - url: /services/search.*
   script: source.services.Service_TextSearch.app
+- url: /services/management
+  script: source.services.Service_Management.app
+
+- url: /services/viewstream
+  script: Routes.app
+- url: /services/upload.*
+  script: Routes.app
+- url: /services/deletestream
+  script: Routes.app
+- url: /services/subcribe
+  script: Routes.app
+- url: /services/unsubscribe
+  script: Routes.app
 - url: /services/createtag
-  script: source.services.Service_CreateTag.app
+  script: Routes.app
 - url: /services/createstream
-  script: source.services.Service_CreateStream.app
+  script: Routes.app
 # [END services]
 
 - url: /css
