@@ -16,7 +16,7 @@ class TagTextSearchService(BaseHandler):
             fh.bad_request_error(self, "Search string not found")
             return
 
-        response['tags'] = fh.search_tag_index(search_string)
+        response[fh.tags_parm] = fh.search_tag_index(search_string)
         self.write_response(json.dumps(response))
 
 

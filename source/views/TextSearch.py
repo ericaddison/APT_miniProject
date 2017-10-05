@@ -33,6 +33,7 @@ class TextSearchForm(BaseHandler):
 
         search_string = self.get_request_param(fh.search_string_parm)
         if search_string is not None:
+            print("\n\nsearch string: {}\n\n".format(search_string))
             template_values['search_string'] = search_string
 
         tags = self.get_request_param(fh.tags_parm)
@@ -72,8 +73,8 @@ class TextSearch(BaseHandler):
         stream_search = json.loads("".join(result.readlines()))
 
         response = {
-                    'search_string': search_string,
-                    'tags': tag_search['tags'],
+                    fh.search_string_parm: search_string,
+                    fh.tags_parm: tag_search[fh.tags_parm],
                     fh.stream_id_parm: stream_search[fh.stream_id_parm]
                     }
 
