@@ -12,6 +12,7 @@ from source.views.Create import CreatePage
 from source.views.ViewStream import ViewStream
 from source.views.TextSearch import TextSearch, TextSearchForm
 from source.views.ErrorView import ErrorView
+from source.views.ViewAllStreams import ViewAllStreams
 
 config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 
@@ -19,6 +20,7 @@ app = webapp2.WSGIApplication([
 
     # [START views]
     ('/create', CreatePage),
+    ('/viewall', ViewAllStreams),
     ('/viewstream', ViewStream),
     ('/search', TextSearchForm),
     ('/searchexe', TextSearch),
