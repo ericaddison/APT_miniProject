@@ -10,7 +10,7 @@ Here is stream: {{ stream.name }}!
         <br>
       Upload File: <br><input type="file" name="file"><br>
       <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
-      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream.key.id }}">
+      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream_id }}">
       <input type="submit" name="submit" value="Submit">
     </form>
 

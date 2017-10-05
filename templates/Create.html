@@ -6,15 +6,15 @@
     <p>
     Create New Stream:
     </p>
-    <form action="/services/createstream" method="post">
+    <form action="/create" method="post">
         Stream Name:<br>
-        <input type="text" name="streamname"><br>
+        <input name="{{ stream_name_parm }}"><br>
         Subscriber Emails (semicolon delimited):<br>
-        <input type="text" name="subs"><br>
+        <textarea name="{{ subs_parm }}"></textarea><br>
         Tags (semicolon delimited):<br>
-        <input type="text" name="tags"><br>
+        <textarea name="{{ tags_parm }}"></textarea><br>
         URL of cover image:<br>
-        <input type="text" name="coverUrl"><br>
+        <input name="{{ cover_url_parm }}"><br>
         <input type="submit" value="Create">
     </form>
 {% endblock %}

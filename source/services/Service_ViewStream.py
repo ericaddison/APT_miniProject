@@ -1,47 +1,47 @@
-import webapp2
-
-from source.services.Service_Utils import *
+import json
+import source.Framework.Framework_Helpers as fh
+from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import Stream
 
 
 # view a stream
 # takes a stream id and an image range and returns a list of URLs to images, and an image range
-class ViewStreamService(webapp2.RequestHandler):
+class ViewStreamService(BaseHandler):
     def get(self):
 
-        self.response.content_type = 'text/plain'
+        self.set_content_text_plain()
         response = {}
 
-        stream = get_stream_param(self, response)
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        if stream_id is None or stream_id == '':
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
+            return
+
+        # get the stream
+        stream = Stream.get_by_id(stream_id)
+
         if stream is None:
+            fh.bad_request_error(self, response, 'Invalid Stream ID')
             return
 
         # write some stream info
         response['streamName'] = stream.name
-        response['streamOwner'] = stream.owner.get().nickName
+        response['streamOwner'] = stream.get_owner_from_db().nickName
 
         # get the indices
-        ind1, ind2 = get_image_range_param(self, response)
-
+        ind1, ind2, status = fh.get_image_range_param(self)
         if ind1 is None or ind2 is None:
+            fh.bad_request_error(self, response, status)
             return
 
-        l = len(stream.items)
-        ind1 = max(1, min(l, ind1))
-        ind2 = max(1, min(l, ind2))
-
         # query for images
-        image_urls = [key.get().URL for key in stream.items[ind1-1:ind2]]
+        items, in1, ind2 = stream.get_items(ind1, ind2)
+        image_urls = [item.URL for item in items]
 
         if len(image_urls) == 0:
-            response[image_range_parm] = None
+            response[fh.image_range_parm] = None
         else:
-            response[image_range_parm] = "{}-{}".format(ind1, ind2)
+            response[fh.image_range_parm] = "{0}-{1}".format(ind1, ind2)
 
         response['urls'] = image_urls
-        self.response.write(json.dumps(response))
-
-
-
-app = webapp2.WSGIApplication([
-    ('/services/viewstream', ViewStreamService)
-], debug=True)
+        self.write_response(json.dumps(response))
