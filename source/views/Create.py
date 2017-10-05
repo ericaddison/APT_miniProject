@@ -46,7 +46,8 @@ class CreatePage(BaseHandler):
         try:
             result = urllib2.urlopen(create_stream_url)
             response = json.loads("".join(result.readlines()))
-            self.redirect('http://{0}/viewstream?{0}={1}'.format(os.environ['HTTP_HOST'], fh.stream_id_parm, response[fh.stream_id_parm]))
+            redirect_url = 'http://{0}/viewstream?{1}={2}'.format(os.environ['HTTP_HOST'], fh.stream_id_parm, response[fh.stream_id_parm])
+            self.redirect(redirect_url)
         except urllib2.HTTPError:
             self.redirect('/Error')
 

@@ -2,25 +2,37 @@
 
 {% block title %}Connexion: Manage Streams{% endblock %}
 
+{% block extrahead %}<script src="/js/ManagePage.js"></script>{% endblock %}
+
 {% block content %}
-         <table>
-             <tr><b>Owned Streams:</b></tr>
-            <tr>
-                <th>Name</th>
-                <th>Latest Update</th>
-                <th>Number of Pictures</th>
-                <th>Delete</th>
-            </tr>
-            {% for stream in streams %}
-            <tr>
-				<td><a href="/viewstream?streamID={{ stream.id }}">{{ stream.streamName }}</a></td>
-                <td>{{ stream.newestDate }}</td>
-                <td>{{ stream.counter }}</td>
-                <td>[CHECKBOX]</td>
-            </tr>
-            {% endfor %}
-        </table>
-    TODO:  Button here to delete the checked streams.<br>
+        {% if msg %}
+            <div style="margin: 10px" class="alert alert-success" id="message">
+                {{ msg }}
+            </div>
+        <br>
+        {% endif %}
+         <form action="/delete" method="post" id="deleteform">
+             <table id="deletetable">
+                 <tr><b>Owned Streams:</b></tr>
+                <tr>
+                    <th>Name</th>
+                    <th>Latest Update</th>
+                    <th>Number of Pictures</th>
+                    <th class="delete-col">Delete<div class="check_all checkbox" data-type="delete"></div></th>
+                </tr>
+                {% for stream in streams %}
+                <tr>
+                    <td><a href="/viewstream?streamID={{ stream.id }}">{{ stream.streamName }}</a></td>
+                    <td>{{ stream.newestDate }}</td>
+                    <td>{{ stream.counter }}</td>
+                    <td class="delete-col checkbox-div"><div class="checkbox delete" name="{{ stream.streamName }}" id="delete_{{ stream.id }}" data-type="delete"></div></td>
+                </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <button id="delete_button" class="btn btn-warning mybtn delete" disabled>Delete Selected Streams</button>
+         </form>
+        <br>
 
     <p>
         
@@ -31,7 +43,7 @@
                 <th>Latest Update</th>
                 <th>Number of Pictures</th>
                 <th>Views</th>
-                <th>Unsubscribe</th>
+                <th class="delete-col">Unsubscribe<div class="check_all checkbox" data-type="unsubscribe"></div></th>
             </tr>
             {% for stream in subscribe %}
             <tr>
@@ -40,9 +52,10 @@
                 <td>{{ stream.newestDate }}</td>
                 <td>{{ stream.counter }}</td>
                 <td>{{ stream.views }}</td>
-                <td>[CHECKBOX]</td>
+                <td class="delete-col checkbox-div"><div class="checkbox unsubscribe" name="{{ stream.streamName }}" id="unsubscribe_{{ stream.id }}" data-type="unsubscribe"></div></td>
             </tr>
             {% endfor %}
         </table>
-    TODO: Button here to unsubscribe from the checked streams.<br>
+        <br>
+        <button type="button" id="unsubscribe_button" class="btn btn-warning mybtn unsubscribe" disabled>Unsubscribe From Selected Streams</button>
 {% endblock %}

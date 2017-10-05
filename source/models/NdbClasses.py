@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from google.appengine.ext import blobstore
 
 
 class Stream(ndb.Model):
@@ -33,7 +34,8 @@ class Stream(ndb.Model):
         StreamSubscriber.delete_by_stream(self)
 
         # delete blobs owned by the items of this stream
-        [it.blobKey.delete() for it in self.items if it.blobKey is not None]
+        real_items = ndb.get_multi(self.items)
+        [blobstore.delete(it.blobKey) for it in real_items if it.blobKey is not None]
 
         # delete the items owned by this stream
         ndb.delete_multi(self.items)
@@ -83,6 +85,16 @@ class Stream(ndb.Model):
             return ndb.Key('Stream', int(stream_id)).get()
         except ValueError:
             return None
+
+    @classmethod
+    # owner should be a StreamUser
+    def get_by_owner(cls, owner):
+        stream_query0 = Stream.query()
+        stream_query1 = stream_query0.filter(Stream.owner == owner.key)
+        stream_result = stream_query1.fetch()
+        if stream_result is None:
+            return None
+        return [s.key.id() for s in stream_result]
 
 
 class StreamItem(ndb.Model):
@@ -228,7 +240,12 @@ class StreamSubscriber(ndb.Model):
     @classmethod
     # stream is a Stream object
     def get_by_stream(cls, stream):
-        return StreamTag.query(StreamTag.stream == stream.key).fetch()
+        return StreamSubscriber.query(StreamSubscriber.stream == stream.key).fetch()
+
+    @classmethod
+    # user is a StreamUser object
+    def get_by_user(cls, user):
+        return StreamSubscriber.query(StreamSubscriber.user == user.key).fetch()
 
     @classmethod
     def delete_by_stream(cls, stream):

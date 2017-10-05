@@ -1,0 +1,22 @@
+{% extends html_template %}
+
+{% block title %}Connexion: Confirm Delete{% endblock %}
+
+{% block content %}
+<br>
+<div style="text-align: center" class="alert alert-danger"><h3>The following streams will be deleted!</h3></div>
+
+    <form action="/deleteexe" method="post">
+        <div style="text-align: center" class="alert alert-warning">
+            {% for stream in del_streams %}
+                <input type="hidden" name="{{ stream.0 }}">
+            <strong>{{ stream.1 }}</strong><br>
+            {% endfor %}
+        </div>
+        <div style="text-align: center;">
+             <input type="submit" name="button" class="btn btn-danger btn-lg" value="DELETE">
+            <br><br>
+            <input type="submit" name="button" class="btn btn-success btn-sm" value="Cancel">
+        </div>
+    </form>
+{% endblock %}
