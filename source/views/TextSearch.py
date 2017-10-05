@@ -56,7 +56,7 @@ class TextSearchForm(BaseHandler):
 class TextSearch(BaseHandler):
     def post(self):
         response = {}
-        search_string = self.get_request_param(fh.search_string_parm)
+        search_string = self.get_request_param(fh.search_string_parm).strip()
         if search_string in [None, '']:
             self.redirect('/search')
             return
