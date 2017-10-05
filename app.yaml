@@ -22,6 +22,8 @@ handlers:
   script: Routes.app
 - url: /create
   script: Routes.app
+- url: /error
+  script: Routes.app
 # [START views]
 
 
@@ -32,7 +34,6 @@ handlers:
   script: source.services.Service_CronTrends.app
 - url: /services/management
   script: source.services.Service_Management.app
-
 - url: /services/search.*
   script: Routes.app
 - url: /services/viewstream

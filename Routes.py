@@ -11,6 +11,7 @@ from source.services.Service_TextSearch import TagTextSearchService, StreamTextS
 from source.views.Create import CreatePage
 from source.views.ViewStream import ViewStream
 from source.views.TextSearch import TextSearch, TextSearchForm
+from source.views.ErrorView import ErrorView
 
 config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
 
@@ -21,6 +22,7 @@ app = webapp2.WSGIApplication([
     ('/viewstream', ViewStream),
     ('/search', TextSearchForm),
     ('/searchexe', TextSearch),
+    ('/error', ErrorView),
     # [END views]
 
     # [START services]
