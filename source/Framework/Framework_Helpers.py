@@ -79,11 +79,11 @@ def get_login_url(handler, redirect):
     return users.create_login_url(redirect)
 
 
-def searchablize_tag(tag, response):
+def searchablize_tag(tag, response={}):
     searchablize_tag_or_stream(tag, tag_index_name, response)
 
 
-def searchablize_stream(stream, response):
+def searchablize_stream(stream, response={}):
     searchablize_tag_or_stream(stream, stream_index_name, response)
 
 

@@ -1,5 +1,5 @@
 from google.appengine.ext import ndb
-
+import source.Framework.Framework_Helpers as fh
 
 class Stream(ndb.Model):
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
@@ -180,12 +180,12 @@ class StreamTag(ndb.Model):
 
     @classmethod
     def add_tags_to_stream(cls, stream, tag_name_list):
-        tag_keys = [Tag.get_key_from_name(tag) for tag in tag_name_list if tag not in [None, '']]
+        tags = [Tag.create(tag) for tag in tag_name_list if tag not in [None, '']]
+        [fh.searchablize_tag(tag) for tag in tags]
         streamtags = [StreamTag(stream=stream.key,
                                 tag=Tag.get_key_from_name(tag),
                                 id=StreamTag.get_key_value_with_tagname(stream, tag))
                       for tag in tag_name_list if tag not in [None, '']]
-        ndb.put_multi(tag_keys)
         ndb.put_multi(streamtags)
 
 

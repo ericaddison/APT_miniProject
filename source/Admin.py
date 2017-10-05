@@ -18,7 +18,8 @@ class AdminDashboard(webapp2.RequestHandler):
             self.redirect("/admin/notadmin")
 
         template_values = {
-            'templatepath': templatepath
+            'templatepath': templatepath,
+            'dash_active': True
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/admin/AdminDashboard.html')
@@ -36,7 +37,8 @@ class ListUsers(webapp2.RequestHandler):
 
         template_values = {
             'users': all_users,
-            'templatepath': templatepath
+            'templatepath': templatepath,
+            'listusers_active': True
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/admin/AdminListUsers.html')
@@ -54,7 +56,8 @@ class ListStreams(webapp2.RequestHandler):
 
         template_values = {
             'streams': all_streams,
-            'templatepath': templatepath
+            'templatepath': templatepath,
+            'liststreams_active': True
         }
 
         path = os.path.join(os.path.dirname(__file__), '../templates/admin/AdminListStreams.html')
@@ -80,18 +83,36 @@ class ClearSearchIndexes(webapp2.RequestHandler):
             msg = 'Error removing exceptions'
 
         template_values = {
-            'simple_content': msg
+            'simple_content': msg,
+            'cleartagindex_active': True
         }
 
         self.response.write(template.render(templatepath, template_values))
 
+
+class DisplayTagIndex(webapp2.RequestHandler):
+    def get(self):
+        index = search.Index(name=fh.tag_index_name, namespace=fh.search_index_namespace)
+
+        res = index.get_range(limit=1000)
+        prints = "<table>"
+        prints += "".join(['<tr><td>{0}</td><td>--</td><td>{1}</td></tr>'.format(r.fields[0].value, r.fields[1].value) for r in res.results])
+        prints += "</table>"
+
+        template_values = {
+            'simple_content': prints,
+            'showtagindex_active': True
+        }
+
+        self.response.write(template.render(templatepath, template_values))
 
 
 app = webapp2.WSGIApplication([
     ('/admin/dashboard', AdminDashboard),
     ('/admin/listusers', ListUsers),
     ('/admin/liststreams', ListStreams),
-    ('/admin/cleartagindex', ClearSearchIndexes)
+    ('/admin/cleartagindex', ClearSearchIndexes),
+    ('/admin/displaytagindex', DisplayTagIndex)
 ], debug=True)
 
 
