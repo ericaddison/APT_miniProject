@@ -49,8 +49,6 @@ class ViewStream(BaseHandler):
         
         upload_url = blobstore.create_upload_url('/services/upload')
 
-        print("\n\n\n{}\n\n\n".format(os.environ['HTTP_HOST']))
-
         #TODO: See if there is some way to use a relative URL here, or to automatically get the first part...
         # got this with HTTP_HOST
         # now how to get protocol? http vs https?

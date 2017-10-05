@@ -22,7 +22,13 @@ handlers:
   script: Routes.app
 - url: /create
   script: Routes.app
+- url: /delete.*
+  script: Routes.app
+- url: /unsubscribe.*
+  script: Routes.app
 - url: /error
+  script: Routes.app
+- url: /manage
   script: Routes.app
 # [START views]
 

@@ -21,6 +21,7 @@ tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
 redirect_parm = 'redirect'
 error_code_parm = 'code'
+message_parm = 'code'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]

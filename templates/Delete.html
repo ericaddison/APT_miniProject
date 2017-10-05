@@ -1,0 +1,22 @@
+{% extends "ConfirmRemoveTemplate.html" %}
+
+{% block title %}Connexion: Confirm Delete{% endblock %}
+
+{% block warning_message %}
+The following streams will be deleted!
+{% endblock %}
+
+{% block action_url %}
+/deleteexe
+{% endblock %}
+
+{% block confirm_content %}
+    {% for stream in del_streams %}
+        <input type="hidden" name="{{ stream.0 }}">
+    <strong>{{ stream.1 }}</strong><br>
+    {% endfor %}
+{% endblock %}
+
+{% block submit_text %}
+DELETE
+{% endblock %}
