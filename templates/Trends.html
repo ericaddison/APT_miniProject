@@ -1,0 +1,28 @@
+{% extends html_template %}
+
+{% block title %}Connexion: Trending Streams{% endblock %}
+
+{% block content %}
+         <table style="width:90%">
+             <tr>
+                 <th>Stream Name</th>
+                 <th style="width:20%">Views in Past 3 Hours</th>
+             </tr>
+                {% for stream in trendingStreams %}
+             <tr>
+				<td><a href="/viewstream?streamID={{ stream.id }}"><img src="{{ stream.stream.coverImageURL }}" style="width:30%;"> {{ stream.stream.name }}</a></td>
+                <td>{{ stream.trendViews }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        <p>
+        <form action="/trending" method="post">
+        Frequency of trending streams email notification:<br>
+            <input type="radio" name="freq" value="5min"> 5 Minutes<br>
+            <input type="radio" name="freq" value="1hr"> Hourly<br>
+            <input type="radio" name="freq" value="1day"> Daily<br>
+            <input type="radio" name="freq" value="none"> None<br>
+            <br><input type="submit" value="Submit">
+        </form> 
+        <p>
+{% endblock %}

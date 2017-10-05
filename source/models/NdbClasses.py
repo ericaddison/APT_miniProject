@@ -261,7 +261,13 @@ class StreamUser(ndb.Model):
 
     def user_id(self):
         return self.key.id()
-
+    
+    def update_email_freq(self, freq):
+        self.trendEmails = freq
+        self.put()
+        return freq
+        
+    
     @classmethod
     def get_by_id(cls, user_id):
         return ndb.Key('StreamUser', user_id).get()
