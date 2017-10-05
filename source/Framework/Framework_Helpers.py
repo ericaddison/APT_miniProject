@@ -20,7 +20,7 @@ subscribers_parm = 'subs'
 tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
 redirect_parm = 'redirect'
-error_code = 'code'
+error_code_parm = 'code'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]
