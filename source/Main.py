@@ -63,11 +63,6 @@ class ManagePage(webapp2.RequestHandler):
             stream_user = ndb.Key('StreamUser', user.user_id()).get()
             email_dup_check = len(StreamUser.query(StreamUser.email == user.email()).fetch()) != 0
 
-            print
-            "ManagePage: stream_user: ", stream_user
-            print
-            "ManagePage: email_dup_check: ", email_dup_check
-
             if not stream_user:
                 if email_dup_check:
                     self.response.write("Uh oh! Duplicate email!!!")
@@ -80,15 +75,16 @@ class ManagePage(webapp2.RequestHandler):
             self.redirect("/")
             return
 
+        
+        
+        
         # get streams owned by this user
         myuser = ndb.Key('StreamUser', stream_user.key.id())
         user_streams = Stream.query(Stream.owner == myuser).fetch()
         print("\nstreams owned by {0}: {1}".format(str(user.nickname()), str(user_streams)))
 
         owned_streams = []
-
         for stream in user_streams:
-            print("parentStream: {}".format(stream))
             newestDate = ""
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
@@ -96,14 +92,19 @@ class ManagePage(webapp2.RequestHandler):
                           'id': stream.key.id()}
             owned_streams.append(streamDict)
 
+            
+            
+            
         # get streams subscribed by this user
         user_subscriptions = StreamSubscriber.query(StreamSubscriber.user == stream_user.key).fetch()
         print("\nstreams subscribed to by {0}: {1}".format(user.nickname(), user_subscriptions))
-
-        subbed_streams = []
-
-        for stream in user_streams:
-            print("parentStream: {}".format(stream))
+        
+        streamKeyList = []
+        for sub in user_subscriptions:
+            streamKeyList.append(sub.stream.get())
+        
+        subbed_streams = []        
+        for stream in streamKeyList:
             newestDate = ""
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
@@ -111,8 +112,8 @@ class ManagePage(webapp2.RequestHandler):
                           'id': stream.key.id(), 'views': stream.numViews}
             subbed_streams.append(streamDict)
 
-        print("owned_streams: {}".format(owned_streams))
-        print("subbed_streams: {}".format(subbed_streams))
+        #print("owned_streams: {}".format(owned_streams))
+        #print("subbed_streams: {}".format(subbed_streams))
 
         template_values = {
             'html_template': 'MasterTemplate.html',
@@ -153,10 +154,59 @@ class ViewAllStreamsPage(webapp2.RequestHandler):
         path = os.path.join(os.path.dirname(__file__), '../templates/ViewAll.html')
         self.response.write(template.render(path, template_values))
 
+        
+class TrendingPage(webapp2.RequestHandler):
+    def post(self):
+        user = users.get_current_user()
+        stream_user = ndb.Key('StreamUser', user.user_id()).get()
+        
+        param_string = self.request.get('freq')
+        
+        stream_user.update_email_freq(param_string)
+
+        self.redirect("/trending")
+        
+    
+    def get(self):
+
+        user = users.get_current_user()
+
+        if user:
+            nickname = user.nickname()
+            login_url = users.create_logout_url('/')
+            login_text = 'Sign out'
+        else:
+            self.redirect("/")
+            return
+
+        response = urllib2.urlopen('http://{0}/services/crontrends'.format(os.environ['HTTP_HOST']))
+        returnValue = json.loads("".join(response.readlines()))
+        
+        
+        streamList = []
+        for stream in returnValue.get('trendingStreams'):
+            thisStream = Stream.get_by_id(stream.get('streamKeyID'))
+            streamDict = {'stream': thisStream, 'trendViews': int(stream.get('recentViews')), 'id':thisStream.key.id()}
+            streamList.append(streamDict)
+        
+        
+        template_values = {
+            'html_template': 'MasterTemplate.html',
+            'user': user,
+            'login_url': login_url,
+            'login_text': login_text,
+            'trendingStreams': streamList,
+            'app': app_identity.get_application_id()}
+
+        self.response.content_type = 'text/html'
+        path = os.path.join(os.path.dirname(__file__), '../templates/Trends.html')
+        self.response.write(template.render(path, template_values))        
+
 
 # define the "app" that will be referenced from app.yaml
 app = webapp2.WSGIApplication([
     ('/', MainPage),
     ('/manage', ManagePage),
-    ('/view', ViewAllStreamsPage)
+    ('/view', ViewAllStreamsPage),
+    ('/trending', TrendingPage)
 ], debug=True)
