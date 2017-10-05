@@ -48,6 +48,9 @@
             <li class="nav-item">
               <a class="nav-link {% block liststreams_active%}{% endblock %}" href="/admin/liststreams">All Streams</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/admin/cleartagindex">Clear Tag Search Index</a>
+            </li>
           </ul>
         </nav>
 
@@ -55,7 +58,7 @@
           <h1>Admin Dashboard</h1>
 
           <h2>{% block section_title %}{% endblock %}</h2>
-          <div is="content">{% block content %}{% endblock %}</div>
+          <div is="content">{% block content %}{{ simple_content }}{% endblock %}</div>
         </main>
       </div>
     </div>

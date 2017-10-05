@@ -6,6 +6,8 @@ from source.services.Service_DeleteStream import DeleteStreamService
 from source.services.Service_Subscribe import SubscribeToStreamService, UnsubscribeFromStreamService
 from source.services.Service_UploadFile import UploadFileHandler
 from source.services.Service_ViewStream import ViewStreamService
+from source.services.Service_TextSearch import TagTextSearchService
+
 from source.views.Create import CreatePage
 from source.views.ViewStream import ViewStream
 from source.views.TextSearch import TextSearch, TextSearchForm
@@ -28,7 +30,8 @@ app = webapp2.WSGIApplication([
     ('/services/unsubscribe', UnsubscribeFromStreamService),
     ('/services/upload', UploadFileHandler),
     ('/services/viewstream', ViewStreamService),
-    ('/services/deletestream', DeleteStreamService)
+    ('/services/deletestream', DeleteStreamService),
+    ('/services/searchtags', TagTextSearchService)
     # [END services]
 
 ], config=config, debug=True)

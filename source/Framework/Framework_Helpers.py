@@ -87,6 +87,13 @@ def searchablize_stream(stream, response):
     searchablize_tag_or_stream(stream, stream_index_name, response)
 
 
+def search_tag_index(search_string):
+    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    search_results = index.search("string: {}".format(search_string))
+    tags = [str(res.fields[0].value) for res in search_results.results]
+    return tags
+
+
 # meant to be called for a tag or stream object
 # must provide the index name
 # hack to get partial string searching
