@@ -20,7 +20,14 @@ subscribers_parm = 'subs'
 tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
 redirect_parm = 'redirect'
+error_code = 'code'
 # [END HTTP request parameter names]
+
+# [START ERROR CODES]
+error_codes = {
+    111: 'Stream view already exists! Please choose another name!'
+}
+# [END ERROR CODES]
 
 
 search_index_namespace = 'connexion'
