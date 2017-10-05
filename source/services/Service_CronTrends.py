@@ -42,7 +42,7 @@ class CronTrendsService(webapp2.RequestHandler):
         sortedStreams = sorted(allStreams, key=lambda x: len(x.viewList), reverse=True)
 
         top3StreamIDs = []
-        for x in range(0,2):
+        for x in range(0,3):
             if sortedStreams[x]:
                 stream = {'streamKeyID': sortedStreams[x].key.id(), 'recentViews': len(sortedStreams[x].viewList)}
                 top3StreamIDs.append(stream)
