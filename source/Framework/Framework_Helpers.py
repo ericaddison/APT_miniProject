@@ -86,12 +86,28 @@ def get_login_url(handler, redirect):
     return users.create_login_url(redirect)
 
 
-def searchablize_tag(tag, response):
+def searchablize_tag(tag, response={}):
     searchablize_tag_or_stream(tag, tag_index_name, response)
 
 
-def searchablize_stream(stream, response):
+def searchablize_stream(stream, response={}):
     searchablize_tag_or_stream(stream, stream_index_name, response)
+
+
+def search_tag_index(search_string):
+    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    search_results = index.search("string: {}".format(search_string))
+    tags = [str(res.fields[0].value) for res in search_results.results]
+    return tags
+
+
+# returns list of stream IDs of matching strings
+def search_stream_index(search_string):
+    index = search.Index(name=stream_index_name, namespace=search_index_namespace)
+    search_results = index.search("string: {}".format(search_string))
+    print(search_results)
+    streams = [str(res.fields[0].value) for res in search_results.results]
+    return streams
 
 
 # meant to be called for a tag or stream object
@@ -99,13 +115,16 @@ def searchablize_stream(stream, response):
 # hack to get partial string searching
 def searchablize_tag_or_stream(item, index_name, response):
     index = search.Index(name=index_name, namespace=search_index_namespace)
+    if item is None:
+        return
     toks = item.name.split()
 
     try:
         for tok in toks:
             for i in range(len(tok)):
                 substr = tok[0:i+1]
-                doc = search.Document(fields=[search.TextField(name='name', value=item.name),
+                doc = search.Document(fields=[search.TextField(name='id', value=str(item.key.id())),
+                                              search.TextField(name='name', value=item.name),
                                               search.TextField(name='string', value=substr),
                                               search.DateField(name='date_added', value=datetime.datetime.now().date())])
                 # Index the document.

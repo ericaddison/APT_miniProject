@@ -6,6 +6,8 @@
 <br><br>
 Here is stream: {{ stream.name }}!
 
+    <img style="width: 90%; height: 300px; object-fit: cover;" src="{{ stream.coverImageURL }}">
+
     <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
         <br>
       Upload File: <br><input type="file" name="file"><br>

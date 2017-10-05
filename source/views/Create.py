@@ -41,12 +41,11 @@ class CreatePage(BaseHandler):
                                                                                   fh.user_id_parm,
                                                                                   fh.get_current_user(self).user_id(),
                                                                                   urllib.urlencode(parm_dict))
-        print("\n{}\n".format(create_stream_url))
+        print("\n{}\n".format(len(create_stream_url)))
 
         try:
             result = urllib2.urlopen(create_stream_url)
             response = json.loads("".join(result.readlines()))
             self.redirect('http://{0}/viewstream?{0}={1}'.format(os.environ['HTTP_HOST'], fh.stream_id_parm, response[fh.stream_id_parm]))
-        except urllib2.HTTPError:
-            self.redirect('/Error')
-
+        except BaseException, e:
+            self.redirect('/Error?{0}={1}'.format(fh.error_msg_parm, urllib.quote('Whoops! Problem creating stream: {}'.format(type(e)))))

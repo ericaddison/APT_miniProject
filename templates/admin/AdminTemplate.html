@@ -40,13 +40,22 @@
         <nav class="col-sm-3 col-md-2 d-none d-sm-block bg-light sidebar">
           <ul class="nav nav-pills flex-column">
             <li class="nav-item">
-              <a class="nav-link {% block dashboard_active%}{% endblock %}" href="/admin/dashboard">Admin Dashboard</a>
+              <a class="nav-link {% if dash_active %}active{% endif %}" href="/admin/dashboard">Admin Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% block listusers_active%}{% endblock %}" href="/admin/listusers">All Users</a>
+              <a class="nav-link {% if listusers_active %}active{% endif %}" href="/admin/listusers">All Users</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link {% block liststreams_active%}{% endblock %}" href="/admin/liststreams">All Streams</a>
+              <a class="nav-link {% if liststreams_active %}active{% endif %}" href="/admin/liststreams">All Streams</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if cleartagindex_active %}active{% endif %}" href="/admin/cleartagindex">Clear Search Indexes</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if showtagindex_active %}active{% endif %}" href="/admin/displaytagindex">Show Tag Search Index</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {% if showstreamindex_active %}active{% endif %}" href="/admin/displaystreamindex">Show Stream Search Index</a>
             </li>
           </ul>
         </nav>
@@ -55,7 +64,7 @@
           <h1>Admin Dashboard</h1>
 
           <h2>{% block section_title %}{% endblock %}</h2>
-          <div is="content">{% block content %}{% endblock %}</div>
+          <div is="content">{% block content %}{{ simple_content|safe}}{% endblock %}</div>
         </main>
       </div>
     </div>

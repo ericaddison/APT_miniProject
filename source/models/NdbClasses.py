@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+import source.Framework.Framework_Helpers as fh
 
 
 class Stream(ndb.Model):
@@ -25,6 +26,9 @@ class Stream(ndb.Model):
     def get_owner_from_db(self):
         return self.owner.get()
 
+    def get_id(self):
+        return self.key.id()
+
     def delete(self):
         # delete the StreamTags associated with this stream
         StreamTag.delete_by_stream(self)
@@ -49,7 +53,7 @@ class Stream(ndb.Model):
         for key in required_keys:
             if "name" not in kwargs.keys():
                 raise TypeError('Missing required key "{}"'.format(key))
-        name = kwargs['name']
+        name = kwargs['name'].strip()
         owner = kwargs['owner']
         cover_url = kwargs['cover_url'] if 'cover_url' in kwargs.keys() else None
 
@@ -80,9 +84,20 @@ class Stream(ndb.Model):
     @classmethod
     def get_by_id(cls, stream_id):
         try:
-            return ndb.Key('Stream', int(stream_id)).get()
+            return ndb.Key('Stream', long(stream_id)).get()
         except ValueError:
             return None
+
+    @classmethod
+    def get_batch_by_ids(cls, stream_ids):
+        try:
+            keys = [ndb.Key('Stream', long(st_id)) for st_id in stream_ids]
+            return ndb.get_multi(keys)
+        except ValueError:
+            return None
+
+
+
 
 
 class StreamItem(ndb.Model):
@@ -131,6 +146,7 @@ class Tag(ndb.Model):
     @classmethod
     def create(cls, tag_name):
         # tags are indexed in Datastore by their name
+        tag_name = tag_name.strip()
         if Tag.get_by_name(tag_name):
             return None
         tag = Tag(name=tag_name, id=tag_name)
@@ -180,12 +196,12 @@ class StreamTag(ndb.Model):
 
     @classmethod
     def add_tags_to_stream(cls, stream, tag_name_list):
-        tag_keys = [Tag.get_key_from_name(tag) for tag in tag_name_list if tag not in [None, '']]
+        tags = [Tag.create(tag) for tag in tag_name_list if tag not in [None, '']]
+        [fh.searchablize_tag(tag) for tag in tags]
         streamtags = [StreamTag(stream=stream.key,
                                 tag=Tag.get_key_from_name(tag),
                                 id=StreamTag.get_key_value_with_tagname(stream, tag))
                       for tag in tag_name_list if tag not in [None, '']]
-        ndb.put_multi(tag_keys)
         ndb.put_multi(streamtags)
 
 

@@ -4,6 +4,7 @@ import urllib2
 import os
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import Stream
 
 
 class TextSearchForm(BaseHandler):
@@ -28,16 +29,24 @@ class TextSearchForm(BaseHandler):
             'cover_url_parm': fh.cover_url_parm,
             'subs_parm': fh.subscribers_parm,
             'search_url': '/searchexe'
-            }
+        }
 
         search_string = self.get_request_param(fh.search_string_parm)
         if search_string is not None:
+            print("\n\nsearch string: {}\n\n".format(search_string))
             template_values['search_string'] = search_string
 
         tags = self.get_request_param(fh.tags_parm)
         if tags not in [None, '']:
             s = urllib.unquote(tags).decode('utf8')
             template_values['search_tags'] = eval(s)
+
+        stream_ids = self.get_request_param(fh.stream_id_parm)
+        if stream_ids not in [None, '']:
+            s = urllib.unquote(stream_ids).decode('utf8')
+            ids = eval(s)
+            template_values['search_streams'] = Stream.get_batch_by_ids(ids)
+            print(template_values['search_streams'])
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/StreamSearch.html')
         self.set_content_text_html()
@@ -47,7 +56,7 @@ class TextSearchForm(BaseHandler):
 class TextSearch(BaseHandler):
     def post(self):
         response = {}
-        search_string = self.get_request_param(fh.search_string_parm)
+        search_string = self.get_request_param(fh.search_string_parm).strip()
         if search_string in [None, '']:
             self.redirect('/search')
             return
@@ -56,6 +65,17 @@ class TextSearch(BaseHandler):
         # make call to textSearch service
         search_service_url = 'http://{0}/services/searchtags?searchString={1}'.format(os.environ['HTTP_HOST'], urllib.quote(search_string))
         result = urllib2.urlopen(search_service_url)
-        search_response = json.loads("".join(result.readlines()))
-        print("\n{}\n".format(search_response))
-        self.redirect('/search?{}'.format(urllib.urlencode(search_response)))
+        tag_search = json.loads("".join(result.readlines()))
+
+        search_service_url = 'http://{0}/services/searchstreams?searchString={1}'.format(os.environ['HTTP_HOST'],
+                                                                                      urllib.quote(search_string))
+        result = urllib2.urlopen(search_service_url)
+        stream_search = json.loads("".join(result.readlines()))
+
+        response = {
+                    fh.search_string_parm: search_string,
+                    fh.tags_parm: tag_search[fh.tags_parm],
+                    fh.stream_id_parm: stream_search[fh.stream_id_parm]
+                    }
+
+        self.redirect('/search?{}'.format(urllib.urlencode(response)))

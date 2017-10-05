@@ -32,10 +32,10 @@ handlers:
   script: source.services.InsertTestStream.app
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
-- url: /services/search.*
-  script: source.services.Service_TextSearch.app
 - url: /services/management
   script: source.services.Service_Management.app
+- url: /services/search.*
+  script: Routes.app
 - url: /services/viewstream
   script: Routes.app
 - url: /services/upload.*
