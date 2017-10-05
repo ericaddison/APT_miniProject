@@ -15,7 +15,7 @@
         <br>
         <h3>Matching Streams</h3>
         {% for stream in search_streams %}
-            <a href="/viewstream?streamID={{ stream.0 }}">{{ stream.1 }}</a><br>
+            <a href="/viewstream?streamID={{ stream.get_id }}"><img src="{{ stream.coverImageURL }}" height="100" ><br>{{ stream.name }}</a><br><br>
         {% endfor %}
     {% endif %}
 

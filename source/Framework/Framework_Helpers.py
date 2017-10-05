@@ -20,6 +20,7 @@ subscribers_parm = 'subs'
 tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
 redirect_parm = 'redirect'
+error_msg_parm = 'errorMsg'
 # [END HTTP request parameter names]
 
 
@@ -99,7 +100,7 @@ def search_stream_index(search_string):
     index = search.Index(name=stream_index_name, namespace=search_index_namespace)
     search_results = index.search("string: {}".format(search_string))
     print(search_results)
-    streams = [(str(res.fields[0].value), res.fields[1].value) for res in search_results.results]
+    streams = [str(res.fields[0].value) for res in search_results.results]
     return streams
 
 

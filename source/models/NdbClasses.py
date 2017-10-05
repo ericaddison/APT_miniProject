@@ -1,6 +1,7 @@
 from google.appengine.ext import ndb
 import source.Framework.Framework_Helpers as fh
 
+
 class Stream(ndb.Model):
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
     name = ndb.StringProperty(indexed=True)
@@ -24,6 +25,9 @@ class Stream(ndb.Model):
 
     def get_owner_from_db(self):
         return self.owner.get()
+
+    def get_id(self):
+        return self.key.id()
 
     def delete(self):
         # delete the StreamTags associated with this stream
@@ -80,9 +84,20 @@ class Stream(ndb.Model):
     @classmethod
     def get_by_id(cls, stream_id):
         try:
-            return ndb.Key('Stream', int(stream_id)).get()
+            return ndb.Key('Stream', long(stream_id)).get()
         except ValueError:
             return None
+
+    @classmethod
+    def get_batch_by_ids(cls, stream_ids):
+        try:
+            keys = [ndb.Key('Stream', long(st_id)) for st_id in stream_ids]
+            return ndb.get_multi(keys)
+        except ValueError:
+            return None
+
+
+
 
 
 class StreamItem(ndb.Model):

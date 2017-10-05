@@ -34,8 +34,5 @@ class StreamTextSearchService(BaseHandler):
             return
 
         results = fh.search_stream_index(search_string)
-
-        response[fh.stream_name_parm] = [r[0] for r in results]
-        response[fh.stream_id_parm] = [r[1] for r in results]
-
+        response[fh.stream_id_parm] = results
         self.write_response(json.dumps(response))

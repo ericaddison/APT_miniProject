@@ -4,6 +4,7 @@ import urllib2
 import os
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import Stream
 
 
 class TextSearchForm(BaseHandler):
@@ -39,14 +40,12 @@ class TextSearchForm(BaseHandler):
             s = urllib.unquote(tags).decode('utf8')
             template_values['search_tags'] = eval(s)
 
-        stream_names = self.get_request_param(fh.stream_name_parm)
         stream_ids = self.get_request_param(fh.stream_id_parm)
-        if stream_names not in [None, ''] and stream_ids not in [None, '']:
-            s = urllib.unquote(stream_names).decode('utf8')
-            names = eval(s)
+        if stream_ids not in [None, '']:
             s = urllib.unquote(stream_ids).decode('utf8')
             ids = eval(s)
-            template_values['search_streams'] = zip(names, ids)
+            template_values['search_streams'] = Stream.get_batch_by_ids(ids)
+            print(template_values['search_streams'])
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/StreamSearch.html')
         self.set_content_text_html()
@@ -75,8 +74,7 @@ class TextSearch(BaseHandler):
         response = {
                     'search_string': search_string,
                     'tags': tag_search['tags'],
-                    fh.stream_name_parm: stream_search[fh.stream_name_parm],
-                    fh.stream_id_parm: stream_search[fh.stream_id_parm],
+                    fh.stream_id_parm: stream_search[fh.stream_id_parm]
                     }
 
         self.redirect('/search?{}'.format(urllib.urlencode(response)))
