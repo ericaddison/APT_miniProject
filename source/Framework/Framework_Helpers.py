@@ -197,4 +197,18 @@ def get_viewstream_url(streamid, i1, i2):
 def get_viewstream_service_url(streamid, i1, i2):
     return '{0}/services/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
 
+
+def get_subscribed_service_url(userid, streamid):
+    return '{0}/services/subscribed?{1}={2};{3}={4};'.format(base_url, user_id_parm, userid, stream_id_parm, streamid)
+
+
+def get_subscribe_service_url(userid, streamid, redirect):
+    return '{0}/services/subscribe?{1}={2};{3}={4};{5}={6};'.format(base_url, user_id_parm, userid, stream_id_parm,
+                                                             streamid, redirect_parm, redirect)
+
+
+def get_unsubscribe_service_url(userid, streamid, redirect):
+    return '{0}/services/unsubscribe?{1}={2};{3}={4};{5}={6};'.format(base_url, user_id_parm, userid, stream_id_parm,
+                                                             streamid, redirect_parm, redirect)
+
 # [END link-helpers}

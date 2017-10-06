@@ -49,13 +49,15 @@ handlers:
   script: Routes.app
 - url: /services/deletestream
   script: Routes.app
-- url: /services/subcribe
+- url: /services/subscribe
   script: Routes.app
 - url: /services/unsubscribe
   script: Routes.app
 - url: /services/createtag
   script: Routes.app
 - url: /services/createstream
+  script: Routes.app
+- url: /services/subscribed
   script: Routes.app
 # [END services]
 

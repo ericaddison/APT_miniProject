@@ -3,7 +3,6 @@
 {% block title %}Connexion: {{ stream.name }}{% endblock %}
 
 {% block extrahead %}
-<link rel="stylesheet" type="text/css" href="css/bootstrap/album.css">
 <link rel="stylesheet" type="text/css" href="css/bootstrap/carousel.css">
 
 <style>
@@ -54,12 +53,18 @@
     opacity: 0.25;
 }
 
+.extra-stuff {
+    display: inline-block;
+    border: 1px solid black;
+    padding: 10px
+}
+
 </style>
 {% endblock %}
 
 {% block content %}
 <br>
-    <div class="jumbotron jumbotron-billboard">
+    <div class="jumbotron jumbotron-billboard" style="position: relative">
       <div class="img"></div>
         <div class="container">
             <div class="row">
@@ -67,6 +72,9 @@
                     <h1>{{ stream.name }}</h1>
                 </div>
             </div>
+            <a href="{{ sub_url }}">
+                <button class="btn btn-success btn-sm" style="position: absolute; bottom: 0; right: 0">{% if is_subscribed %}Unsubscribe{% else %}Subscribe{% endif %}</button>
+            </a>
         </div>
     </div>
     <br>
@@ -98,11 +106,18 @@
       </div>
     </div>
 
-<form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-      Upload File: <br><input type="file" name="file"><br>
-      <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
-      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream_id }}">
-      <input type="submit" name="submit" value="Submit">
-    </form>
+<div>
+    <div >
+        <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+          Upload File: <br><input type="file" name="file"><br>
+          <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
+          <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream_id }}">
+          <input type="submit" name="submit" value="Submit">
+        </form>
+    </div>
 
+    <div>
+
+    </div>
+</div>
 {% endblock %}

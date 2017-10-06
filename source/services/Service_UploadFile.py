@@ -47,7 +47,7 @@ class UploadFileHandler(FileUploadHandler):
             stream.add_item(item)
 
         # go back to viewstream page
-        redirect = self.get_request_param(fh.redirect_parm)
+        redirect = str(self.get_request_param(fh.redirect_parm))
         if redirect:
             self.redirect(redirect)
             return

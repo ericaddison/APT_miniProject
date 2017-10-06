@@ -66,8 +66,6 @@ class ViewStream(BaseHandler):
         response = json.loads("".join(result.readlines()))
         image_urls = response['urls']
 
-        print(response)
-
         # get total number of images and make links
         num_images = response[fh.num_images_parm]
 
@@ -81,6 +79,20 @@ class ViewStream(BaseHandler):
         if ind1 > 1:
             prev_page_url = fh.get_viewstream_url(stream_id, ind1-images_per_page, ind2-images_per_page)
 
+        # see if user is subscribed to this stream
+        # make call to subscribed service
+        subscribed_service_url = fh.get_subscribed_service_url(user.user_id(), stream_id)
+
+        result = urllib2.urlopen(subscribed_service_url)
+        response = json.loads("".join(result.readlines()))
+        is_subscribed = response['status']
+
+        redirect_url = urllib2.quote(fh.get_viewstream_url(stream_id, ind1, ind2))
+        if is_subscribed:
+            sub_url = fh.get_unsubscribe_service_url(user.user_id(), stream_id, redirect_url)
+        else:
+            sub_url = fh.get_subscribe_service_url(user.user_id(), stream_id, redirect_url)
+
         template_values = {
                     'html_template': 'MasterTemplate.html',
                     'stream': stream,
@@ -89,7 +101,9 @@ class ViewStream(BaseHandler):
                     'image_urls': image_urls,
                     'user': user,
                     'login_url': login_url,
-                    'login_text': login_text
+                    'login_text': login_text,
+                    'is_subscribed': is_subscribed,
+                    'sub_url': sub_url
                 }
 
         if next_page_url:

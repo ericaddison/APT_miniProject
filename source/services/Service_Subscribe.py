@@ -28,7 +28,7 @@ class SubscribeToStreamService(BaseHandler):
 
         # get current user
         user_id = self.get_request_param(fh.user_id_parm)
-        if user_id is None:
+        if user_id is None or user_id == "":
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
             return
 
@@ -42,7 +42,12 @@ class SubscribeToStreamService(BaseHandler):
         else:
             response['status'] = "Subscription created"
 
-        self.write_response(json.dumps(response))
+        redirect_url = str(self.get_request_param(fh.redirect_parm))
+
+        if redirect_url in ['', None]:
+            self.write_response(json.dumps(response))
+        else:
+            self.redirect(redirect_url)
 
 
 # unsubscribe from a stream
@@ -65,7 +70,7 @@ class UnsubscribeFromStreamService(BaseHandler):
 
         # get current user
         user_id = self.get_request_param(fh.user_id_parm)
-        if user_id is None:
+        if user_id is None or user_id == "":
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
             return
 
@@ -79,6 +84,46 @@ class UnsubscribeFromStreamService(BaseHandler):
         else:
             response['status'] = "Subscription not found"
 
-        print("\n{}\n".format(response))
+        redirect_url = str(self.get_request_param(fh.redirect_parm))
 
-        self.write_response(json.dumps(response))
+        if redirect_url in ['', None]:
+            self.write_response(json.dumps(response))
+        else:
+            self.redirect(redirect_url)
+
+
+# check if a user is subscribed to a stream
+# takes a stream id and a user id. Returns true or false
+class CheckSubscribedService(BaseHandler):
+    def get(self):
+
+        self.set_content_text_plain()
+        response = {}
+
+        # get stream name
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        response[fh.stream_id_parm] = stream_id
+        if stream_id is None or stream_id == "":
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
+            return
+
+        # get current user
+        user_id = self.get_request_param(fh.user_id_parm)
+        response[fh.user_id_parm] = user_id
+        if user_id is None or user_id == "":
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
+            return
+
+        # create new subscription
+        sub = StreamSubscriber.get_by_stream_id_and_user_id(stream_id, user_id)
+        if sub is not None:
+            response['status'] = True
+        else:
+            response['status'] = False
+
+        redirect_url = str(self.get_request_param(fh.redirect_parm))
+
+        if redirect_url in ['', None]:
+            self.write_response(json.dumps(response))
+        else:
+            self.redirect(redirect_url)
