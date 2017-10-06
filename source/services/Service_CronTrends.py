@@ -81,7 +81,8 @@ class CronTrendsService(webapp2.RequestHandler):
                 
                 mail.send_mail_to_admins(sender=email_sender_address,
                                          subject="WhiteTeam Trending Streams",
-                                         body=messageString)
+                                         body=messageString,
+                                         html=messageString)
                 
                 print "Email Message: ", messageString
                 
@@ -110,7 +111,8 @@ class CronTrendsService(webapp2.RequestHandler):
                 
                 mail.send_mail_to_admins(sender=email_sender_address,
                                          subject="WhiteTeam Trending Streams",
-                                         body=messageString)
+                                         body=messageString,
+                                         html=messageString)
                 continue
 
         return
