@@ -26,8 +26,35 @@
      position:relative;
       z-index:2;
     }
-</style>
 
+.nav-arrow {
+    height: 25px;
+    width: 25px;
+}
+
+.rotate-180 {
+    -ms-transform: rotate(180deg); /* IE 9 */
+    -webkit-transform: rotate(180deg); /* Chrome, Safari, Opera */
+    transform: rotate(180deg);
+}
+
+.arrow-div {
+    display: inline-block;
+    padding: 10px;
+    width: 23%;
+    text-align: center;
+}
+
+.enabled-arrow:hover {
+    background-color: #ddd;
+    cursor: pointer
+}
+
+.disabled-arrow {
+    opacity: 0.25;
+}
+
+</style>
 {% endblock %}
 
 {% block content %}
@@ -44,7 +71,17 @@
     </div>
     <br>
 
+
+
+
+    <div style="text-align: center">
+        <a {% if prev_page_url %}href="{{ prev_page_url }}"{% endif %}><div class="arrow-div {% if prev_page_url %}enabled-arrow{% else %}disabled-arrow{% endif %}"><img src="/images/arrow.svg" style="margin-right: -13px" class="nav-arrow rotate-180"><img src="/images/arrow.svg" class="nav-arrow rotate-180"></div></a>
+        <a href="#myCarousel" data-slide="prev" class="a-nounder"><div class="arrow-div enabled-arrow"><img src="/images/arrow.svg" class="nav-arrow rotate-180"></div></a>
+        <a href="#myCarousel" data-slide="next"><div class="arrow-div enabled-arrow"><img src="/images/arrow.svg" class="nav-arrow "></div></a>
+        <a {% if next_page_url %}href="{{ next_page_url }}"{% endif %}><div class="arrow-div {% if next_page_url %}enabled-arrow{% else %}disabled-arrow{% endif %}"><img src="/images/arrow.svg" class="nav-arrow"><img src="/images/arrow.svg" style="margin-left: -13px" class="nav-arrow"></div></a>
+    </div>
     <div id="myCarousel" class="carousel slide" data-ride="carousel" style="border: 3px solid gray">
+
 
       <ol class="carousel-indicators">
         {% for url in image_urls %}
@@ -59,15 +96,6 @@
           </div>
         {% endfor %}
       </div>
-
-      <a class="carousel-control-prev" href="#myCarousel" role="button" data-slide="prev" style="background-color: black; width: 30px">
-        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-        <span class="sr-only">Previous</span>
-      </a>
-      <a class="carousel-control-next" href="#myCarousel" role="button" data-slide="next" style="background-color: black; width: 30px">
-        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-        <span class="sr-only">Next</span>
-      </a>
     </div>
 
 <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">

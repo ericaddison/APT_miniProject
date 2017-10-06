@@ -15,6 +15,10 @@ from google.appengine.api import users
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
 
+DEFAULT_IMAGES_PER_PAGE = 10
+images_per_page = DEFAULT_IMAGES_PER_PAGE
+
+
 class ViewStream(BaseHandler):
     def get(self):
         user = users.get_current_user()
@@ -49,17 +53,33 @@ class ViewStream(BaseHandler):
         
         upload_url = blobstore.create_upload_url('/services/upload')
 
-        #TODO: See if there is some way to use a relative URL here, or to automatically get the first part...
-        # got this with HTTP_HOST
-        # now how to get protocol? http vs https?
+        # get the current image range
+        ind1, ind2, status = fh.get_image_range_param(self)
+        if ind1 is None or ind2 is None:
+            ind1 = 1
+            ind2 = images_per_page
 
         # make call to viewimage service
-        viewstream_service_url = 'http://{0}/services/viewstream?streamID={1};imageRange={2}'.format(os.environ['HTTP_HOST'],stream_id, '1-10')
+        viewstream_service_url = fh.get_viewstream_service_url(stream_id, ind1, ind2)
+
         result = urllib2.urlopen(viewstream_service_url)
         response = json.loads("".join(result.readlines()))
         image_urls = response['urls']
 
-        print("\n{}\n".format(image_urls))
+        print(response)
+
+        # get total number of images and make links
+        num_images = response[fh.num_images_parm]
+
+        # get next 10 images link
+        next_page_url = None
+        if ind2 < num_images:
+            next_page_url = fh.get_viewstream_url(stream_id, ind1+images_per_page, ind2+images_per_page)
+
+        # get previous 10 images link
+        prev_page_url = None
+        if ind1 > 1:
+            prev_page_url = fh.get_viewstream_url(stream_id, ind1-images_per_page, ind2-images_per_page)
 
         template_values = {
                     'html_template': 'MasterTemplate.html',
@@ -71,6 +91,12 @@ class ViewStream(BaseHandler):
                     'login_url': login_url,
                     'login_text': login_text
                 }
+
+        if next_page_url:
+            template_values['next_page_url'] = next_page_url
+
+        if prev_page_url:
+            template_values['prev_page_url'] = prev_page_url
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/ViewStream.html')
         self.response.write(template.render(path, template_values))

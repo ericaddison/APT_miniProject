@@ -2,6 +2,7 @@ import json
 import re
 import datetime
 
+import webapp2
 from google.appengine.api import images
 from google.appengine.api import search
 from google.appengine.api import users
@@ -21,7 +22,9 @@ tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
 redirect_parm = 'redirect'
 error_code_parm = 'code'
-message_parm = 'code'
+message_parm = 'msg'
+owner_parm = 'owner'
+num_images_parm = 'num_images'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]
@@ -38,6 +41,11 @@ stream_index_name = 'stream_index'
 
 # [START HTTP request methods]
 # currently using webapp2 request handlers
+
+
+def get_site_url(path, **kwargs):
+    webapp2.uri_for(path, **kwargs)
+
 
 def bad_request_error(handler, response_dict, error_msg):
     response_dict['error'] = error_msg
@@ -174,3 +182,19 @@ def get_image_range_param(handler):
 
 def render_html_template(path, template_values_dict):
     return template.render(path, template_values_dict)
+
+
+
+# [START link-helpers}
+import os
+base_url = 'http://{0}'.format(os.environ['HTTP_HOST'])
+
+
+def get_viewstream_url(streamid, i1, i2):
+    return '{0}/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
+
+
+def get_viewstream_service_url(streamid, i1, i2):
+    return '{0}/services/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
+
+# [END link-helpers}

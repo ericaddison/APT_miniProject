@@ -25,8 +25,9 @@ class ViewStreamService(BaseHandler):
             return
 
         # write some stream info
-        response['streamName'] = stream.name
-        response['streamOwner'] = stream.get_owner_from_db().nickName
+        response[fh.stream_name_parm] = stream.name
+        response[fh.owner_parm] = stream.get_owner_from_db().nickName
+        response[fh.num_images_parm] = len(stream.items)
 
         # get the indices
         ind1, ind2, status = fh.get_image_range_param(self)
