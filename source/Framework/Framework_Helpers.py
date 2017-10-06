@@ -144,7 +144,7 @@ def searchablize_tag_or_stream(item, index_name, response):
         for tok in toks:
             for i in range(len(tok)):
                 substr = tok[0:i+1]
-                doc = search.Document(fields=[search.TextField(name='id', value=str(item.key.id())),
+                doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
                                               search.TextField(name='name', value=item.name),
                                               search.TextField(name='string', value=substr),
                                               search.DateField(name='date_added', value=datetime.datetime.now().date())])
