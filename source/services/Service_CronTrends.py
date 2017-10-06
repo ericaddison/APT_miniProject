@@ -56,7 +56,7 @@ class CronTrendsService(webapp2.RequestHandler):
         return top3StreamIDs
 
     def sendEmails(self, emailList, trendingStreams):
-        email_sender_address = 'trending@apt17-miniproj-whiteteam.appspot.com'
+        email_sender_address = 'trending@apt17-miniproj-whiteteam.appspotmail.com'
 
         for email_rcpt_address in emailList:
             try:
@@ -66,6 +66,9 @@ class CronTrendsService(webapp2.RequestHandler):
                                body="Check out these streams: {0}".format(trendingStreams))
             except:
                 print "Email failed to: ", email_rcpt_address
+                mail.send_mail_to_admins(sender=email_sender_address,
+                                         subject="WhiteTeam Trending Streams",
+                                         body="***ADMIN*** Check out these streams: {0}".format(trendingStreams))
                 continue
 
         return
@@ -98,6 +101,7 @@ class CronTrendsService(webapp2.RequestHandler):
             for user in userList:
                 userEmailList.append(user.email)
 
+            response['5min_emails'] = userEmailList
             self.sendEmails(userEmailList, trendingStreams)
 
         #/services/crontrends?int=1hr       
@@ -111,6 +115,7 @@ class CronTrendsService(webapp2.RequestHandler):
             for user in userList:
                 userEmailList.append(user.email)
 
+            response['1hr_emails'] = userEmailList
             self.sendEmails(userEmailList, trendingStreams)
 
             #/services/crontrends?int=1day
@@ -124,14 +129,13 @@ class CronTrendsService(webapp2.RequestHandler):
             for user in userList:
                 userEmailList.append(user.email)
 
+            response['daily_emails'] = userEmailList
             self.sendEmails(userEmailList, trendingStreams)
 
 
             #/services/crontrends
         else:  #No intervalParam, assume the call just wants the trending streams:
             response['trendingStreams'] = self.trending(trendingDuration)
-
-
 
         self.response.write(json.dumps(response))
 
