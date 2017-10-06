@@ -111,6 +111,7 @@ class Stream(ndb.Model):
             return None
         return [s.key.id() for s in stream_result]
 
+
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
