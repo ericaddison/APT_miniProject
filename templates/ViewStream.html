@@ -147,12 +147,12 @@ div.scrollmenu a:hover {
     {% endfor %}
 </div>
 <br>
-<form action="{{ add_tag_url }}" method="get">
+<form action="{{ tag_url }}" method="post">
     Tag Name:
     <input name="{{tag_name_parm}}">
     <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
     <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
-    <input type="submit" value="Add Tag">
+    <input type="submit" name="submit" value="Add Tag">
+    <input type="submit" name="submit" value="Remove Tag">
 </form>
-
 {% endblock %}

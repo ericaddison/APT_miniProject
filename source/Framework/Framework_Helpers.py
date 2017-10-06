@@ -1,6 +1,7 @@
 import json
 import re
 import datetime
+import urllib2
 
 import webapp2
 from google.appengine.api import images
@@ -213,14 +214,20 @@ def get_unsubscribe_service_url(userid, streamid, redirect):
 
 
 def get_viewtag_url(tagname):
-    return '{0}/viewtag?{1}={2};'.format(base_url, tag_name_parm, tagname)
+    return '{0}/viewtag?{1}={2};'.format(base_url, tag_name_parm, urllib2.quote(tagname))
 
 
-def get_addtag_service_url(tagname):
-    return '{0}/services/addtag?{1}={2};'.format(base_url, tag_name_parm, tagname)
+def get_addtag_service_url(stream_id, tagname):
+    return '{0}/services/addstreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, urllib2.quote(tagname))
 
 
-def get_addtag_service_url_noparm():
-    return '{0}/services/addtag'.format(base_url)
+def get_removetag_service_url(stream_id, tagname):
+    return '{0}/services/removestreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, urllib2.quote(tagname))
 
-# [END link-helpers}
+
+def get_tagmod_url_noparm():
+    return '{0}/tagmod'.format(base_url)
+
+
+
+        # [END link-helpers}

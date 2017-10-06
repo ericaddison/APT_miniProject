@@ -108,7 +108,7 @@ class ViewStream(BaseHandler):
                     'sub_url': sub_url,
                     'tags': tags,
                     'tag_name_parm': fh.tag_name_parm,
-                    'add_tag_url': fh.get_addtag_service_url_noparm(),
+                    'tag_url': fh.get_tagmod_url_noparm(),
                     'redirect_url': self.get_current_url(),
                     'stream_id_parm': fh.stream_id_parm,
                     'redirect_parm': fh.redirect_parm
@@ -124,6 +124,27 @@ class ViewStream(BaseHandler):
         self.response.write(template.render(path, template_values))
 
 
-app = webapp2.WSGIApplication([
-    ('/viewstream', ViewStream)
-], debug=True)
+class TagMod(BaseHandler):
+    def post(self):
+
+        button = self.get_request_param('submit')
+        stream_id = self.get_request_param(fh.stream_id_parm)
+        tag_name = self.get_request_param(fh.tag_name_parm)
+
+        if button == 'Add Tag':
+            tag_service_url = fh.get_addtag_service_url(stream_id, tag_name)
+        elif button == 'Remove Tag':
+            tag_service_url = fh.get_removetag_service_url(stream_id, tag_name)
+
+        print("\n{}\n".format(tag_service_url))
+
+        urllib2.urlopen(tag_service_url)
+
+        redirect_url = str(self.get_request_param(fh.redirect_parm))
+
+        if redirect_url in ['', None]:
+            self.redirect('/')
+        else:
+            self.redirect(redirect_url)
+
+

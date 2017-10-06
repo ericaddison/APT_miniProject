@@ -12,7 +12,7 @@ from source.services.Service_Tag import AddTagToStreamService, RemoveTagFromStre
 from source.views.Create import CreatePage
 from source.views.Delete import DeletePage, DeleteExe
 from source.views.Unsubscribe import UnsubscribePage, UnsubscribeExe
-from source.views.ViewStream import ViewStream
+from source.views.ViewStream import ViewStream, TagMod
 from source.views.TextSearch import TextSearch, TextSearchForm
 from source.views.ErrorView import ErrorView
 from source.views.ViewAllStreams import ViewAllStreams
@@ -34,6 +34,7 @@ app = webapp2.WSGIApplication([
     ('/searchexe', TextSearch),
     ('/error', ErrorView),
     ('/manage', ManagePage),
+    ('/tagmod', TagMod),
     # [END views]
 
     # [START services]
@@ -48,8 +49,8 @@ app = webapp2.WSGIApplication([
     ('/services/searchstreams', StreamTextSearchService),
     ('/services/management', ManagementService),
     ('/services/subscribed', CheckSubscribedService),
-    ('/services/addtag', AddTagToStreamService),
-    ('/services/removetag', RemoveTagFromStreamService)
+    ('/services/addstreamtag', AddTagToStreamService),
+    ('/services/removestreamtag', RemoveTagFromStreamService)
     # [END services]
 
 ], config=config, debug=True)
