@@ -166,6 +166,17 @@ def remove_stream_from_search_index(stream, response):
     return
 
 
+def remove_tag_from_search_index(tag_name, response):
+    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    if tag_name in ['', None]:
+        return
+
+    search_result = index.search("id: {}".format(str(tag_name)))
+    for doc in search_result.results:
+        index.delete(doc.doc_id)
+    return
+
+
 def get_image_range_param(handler):
     image_range = handler.get_request_param(image_range_parm)
     if image_range is None:
@@ -224,6 +235,7 @@ def get_addtag_service_url(stream_id, tagname):
 def get_removetag_service_url(stream_id, tagname):
     tagname = urllib2.quote(tagname.strip())
     return '{0}/services/removestreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, tagname)
+
 
 def get_viewstream_service_url(streamid, i1, i2):
     return '{0}/services/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)

@@ -159,6 +159,9 @@ class Tag(ndb.Model):
     name = ndb.StringProperty(indexed=True)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
+    def delete(self):
+        self.key.delete()
+
     @classmethod
     def create(cls, tag_name):
         # tags are indexed in Datastore by their name

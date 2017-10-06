@@ -80,11 +80,19 @@ class RemoveTagFromStreamService(BaseHandler):
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.tag_name_parm))
             return
 
+        # check how many streams have this tag
+        st = StreamTag.get_batch_by_tag_name(tag_name)
+        n_streams = len(st)
+
         # get the tag
         tag = Tag.get_by_name(tag_name)
         if tag is not None:
             # remove streamtags
             StreamTag.delete_tag_from_stream(stream, tag)
+            if n_streams == 1:
+                print("\ndeleting empty tag: {}\n".format(tag_name))
+                fh.remove_tag_from_search_index(tag_name, {})
+                tag.delete()
 
         # block until new tag is found
         time.sleep(0.01)
