@@ -63,7 +63,7 @@ class RemoveTagFromStreamService(BaseHandler):
         # get stream name
         stream_id = self.get_request_param(fh.stream_id_parm)
         response[fh.stream_id_parm] = stream_id
-        if stream_id is None or stream_id == "":
+        if stream_id in [None, '']:
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
             return
 
@@ -76,7 +76,7 @@ class RemoveTagFromStreamService(BaseHandler):
 
         # get tag name
         tag_name = self.get_request_param(fh.tag_name_parm)
-        if tag_name is None or tag_name == "":
+        if tag_name in [None, '']:
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.tag_name_parm))
             return
 
@@ -89,14 +89,15 @@ class RemoveTagFromStreamService(BaseHandler):
         if tag is not None:
             # remove streamtags
             StreamTag.delete_tag_from_stream(stream, tag)
+
+            # block until new tag is found
+            time.sleep(0.01)
+            while StreamTag.get_by_stream_and_tag(stream, tag) is not None:
+                time.sleep(0.01)
+
             if n_streams == 1:
                 fh.remove_tag_from_search_index(tag_name, {})
                 tag.delete()
-
-        # block until new tag is found
-        time.sleep(0.01)
-        while StreamTag.get_by_stream_and_tag(stream, tag) is not None:
-            time.sleep(0.01)
 
         redirect_url = str(self.get_request_param(fh.redirect_parm))
 
