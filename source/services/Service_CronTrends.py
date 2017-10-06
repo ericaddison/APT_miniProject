@@ -19,10 +19,10 @@ class CronTrendsService(webapp2.RequestHandler):
 
     def trending(self, duration):
         #Cleanup old stream views:
-        
+
         compareDateTime = datetime.datetime.now() - timedelta(hours=int(duration))
         oldStreams = Stream.query().filter(Stream.viewList <= compareDateTime).fetch()
-        
+
         print "Cleaning up views older than: ", compareDateTime
         #DON'T MODIFY A LIST WHILE YOU'RE ITERATING THROUGH IT!!!!
         for stream in oldStreams:
@@ -37,7 +37,7 @@ class CronTrendsService(webapp2.RequestHandler):
                 items.remove(rmItem)
             stream.viewList = items
             stream.put()
-        
+
         #Get the top 3 trending streams:
         allStreams = Stream.query().fetch()
         sortedStreams = sorted(allStreams, key=lambda x: len(x.viewList), reverse=True)
@@ -47,96 +47,92 @@ class CronTrendsService(webapp2.RequestHandler):
             indexRange = 3
         else:
             indexRange = len(sortedStreams)
-        
+
         for x in range(indexRange):
             if sortedStreams[x]:
                 stream = {'streamKeyID': sortedStreams[x].key.id(), 'recentViews': len(sortedStreams[x].viewList)}
                 top3StreamIDs.append(stream)
-                
+
         return top3StreamIDs
-    
-    def sendEmails(self, emailList):
-        for email_rcpt_address in emailList:    
+
+    def sendEmails(self, emailList, trendingStreams):
+        email_sender_address = 'trending@apt17-miniproj-whiteteam.appspot.com'
+
+        for email_rcpt_address in emailList:
             try:
                 mail.send_mail(sender=email_sender_address,
-                           to=email_rcpt_address,
-                           subject="WhiteTeam Trending Streams",
-                           body="Check out these streams: {0}".format(trendingStreams))
+                               to=email_rcpt_address,
+                               subject="WhiteTeam Trending Streams",
+                               body="Check out these streams: {0}".format(trendingStreams))
             except:
                 print "Email failed to: ", email_rcpt_address
                 continue
-                
+
         return
-    
-        
+
     def get(self):
 
-        emails_sender_address = 'test@example.com'
-        
         self.response.content_type = 'text/plain'
         response = {}
-        
+
         intervalParam = self.request.get('int')
-        
+
         #Default duration for "trending cleanup" is the previous 3 hours but can be overridden by parameter: 'duration'
         if self.request.get('duration'):
             trendingDuration = int(self.request.get('duration'))
         else:
             trendingDuration = 3
 
-                        
         #/services/crontrends?int=5min
         if intervalParam == '5min':
             #Cleanup Stream.viewList entries, keep only those < 'trendingDuration' hrs old (default 3)
             print "Running scheduled 5min trending cleanup cron job"
-            
+
             #Run cleanup and return list of top 3 trending StreamIDs
             trendingStreams = self.trending(trendingDuration)
             response['trendingStreams'] = trendingStreams
 
-            
             #Collect StreamUser.email values for StreamUsers where StreamUser.trendEmails = '5min'
             userList = StreamUser.query().filter(StreamUser.trendEmails == '5min').fetch()
             userEmailList = []
             for user in userList:
                 userEmailList.append(user.email)
 
-            self.sendEmails(userEmailList)
+            self.sendEmails(userEmailList, trendingStreams)
 
-                
         #/services/crontrends?int=1hr       
         if intervalParam == '1hr':
             #Collect StreamUser.email values for StreamUsers where StreamUser.trendEmails = '1hr'
             #Send trending email to those users
             trendingStreams = self.trending(trendingDuration)
-            
+
             userList = StreamUser.query().filter(StreamUser.trendEmails == '1hr').fetch()
             userEmailList = []
             for user in userList:
                 userEmailList.append(user.email)
-                
-            self.sendEmails(userEmailList)           
-            
-        #/services/crontrends?int=1day            
+
+            self.sendEmails(userEmailList, trendingStreams)
+
+            #/services/crontrends?int=1day
         if intervalParam == '1day':
             #Collect StreamUser.email values for StreamUsers where StreamUser.trendEmails = '1day'
             #Send trending email to those users
             trendingStreams = self.trending(trendingDuration)
-            
+
             userList = StreamUser.query().filter(StreamUser.trendEmails == '1day').fetch()
             userEmailList = []
             for user in userList:
-                userEmailList.append(user.email)  
+                userEmailList.append(user.email)
 
-            self.sendEmails(userEmailList)               
+            self.sendEmails(userEmailList, trendingStreams)
 
-            
-        #/services/crontrends    
+
+            #/services/crontrends
         else:  #No intervalParam, assume the call just wants the trending streams:
             response['trendingStreams'] = self.trending(trendingDuration)
 
 
-            
+
         self.response.write(json.dumps(response))
 
 
