@@ -23,7 +23,7 @@
         <br>
         <h3>Matching Tags</h3>
         {% for tag in search_tags %}
-            <a href="/viewtag?tagName={{ tag }}">{{ tag }}</a><br>
+            <a href="{{ tag.url }}">{{ tag.name }}</a><br>
         {% endfor %}
     {% endif %}
 

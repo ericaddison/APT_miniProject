@@ -171,6 +171,16 @@ class Tag(ndb.Model):
         return ndb.Key('Tag', tag_name).get()
 
     @classmethod
+    # also searchibilizes it
+    def get_or_create_by_name(cls, tag_name):
+        tag = cls.get_by_name(tag_name)
+        if tag is not None:
+            return tag
+        tag = cls.create(tag_name)
+        fh.searchablize_tag(tag, {})
+        return tag
+
+    @classmethod
     def get_key_from_name(cls, tag_name):
         print('MATHING KEY! ... ' + tag_name)
         key = ndb.Key('Tag', tag_name)
@@ -182,10 +192,19 @@ class StreamTag(ndb.Model):
     tag = ndb.KeyProperty(indexed=True, kind='Tag')
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
+    def get_tag_name(self):
+        return self.tag.id()
+
     @classmethod
     # stream is a Stream object
-    def get_by_stream(cls, stream):
+    def get_batch_by_stream(cls, stream):
         return StreamTag.query(StreamTag.stream == stream.key).fetch()
+
+    @classmethod
+    # stream is a Stream object
+    # tag is a tag object
+    def get_by_stream_and_tag(cls, stream, tag):
+        return cls.get_key(stream, tag).get()
 
     @classmethod
     def delete_by_stream(cls, stream):
@@ -201,19 +220,29 @@ class StreamTag(ndb.Model):
 
     @classmethod
     # stream is a Stream object
-    # tag is a Tag object
-    def get_key_value_with_tagname(cls, stream, tag):
-        return "{0}{1}".format(stream.key.id(), tag)
+    # tag is a tag name
+    def get_key_value_with_tagname(cls, stream, tag_name):
+        return "{0}{1}".format(stream.key.id(), tag_name)
 
     @classmethod
-    def add_tags_to_stream(cls, stream, tag_name_list):
-        tags = [Tag.create(tag) for tag in tag_name_list if tag not in [None, '']]
-        [fh.searchablize_tag(tag) for tag in tags]
+    # stream is a Stream object
+    # tag is a Tag object
+    def get_key(cls, stream, tag):
+        return ndb.Key('StreamTag', cls.get_key_value(stream, tag))
+
+    @classmethod
+    def add_tags_to_stream_by_name(cls, stream, tag_name_list):
+        tags = [Tag.create(tag_name) for tag_name in tag_name_list if tag_name not in [None, '']]
+        [fh.searchablize_tag(tag_name) for tag_name in tags]
         streamtags = [StreamTag(stream=stream.key,
-                                tag=Tag.get_key_from_name(tag),
-                                id=StreamTag.get_key_value_with_tagname(stream, tag))
-                      for tag in tag_name_list if tag not in [None, '']]
+                                tag=Tag.get_key_from_name(tag_name),
+                                id=StreamTag.get_key_value_with_tagname(stream, tag_name))
+                      for tag_name in tag_name_list if tag_name not in [None, '']]
         ndb.put_multi(streamtags)
+
+    @classmethod
+    def delete_tag_from_stream(cls, stream, tag):
+        cls.get_key(stream, tag).delete()
 
 
 class StreamSubscriber(ndb.Model):

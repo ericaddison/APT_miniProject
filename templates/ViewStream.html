@@ -59,6 +59,24 @@
     padding: 10px
 }
 
+div.scrollmenu {
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+div.scrollmenu a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+
+div.scrollmenu a:hover {
+    background-color: #777;
+}
+
 </style>
 {% endblock %}
 
@@ -108,16 +126,33 @@
 
 <div>
     <div >
+    <h2>Add Image</h2>
         <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-          Upload File: <br><input type="file" name="file"><br>
-          <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
-          <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream_id }}">
-          <input type="submit" name="submit" value="Submit">
+          <input type="file" name="file">
+          <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
+          <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
+          <input type="submit" name="submit" value="Upload">
         </form>
     </div>
-
     <div>
-
     </div>
 </div>
+
+
+<br><br>
+<h2>Tags</h2>
+<div class="scrollmenu">
+    {% for tag in tags %}
+        <a href="{{ tag.url }}">{{ tag.name }}</a>
+    {% endfor %}
+</div>
+<br>
+<form action="{{ add_tag_url }}" method="get">
+    Tag Name:
+    <input name="{{tag_name_parm}}">
+    <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
+    <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
+    <input type="submit" value="Add Tag">
+</form>
+
 {% endblock %}

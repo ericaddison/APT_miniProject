@@ -65,6 +65,8 @@ class ViewStream(BaseHandler):
         result = urllib2.urlopen(viewstream_service_url)
         response = json.loads("".join(result.readlines()))
         image_urls = response['urls']
+        tags = response[fh.tags_parm]
+        tags = [{'name': tag, 'url': fh.get_viewtag_url(tag)} for tag in tags]
 
         # get total number of images and make links
         num_images = response[fh.num_images_parm]
@@ -96,14 +98,20 @@ class ViewStream(BaseHandler):
         template_values = {
                     'html_template': 'MasterTemplate.html',
                     'stream': stream,
-                    'stream_id': stream.key.id(),
+                    'stream_id': stream.stream_id(),
                     'upload_url': upload_url,
                     'image_urls': image_urls,
                     'user': user,
                     'login_url': login_url,
                     'login_text': login_text,
                     'is_subscribed': is_subscribed,
-                    'sub_url': sub_url
+                    'sub_url': sub_url,
+                    'tags': tags,
+                    'tag_name_parm': fh.tag_name_parm,
+                    'add_tag_url': fh.get_addtag_service_url_noparm(),
+                    'redirect_url': self.get_current_url(),
+                    'stream_id_parm': fh.stream_id_parm,
+                    'redirect_parm': fh.redirect_parm
                 }
 
         if next_page_url:

@@ -1,11 +1,11 @@
 import json
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
-from source.models.NdbClasses import Stream
+from source.models.NdbClasses import Stream, StreamTag
 
 
 # view a stream
-# takes a stream id and an image range and returns a list of URLs to images, and an image range
+# takes a stream id and an image range and returns a list of URLs to images, and an image range, and tag names
 class ViewStreamService(BaseHandler):
     def get(self):
 
@@ -43,6 +43,10 @@ class ViewStreamService(BaseHandler):
             response[fh.image_range_parm] = None
         else:
             response[fh.image_range_parm] = "{0}-{1}".format(ind1, ind2)
+
+        # get the tags
+        stream_tags = StreamTag.get_batch_by_stream(stream)
+        response[fh.tags_parm] = [t.get_tag_name() for t in stream_tags]
 
         response['urls'] = image_urls
         self.write_response(json.dumps(response))

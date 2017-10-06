@@ -44,6 +44,9 @@ class BaseHandler(webapp2.RequestHandler):
     def redirect(self, url):
         super(BaseHandler, self).redirect(url)
 
+    def get_current_url(self):
+        return self.request.url
+
 
 # file handler. Currently just extends BaseHandler and google blobstoreUpload handler
 class FileUploadHandler(BaseHandler, blobstore_handlers.BlobstoreUploadHandler):

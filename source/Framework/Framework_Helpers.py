@@ -211,4 +211,16 @@ def get_unsubscribe_service_url(userid, streamid, redirect):
     return '{0}/services/unsubscribe?{1}={2};{3}={4};{5}={6};'.format(base_url, user_id_parm, userid, stream_id_parm,
                                                              streamid, redirect_parm, redirect)
 
+
+def get_viewtag_url(tagname):
+    return '{0}/viewtag?{1}={2};'.format(base_url, tag_name_parm, tagname)
+
+
+def get_addtag_service_url(tagname):
+    return '{0}/services/addtag?{1}={2};'.format(base_url, tag_name_parm, tagname)
+
+
+def get_addtag_service_url_noparm():
+    return '{0}/services/addtag'.format(base_url)
+
 # [END link-helpers}

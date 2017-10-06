@@ -59,6 +59,10 @@ handlers:
   script: Routes.app
 - url: /services/subscribed
   script: Routes.app
+- url: /services/addtag
+  script: Routes.app
+- url: /services/removetag
+  script: Routes.app
 # [END services]
 
 - url: /css
