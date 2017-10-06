@@ -16,7 +16,7 @@ class AddTagToStreamService(BaseHandler):
         # get stream name
         stream_id = self.get_request_param(fh.stream_id_parm)
         response[fh.stream_id_parm] = stream_id
-        if stream_id is None or stream_id == "":
+        if stream_id in ['', None]:
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
             return
 
@@ -29,12 +29,12 @@ class AddTagToStreamService(BaseHandler):
 
         # get tag name
         tag_name = self.get_request_param(fh.tag_name_parm)
-        if tag_name is None or tag_name == "":
+        if tag_name in ['', None]:
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.tag_name_parm))
             return
 
         # get the tag
-        tag = Tag.get_or_create_by_name(tag_name)
+        tag = Tag.get_or_create_by_name(tag_name.strip().lower())
 
         # create new streamtag
         StreamTag.add_tags_to_stream_by_name(stream, [tag.name])

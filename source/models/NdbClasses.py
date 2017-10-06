@@ -164,6 +164,9 @@ class Tag(ndb.Model):
 
     @classmethod
     def create(cls, tag_name):
+        if tag_name in ['', None]:
+            return None
+        tag_name = tag_name.lower().strip()
         # tags are indexed in Datastore by their name
         tag_name = tag_name.strip()
         if Tag.get_by_name(tag_name):
@@ -174,14 +177,17 @@ class Tag(ndb.Model):
 
     @classmethod
     def get_by_name(cls, tag_name):
-        if tag_name is None or tag_name == '':
+        if tag_name in ['', None]:
             return None
+        tag_name = tag_name.lower().strip()
         return ndb.Key('Tag', tag_name).get()
 
     @classmethod
     # also searchibilizes it
     def get_or_create_by_name(cls, tag_name):
-        tag_name = tag_name.strip()
+        if tag_name in ['', None]:
+            return None
+        tag_name = tag_name.lower().strip()
         tag = cls.get_by_name(tag_name)
         if tag is not None:
             return tag
@@ -191,7 +197,11 @@ class Tag(ndb.Model):
 
     @classmethod
     def get_key_from_name(cls, tag_name):
-        key = ndb.Key('Tag', tag_name.strip())
+        if tag_name in ['', None]:
+            return None
+        tag_name = tag_name.lower().strip()
+        tag_name = tag_name.strip().lower()
+        key = ndb.Key('Tag', tag_name)
         return key
 
 
@@ -214,6 +224,9 @@ class StreamTag(ndb.Model):
     @classmethod
     # tag_name is a string
     def get_batch_by_tag_name(cls, tag_name):
+        if tag_name in ['', None]:
+            return None
+        tag_name = tag_name.lower().strip()
         return StreamTag.query(StreamTag.tag == Tag.get_key_from_name(tag_name)).fetch()
 
     @classmethod
@@ -238,6 +251,9 @@ class StreamTag(ndb.Model):
     # stream is a Stream object
     # tag is a tag name
     def get_key_value_with_tagname(cls, stream, tag_name):
+        if tag_name in ['', None]:
+            return None
+        tag_name = tag_name.lower().strip()
         return "{0}{1}".format(stream.key.id(), tag_name.strip())
 
     @classmethod
@@ -248,11 +264,12 @@ class StreamTag(ndb.Model):
 
     @classmethod
     def add_tags_to_stream_by_name(cls, stream, tag_name_list):
-        tags = [Tag.create(tag_name.strip()) for tag_name in tag_name_list if tag_name not in [None, '']]
+        tag_name_list = [tag_name.strip().lower() for tag_name in tag_name_list if tag_name not in [None, '']]
+        tags = [Tag.create(tag_name) for tag_name in tag_name_list if tag_name not in [None, '']]
         [fh.searchablize_tag(tag) for tag in tags]
         streamtags = [StreamTag(stream=stream.key,
-                                tag=Tag.get_key_from_name(tag_name.strip()),
-                                id=StreamTag.get_key_value_with_tagname(stream, tag_name.strip()))
+                                tag=Tag.get_key_from_name(tag_name),
+                                id=StreamTag.get_key_value_with_tagname(stream, tag_name))
                       for tag_name in tag_name_list if tag_name not in [None, '']]
         ndb.put_multi(streamtags)
 
