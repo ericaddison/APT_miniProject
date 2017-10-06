@@ -252,8 +252,17 @@ class StreamSubscriber(ndb.Model):
         return "{0}{1}".format(user.key.id(), stream.key.id())
 
     @classmethod
+    def get_key_value_by_ids(cls, stream_id, user_id):
+        return "{0}{1}".format(user_id, stream_id)
+
+    @classmethod
     def get_by_stream_and_user(cls, stream, user):
         key_val = StreamSubscriber.get_key_value(stream, user)
+        return ndb.Key('StreamSubscriber', key_val).get()
+
+    @classmethod
+    def get_by_stream_id_and_user_id(cls, stream_id, user_id):
+        key_val = StreamSubscriber.get_key_value_by_ids(stream_id, user_id)
         return ndb.Key('StreamSubscriber', key_val).get()
 
     @classmethod

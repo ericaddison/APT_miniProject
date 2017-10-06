@@ -71,10 +71,10 @@ class UnsubscribeExe(BaseHandler):
             except urllib2.HTTPError:
                 self.redirect('/error?{0}={1}'.format(fh.error_code_parm, 'Error unsubscribing from stream'))
 
-        # try to wait until streams are really gone...
-        # for id in stream_ids:
-        #     while StreamSubscriber.
-        #         pass
+        #try to wait until streams are really gone...
+        for id in stream_ids:
+            while StreamSubscriber.get_by_stream_id_and_user_id(id, user.user_id()) is not None:
+                pass
 
         self.redirect('http://{0}/manage?{1}={2}'.format(os.environ['HTTP_HOST'], fh.message_parm, 'Unsubscribed from streams'))
 
