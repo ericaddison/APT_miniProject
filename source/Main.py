@@ -120,31 +120,6 @@ class ManagePage(BaseHandler):
         self.response.write(template.render(path, template_values))
 
 
-class ViewAllStreamsPage(webapp2.RequestHandler):
-    def get(self):
-
-        user = users.get_current_user()
-
-        if user:
-            nickname = user.nickname()
-            login_url = users.create_logout_url('/')
-            login_text = 'Sign out'
-        else:
-            self.redirect("/")
-            return
-
-        template_values = {
-            'html_template': 'MasterTemplate.html',
-            'user': user,
-            'login_url': login_url,
-            'login_text': login_text,
-            'app': app_identity.get_application_id()}
-
-        self.response.content_type = 'text/html'
-        path = os.path.join(os.path.dirname(__file__), '../templates/ViewAll.html')
-        self.response.write(template.render(path, template_values))
-
-
 class TrendingPage(webapp2.RequestHandler):
     def post(self):
         user = users.get_current_user()
@@ -194,6 +169,5 @@ class TrendingPage(webapp2.RequestHandler):
 # define the "app" that will be referenced from app.yaml
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/view', ViewAllStreamsPage),
     ('/trending', TrendingPage)
 ], debug=True)
