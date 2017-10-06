@@ -64,6 +64,10 @@ tr.stream-checked {
     cursor: pointer;
 }
 
+.checkbox-div:hover {
+    background-color: #e9b8b8;
+}
+
 .checkbox {
     cursor: pointer;
     height: 15px;
