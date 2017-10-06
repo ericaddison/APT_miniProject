@@ -31,6 +31,8 @@ handlers:
   script: Routes.app
 - url: /manage
   script: Routes.app
+- url: /social
+  script: Routes.app
 # [START views]
 
 
