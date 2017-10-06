@@ -23,7 +23,13 @@ handlers:
   script: Routes.app
 - url: /create
   script: Routes.app
+- url: /delete.*
+  script: Routes.app
+- url: /unsubscribe.*
+  script: Routes.app
 - url: /error
+  script: Routes.app
+- url: /manage
   script: Routes.app
 # [START views]
 
@@ -34,7 +40,7 @@ handlers:
 - url: /services/crontrends*
   script: source.services.Service_CronTrends.app
 - url: /services/management
-  script: source.services.Service_Management.app
+  script: Routes.app
 - url: /services/search.*
   script: Routes.app
 - url: /services/viewstream

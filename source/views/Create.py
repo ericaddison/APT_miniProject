@@ -21,6 +21,7 @@ class CreatePage(BaseHandler):
         template_values = {
             'html_template': 'MasterTemplate.html',
             'user': user.nickName,
+            'email': user.email,
             'login_url': login_url,
             'login_text': login_text,
             'stream_name_parm': fh.stream_name_parm,
@@ -46,6 +47,7 @@ class CreatePage(BaseHandler):
         try:
             result = urllib2.urlopen(create_stream_url)
             response = json.loads("".join(result.readlines()))
-            self.redirect('http://{0}/viewstream?{0}={1}'.format(os.environ['HTTP_HOST'], fh.stream_id_parm, response[fh.stream_id_parm]))
-        except BaseException, e:
-            self.redirect('/Error?{0}={1}'.format(fh.error_msg_parm, urllib.quote('Whoops! Problem creating stream: {}'.format(type(e)))))
+            redirect_url = 'http://{0}/viewstream?{1}={2}'.format(os.environ['HTTP_HOST'], fh.stream_id_parm, response[fh.stream_id_parm])
+            self.redirect(redirect_url)
+        except urllib2.HTTPError:
+            self.redirect('/Error')

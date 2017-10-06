@@ -1,0 +1,17 @@
+{% extends html_template %}
+
+{% block content %}
+<br>
+<div style="text-align: center" class="alert alert-danger"><h3>{% block warning_message %}{% endblock %}</h3></div>
+
+    <form action="{% block action_url %}{% endblock %}" method="post">
+        <div style="text-align: center" class="alert alert-warning">
+            {% block confirm_content %}{% endblock %}
+        </div>
+        <div style="text-align: center;">
+             <input type="submit" name="button" class="btn btn-danger btn-lg" value="{% block submit_text %}{% endblock %}">
+            <br><br>
+            <input type="submit" name="button" class="btn btn-success btn-sm" value="Cancel">
+        </div>
+    </form>
+{% endblock %}

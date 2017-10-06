@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 import source.Framework.Framework_Helpers as fh
+from google.appengine.ext import blobstore
 
 
 class Stream(ndb.Model):
@@ -23,6 +24,9 @@ class Stream(ndb.Model):
         item_keys = self.items[(ind1-1):ind2]
         return ndb.get_multi(item_keys), ind1, ind2
 
+    def stream_id(self):
+        return self.key.id()
+
     def get_owner_from_db(self):
         return self.owner.get()
 
@@ -37,7 +41,8 @@ class Stream(ndb.Model):
         StreamSubscriber.delete_by_stream(self)
 
         # delete blobs owned by the items of this stream
-        [it.blobKey.delete() for it in self.items if it.blobKey is not None]
+        real_items = ndb.get_multi(self.items)
+        [blobstore.delete(it.blobKey) for it in real_items if it.blobKey is not None]
 
         # delete the items owned by this stream
         ndb.delete_multi(self.items)
@@ -96,8 +101,15 @@ class Stream(ndb.Model):
         except ValueError:
             return None
 
-
-
+    # owner should be a StreamUser
+    @classmethod
+    def get_ids_by_owner(cls, owner):
+        stream_query0 = Stream.query()
+        stream_query1 = stream_query0.filter(Stream.owner == owner.key)
+        stream_result = stream_query1.fetch()
+        if stream_result is None:
+            return None
+        return [s.key.id() for s in stream_result]
 
 
 class StreamItem(ndb.Model):
@@ -210,6 +222,9 @@ class StreamSubscriber(ndb.Model):
     user = ndb.KeyProperty(indexed=True, kind='StreamUser')
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
 
+    def get_id(self):
+        return self.key.id()
+
     @classmethod
     def create(cls, stream, user):
         sub = StreamSubscriber.get_by_stream_and_user(stream, user)
@@ -237,14 +252,28 @@ class StreamSubscriber(ndb.Model):
         return "{0}{1}".format(user.key.id(), stream.key.id())
 
     @classmethod
+    def get_key_value_by_ids(cls, stream_id, user_id):
+        return "{0}{1}".format(user_id, stream_id)
+
+    @classmethod
     def get_by_stream_and_user(cls, stream, user):
         key_val = StreamSubscriber.get_key_value(stream, user)
         return ndb.Key('StreamSubscriber', key_val).get()
 
     @classmethod
+    def get_by_stream_id_and_user_id(cls, stream_id, user_id):
+        key_val = StreamSubscriber.get_key_value_by_ids(stream_id, user_id)
+        return ndb.Key('StreamSubscriber', key_val).get()
+
+    @classmethod
     # stream is a Stream object
     def get_by_stream(cls, stream):
-        return StreamTag.query(StreamTag.stream == stream.key).fetch()
+        return StreamSubscriber.query(StreamSubscriber.stream == stream.key).fetch()
+
+    @classmethod
+    # user is a StreamUser object
+    def get_by_user(cls, user):
+        return StreamSubscriber.query(StreamSubscriber.user == user.key).fetch()
 
     @classmethod
     def delete_by_stream(cls, stream):

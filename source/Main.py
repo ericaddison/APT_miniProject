@@ -24,11 +24,7 @@ class MainPage(webapp2.RequestHandler):
 
         user = users.get_current_user()
 
-        print
-        "MainPage: users.get_current_user(): ", user
-
         if user:
-            nickname = user.nickname()
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
 
@@ -49,11 +45,10 @@ class MainPage(webapp2.RequestHandler):
         self.response.out.write(template.render(path, template_values))
 
 
-class ManagePage(webapp2.RequestHandler):
+class ManagePage(BaseHandler):
     def get(self):
 
         user = users.get_current_user()
-
         if user:
             nickname = user.nickname()
             login_url = users.create_logout_url('/')
@@ -67,7 +62,6 @@ class ManagePage(webapp2.RequestHandler):
                 if email_dup_check:
                     self.response.write("Uh oh! Duplicate email!!!")
                     return
-                print("\n\nAdding new StreamUser by email: {}\n\n".format(str(user.email())))
                 stream_user = StreamUser(email=user.email(), nickName=nickname, id=str(user.user_id()))
                 stream_user.put()
 
@@ -75,16 +69,18 @@ class ManagePage(webapp2.RequestHandler):
             self.redirect("/")
             return
 
-
-
-
-        # get streams owned by this user
-        myuser = ndb.Key('StreamUser', stream_user.key.id())
-        user_streams = Stream.query(Stream.owner == myuser).fetch()
-        print("\nstreams owned by {0}: {1}".format(str(user.nickname()), str(user_streams)))
+        # call management service to get stream lists
+        management_service_url = 'http://{0}/services/management?{1}={2}'.format(os.environ['HTTP_HOST'],
+                                                                                 fh.user_id_parm, user.user_id())
+        print("\n\n{}\n\n".format(management_service_url))
+        result = urllib2.urlopen(management_service_url)
+        response = json.loads("".join(result.readlines()))
+        user_streams = response['owned_streams']
+        subby_streams = response['subscribed_streams']
 
         owned_streams = []
-        for stream in user_streams:
+        for stream_id in user_streams:
+            stream = Stream.get_by_id(stream_id)
             newestDate = ""
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
@@ -92,28 +88,16 @@ class ManagePage(webapp2.RequestHandler):
                           'id': stream.key.id()}
             owned_streams.append(streamDict)
 
-
-
-
         # get streams subscribed by this user
-        user_subscriptions = StreamSubscriber.query(StreamSubscriber.user == stream_user.key).fetch()
-        print("\nstreams subscribed to by {0}: {1}".format(user.nickname(), user_subscriptions))
-
-        streamKeyList = []
-        for sub in user_subscriptions:
-            streamKeyList.append(sub.stream.get())
-
         subbed_streams = []
-        for stream in streamKeyList:
+        for stream_id in subby_streams:
+            stream = Stream.get_by_id(stream_id)
             newestDate = ""
             if len(stream.items) > 0:
                 newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
             streamDict = {'streamName': stream.name, 'counter': len(stream.items), 'newestDate': newestDate,
                           'id': stream.key.id(), 'views': stream.numViews}
             subbed_streams.append(streamDict)
-
-        #print("owned_streams: {}".format(owned_streams))
-        #print("subbed_streams: {}".format(subbed_streams))
 
         template_values = {
             'html_template': 'MasterTemplate.html',
@@ -123,7 +107,13 @@ class ManagePage(webapp2.RequestHandler):
             'login_text': login_text,
             'streams': owned_streams,
             'subscribe': subbed_streams,
-            'app': app_identity.get_application_id()}
+            'app': app_identity.get_application_id()
+        }
+
+        # look for any message
+        msg = self.get_request_param(fh.message_parm)
+        if msg not in [None, '']:
+            template_values['msg'] = msg
 
         self.response.content_type = 'text/html'
         path = os.path.join(os.path.dirname(__file__), '../templates/Manage.html')
@@ -141,7 +131,6 @@ class TrendingPage(webapp2.RequestHandler):
 
         self.redirect("/trending")
 
-
     def get(self):
 
         user = users.get_current_user()
@@ -157,13 +146,12 @@ class TrendingPage(webapp2.RequestHandler):
         response = urllib2.urlopen('http://{0}/services/crontrends'.format(os.environ['HTTP_HOST']))
         returnValue = json.loads("".join(response.readlines()))
 
-
         streamList = []
         for stream in returnValue.get('trendingStreams'):
             thisStream = Stream.get_by_id(stream.get('streamKeyID'))
-            streamDict = {'stream': thisStream, 'trendViews': int(stream.get('recentViews')), 'id':thisStream.key.id()}
+            streamDict = {'stream': thisStream, 'trendViews': int(stream.get('recentViews')),
+                          'id': thisStream.key.id()}
             streamList.append(streamDict)
-
 
         template_values = {
             'html_template': 'MasterTemplate.html',
@@ -181,6 +169,5 @@ class TrendingPage(webapp2.RequestHandler):
 # define the "app" that will be referenced from app.yaml
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/manage', ManagePage),
     ('/trending', TrendingPage)
 ], debug=True)

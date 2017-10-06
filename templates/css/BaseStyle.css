@@ -44,6 +44,44 @@ td, th {
     padding: 8px;
 }
 
+
 tr:nth-child(even) {
     background-color: #dddddd;
+}
+
+/* Manage page stuff */
+th.delete-col, td.delete-col {
+    text-align: center;
+}
+
+tr.stream-checked {
+    border-left: 4px solid red;
+    border-right: 4px solid red;
+    background-color: #e9b8b8;
+}
+
+.checkbox-div {
+    cursor: pointer;
+}
+
+.checkbox {
+    cursor: pointer;
+    height: 15px;
+    width: 15px;
+    border: 2px solid black;
+    border-radius: 3px;
+    margin: auto;
+}
+
+.checked {
+    background-color: red;
+}
+
+.unchecked {
+    background-color: none;
+}
+
+.mybtn {
+    border: 3px solid black;
+    cursor: pointer;
 }
