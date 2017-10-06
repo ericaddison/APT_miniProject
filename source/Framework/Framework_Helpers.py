@@ -230,5 +230,8 @@ def get_tagmod_url_noparm():
     return '{0}/tagmod'.format(base_url)
 
 
+def get_tagged_streams_url(tagname):
+    return '{0}/service/taggedstreams?{1}={0}'.format(base_url, tag_name_parm, tagname)
+
 
         # [END link-helpers}

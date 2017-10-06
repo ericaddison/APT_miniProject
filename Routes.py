@@ -8,6 +8,7 @@ from source.services.Service_UploadFile import UploadFileHandler
 from source.services.Service_ViewStream import ViewStreamService
 from source.services.Service_TextSearch import TagTextSearchService, StreamTextSearchService
 from source.services.Service_Management import ManagementService
+from source.services.Service_StreamsForTag import StreamsForTagService
 from source.services.Service_Tag import AddTagToStreamService, RemoveTagFromStreamService
 from source.views.Create import CreatePage
 from source.views.Delete import DeletePage, DeleteExe
@@ -50,7 +51,8 @@ app = webapp2.WSGIApplication([
     ('/services/management', ManagementService),
     ('/services/subscribed', CheckSubscribedService),
     ('/services/addstreamtag', AddTagToStreamService),
-    ('/services/removestreamtag', RemoveTagFromStreamService)
+    ('/services/removestreamtag', RemoveTagFromStreamService),
+    ('/services/taggedstreams', StreamsForTagService)
     # [END services]
 
 ], config=config, debug=True)

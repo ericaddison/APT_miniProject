@@ -65,6 +65,8 @@ handlers:
   script: Routes.app
 - url: /services/removestreamtag
   script: Routes.app
+- url: /services/taggedstreams
+  script: Routes.app
 # [END services]
 
 - url: /css

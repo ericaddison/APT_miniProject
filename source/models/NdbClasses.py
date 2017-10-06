@@ -200,10 +200,18 @@ class StreamTag(ndb.Model):
     def get_tag_name(self):
         return self.tag.id()
 
+    def get_stream_id(self):
+        return self.stream.id()
+
     @classmethod
     # stream is a Stream object
     def get_batch_by_stream(cls, stream):
         return StreamTag.query(StreamTag.stream == stream.key).fetch()
+
+    @classmethod
+    # tag_name is a string
+    def get_batch_by_tag_name(cls, tag_name):
+        return StreamTag.query(StreamTag.tag == Tag.get_key_from_name(tag_name)).fetch()
 
     @classmethod
     # stream is a Stream object

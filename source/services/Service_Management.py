@@ -14,7 +14,7 @@ class ManagementService(BaseHandler):
 
         # get current user
         user_id = self.get_request_param(fh.user_id_parm)
-        if user_id is None:
+        if user_id in ['', None]:
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
             return
 

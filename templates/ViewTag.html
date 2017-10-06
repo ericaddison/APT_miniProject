@@ -1,0 +1,19 @@
+{% extends html_template %}
+
+{% block title %}Connexion: Search{% endblock %}
+
+{% block content %}
+<br>
+<h1>Streams tagged with {{ tag_name }}</h1>
+    <table style="width:90%">
+         <tr>
+             <th>Stream Name</th>
+         </tr>
+            {% for stream in search_streams %}
+         <tr>
+            <td><a href="/viewstream?streamID={{ stream.get_id }}"><img src="{{ stream.coverImageURL }}" style="width:30%;"> {{ stream.name }}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+<br>
+{% endblock %}
