@@ -15,6 +15,7 @@ from source.views.ViewStream import ViewStream
 from source.views.TextSearch import TextSearch, TextSearchForm
 from source.views.ErrorView import ErrorView
 from source.views.ViewAllStreams import ViewAllStreams
+from source.views.Social import SocialPage
 from source.Main import ManagePage
 
 config = {'webapp2_extras.sessions': {'secret_key': 'my-super-secret-key'}}
@@ -33,6 +34,7 @@ app = webapp2.WSGIApplication([
     ('/searchexe', TextSearch),
     ('/error', ErrorView),
     ('/manage', ManagePage),
+    ('/social', SocialPage),
     # [END views]
 
     # [START services]
