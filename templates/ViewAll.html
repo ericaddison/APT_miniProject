@@ -3,21 +3,28 @@
 {% block title %}Connexion: View All Streams{% endblock %}
 
 {% block content %}
-        <table>
-            <tr><b>View All Streams:</b></tr>
-
-            <tr>
-                <th>Name</th>
-                <th>Latest Update</th>
-                <th>Number of Pictures</th>
-            </tr>
-
-            <tr>
-                <td>testing_static_table1</td>
-                <td>test1</td>
-                <td>number1</td>
-            </tr>
-        </table>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>name</th>
+          <th>owner</th>
+          <th>cover image URL</th>
+          <th>number of views</th>
+          <th>number of items</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stream in streams %}
+          <tr>
+            <td><a href="/viewstream?streamID={{ stream.key.id }}">{{ stream.name }}</a></td>
+            <td>{{ stream.owner.get.nickName }}</td>
+            <td><a href="{{ stream.coverImageURL }}" title="{{ stream.coverImageURL }}">link</a></td>
+            <td>{{ stream.numViews }}</td>
+            <td>{{ stream.items|length }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
         <footer>Copyright &copy; Footnote Here</footer>
 
