@@ -60,15 +60,57 @@ class CronTrendsService(webapp2.RequestHandler):
 
         for email_rcpt_address in emailList:
             try:
-                mail.send_mail(sender=email_sender_address,
-                               to=email_rcpt_address,
-                               subject="WhiteTeam Trending Streams",
-                               body="Check out these streams: {0}".format(trendingStreams))
-            except:
-                print "Email failed to: ", email_rcpt_address
+                streams = []
+                if len(trendingStreams) > 0:
+                    streams.append(Stream.get_by_id(trendingStreams[0].get('streamKeyID')))
+                if len(trendingStreams) > 1:
+                    streams.append(Stream.get_by_id(trendingStreams[1].get('streamKeyID')))
+                if len(trendingStreams) > 2:
+                    streams.append(Stream.get_by_id(trendingStreams[2].get('streamKeyID')))
+                    
+                messageString = "Check out these streams: <br>"
+                counter = -1
+                for stream in streams:
+                    counter += 1
+                    addMessage = """<a href="http://apt17-miniproj-whiteteam.appspot.com/viewstream?streamID={0}">
+                                            <img src="{1}" style="width:150;"> {2}</a> - {3} Views!<br>
+                                 """.format(stream.key.id(), stream.coverImageURL, stream.name, trendingStreams[counter].get('recentViews'))
+                    messageString = messageString + addMessage
+                
+                    
+                
                 mail.send_mail_to_admins(sender=email_sender_address,
                                          subject="WhiteTeam Trending Streams",
-                                         body="***ADMIN*** Check out these streams: {0}".format(trendingStreams))
+                                         body=messageString)
+                
+                print "Email Message: ", messageString
+                
+                
+            except:
+                print "Email failed to: ", email_rcpt_address
+                
+                streams = []
+                if len(trendingStreams) > 0:
+                    streams.append(Stream.get_by_id(trendingStreams[0].get('streamKeyID')))
+                if len(trendingStreams) > 1:
+                    streams.append(Stream.get_by_id(trendingStreams[1].get('streamKeyID')))
+                if len(trendingStreams) > 2:
+                    streams.append(Stream.get_by_id(trendingStreams[2].get('streamKeyID')))
+                    
+                messageString = "**** ADMIN **** Check out these streams: <br>"
+                counter = -1
+                for stream in streams:
+                    counter += 1
+                    addMessage = """<a href="http://apt17-miniproj-whiteteam.appspot.com/viewstream?streamID={0}">
+                                            <img src="{1}" style="width:150;"> {2}</a> - {3} Views!<br>
+                                 """.format(stream.key.id(), stream.coverImageURL, stream.name, trendingStreams[counter].get('recentViews'))
+                    messageString = messageString + addMessage
+                
+                    
+                
+                mail.send_mail_to_admins(sender=email_sender_address,
+                                         subject="WhiteTeam Trending Streams",
+                                         body=messageString)
                 continue
 
         return

@@ -18,7 +18,7 @@
           <tr>
             <td><a href="/viewstream?streamID={{ stream.key.id }}">{{ stream.name }}</a></td>
             <td>{{ stream.owner.get.nickName }}</td>
-            <td><a href="{{ stream.coverImageURL }}" title="{{ stream.coverImageURL }}">link</a></td>
+            <td><a href="/viewstream?streamID={{ stream.key.id }}"><img src="{{ stream.coverImageURL }}" style="width:30%;"></a></td>
             <td>{{ stream.numViews }}</td>
             <td>{{ stream.items|length }}</td>
           </tr>
