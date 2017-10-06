@@ -26,6 +26,7 @@ error_code_parm = 'code'
 message_parm = 'msg'
 owner_parm = 'owner'
 num_images_parm = 'num_images'
+url_parm = 'url'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]

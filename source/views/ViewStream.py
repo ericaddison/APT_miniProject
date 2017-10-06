@@ -111,7 +111,8 @@ class ViewStream(BaseHandler):
                     'tag_url': fh.get_tagmod_url_noparm(),
                     'redirect_url': self.get_current_url(),
                     'stream_id_parm': fh.stream_id_parm,
-                    'redirect_parm': fh.redirect_parm
+                    'redirect_parm': fh.redirect_parm,
+                    'url_parm': fh.url_parm
                 }
 
         if next_page_url:

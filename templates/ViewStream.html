@@ -128,10 +128,15 @@ div.scrollmenu a:hover {
     <div >
     <h2>Add Image</h2>
         <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-          <input type="file" name="file">
+          <input type="file" name="file"> <br>
+           ** OR **<br>
+          Image URL: <input name="{{ url_parm }}" value="http://">
+            <br>
+            Make Cover Image? <input type="checkbox" name="iscover">
           <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
           <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
-          <input type="submit" name="submit" value="Upload">
+            <br>
+          <input type="submit" name="submit" value="Submit">
         </form>
     </div>
     <div>

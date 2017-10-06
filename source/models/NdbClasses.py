@@ -24,6 +24,10 @@ class Stream(ndb.Model):
         item_keys = self.items[(ind1-1):ind2]
         return ndb.get_multi(item_keys), ind1, ind2
 
+    def set_cover_image_url(self, url):
+        self.coverImageURL = url
+        self.put()
+
     def stream_id(self):
         return self.key.id()
 
@@ -138,11 +142,12 @@ class StreamItem(ndb.Model):
         url = kwargs['URL']
         stream = kwargs['stream']
         blob = kwargs['file'] if 'file' in kwargs.keys() else None
+        blobkey = blob.key() if blob is not None else None
 
         # create and return stream
         item = StreamItem(
                 owner=owner.key,
-                blobKey=blob.key(),
+                blobKey=blobkey,
                 URL=url,
                 name=name,
                 stream=stream.key)
