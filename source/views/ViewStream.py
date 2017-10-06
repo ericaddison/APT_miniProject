@@ -1,9 +1,7 @@
 import json
 import os
 
-import jinja2
 import urllib2
-import webapp2
 
 from datetime import datetime
 
@@ -136,8 +134,6 @@ class TagMod(BaseHandler):
             tag_service_url = fh.get_addtag_service_url(stream_id, tag_name)
         elif button == 'Remove Tag':
             tag_service_url = fh.get_removetag_service_url(stream_id, tag_name)
-
-        print("\n{}\n".format(tag_service_url))
 
         urllib2.urlopen(tag_service_url)
 

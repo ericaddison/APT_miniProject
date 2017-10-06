@@ -14,6 +14,7 @@ from source.views.Create import CreatePage
 from source.views.Delete import DeletePage, DeleteExe
 from source.views.Unsubscribe import UnsubscribePage, UnsubscribeExe
 from source.views.ViewStream import ViewStream, TagMod
+from source.views.ViewTag import ViewTag
 from source.views.TextSearch import TextSearch, TextSearchForm
 from source.views.ErrorView import ErrorView
 from source.views.ViewAllStreams import ViewAllStreams
@@ -31,6 +32,7 @@ app = webapp2.WSGIApplication([
     ('/unsubscribe', UnsubscribePage),
     ('/unsubscribeexe', UnsubscribeExe),
     ('/viewstream', ViewStream),
+    ('/viewtag', ViewTag),
     ('/search', TextSearchForm),
     ('/searchexe', TextSearch),
     ('/error', ErrorView),

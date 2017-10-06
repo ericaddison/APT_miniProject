@@ -9,9 +9,9 @@
          <tr>
              <th>Stream Name</th>
          </tr>
-            {% for stream in search_streams %}
+            {% for stream in streams %}
          <tr>
-            <td><a href="/viewstream?streamID={{ stream.get_id }}"><img src="{{ stream.coverImageURL }}" style="width:30%;"> {{ stream.name }}</a></td>
+            <td><a href="{{ stream.url }}"><img src="{{ stream.coverImageURL }}" style="width:30%;"> {{ stream.name }}</a></td>
         </tr>
         {% endfor %}
     </table>

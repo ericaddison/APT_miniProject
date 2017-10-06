@@ -178,6 +178,7 @@ class Tag(ndb.Model):
     @classmethod
     # also searchibilizes it
     def get_or_create_by_name(cls, tag_name):
+        tag_name = tag_name.strip()
         tag = cls.get_by_name(tag_name)
         if tag is not None:
             return tag
@@ -187,8 +188,7 @@ class Tag(ndb.Model):
 
     @classmethod
     def get_key_from_name(cls, tag_name):
-        print('MATHING KEY! ... ' + tag_name)
-        key = ndb.Key('Tag', tag_name)
+        key = ndb.Key('Tag', tag_name.strip())
         return key
 
 
@@ -235,7 +235,7 @@ class StreamTag(ndb.Model):
     # stream is a Stream object
     # tag is a tag name
     def get_key_value_with_tagname(cls, stream, tag_name):
-        return "{0}{1}".format(stream.key.id(), tag_name)
+        return "{0}{1}".format(stream.key.id(), tag_name.strip())
 
     @classmethod
     # stream is a Stream object
@@ -245,11 +245,11 @@ class StreamTag(ndb.Model):
 
     @classmethod
     def add_tags_to_stream_by_name(cls, stream, tag_name_list):
-        tags = [Tag.create(tag_name) for tag_name in tag_name_list if tag_name not in [None, '']]
-        [fh.searchablize_tag(tag_name) for tag_name in tags]
+        tags = [Tag.create(tag_name.strip()) for tag_name in tag_name_list if tag_name not in [None, '']]
+        [fh.searchablize_tag(tag) for tag in tags]
         streamtags = [StreamTag(stream=stream.key,
-                                tag=Tag.get_key_from_name(tag_name),
-                                id=StreamTag.get_key_value_with_tagname(stream, tag_name))
+                                tag=Tag.get_key_from_name(tag_name.strip()),
+                                id=StreamTag.get_key_value_with_tagname(stream, tag_name.strip()))
                       for tag_name in tag_name_list if tag_name not in [None, '']]
         ndb.put_multi(streamtags)
 

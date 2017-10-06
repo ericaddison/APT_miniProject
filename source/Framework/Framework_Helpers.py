@@ -161,7 +161,6 @@ def remove_stream_from_search_index(stream, response):
         return
 
     search_result = index.search("id: {}".format(str(stream.key.id())))
-    print("\n{}\n".format(search_result))
     for doc in search_result.results:
         index.delete(doc.doc_id)
     return
@@ -196,6 +195,36 @@ def get_viewstream_url(streamid, i1, i2):
     return '{0}/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
 
 
+def get_viewstream_default_url(streamid):
+    return get_viewstream_url(streamid, 1, 10)
+
+
+def get_tagmod_url_noparm():
+    return '{0}/tagmod'.format(base_url)
+
+
+def get_tagged_streams_url(tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/services/taggedstreams?{1}={2}'.format(base_url, tag_name_parm, tagname)
+
+
+def get_viewtag_url(tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/viewtag?{1}={2};'.format(base_url, tag_name_parm, tagname)
+
+# [END link-helpers}
+
+
+# [START service-link-helpers]
+def get_addtag_service_url(stream_id, tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/services/addstreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, tagname)
+
+
+def get_removetag_service_url(stream_id, tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/services/removestreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, tagname)
+
 def get_viewstream_service_url(streamid, i1, i2):
     return '{0}/services/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
 
@@ -213,25 +242,4 @@ def get_unsubscribe_service_url(userid, streamid, redirect):
     return '{0}/services/unsubscribe?{1}={2};{3}={4};{5}={6};'.format(base_url, user_id_parm, userid, stream_id_parm,
                                                              streamid, redirect_parm, redirect)
 
-
-def get_viewtag_url(tagname):
-    return '{0}/viewtag?{1}={2};'.format(base_url, tag_name_parm, urllib2.quote(tagname))
-
-
-def get_addtag_service_url(stream_id, tagname):
-    return '{0}/services/addstreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, urllib2.quote(tagname))
-
-
-def get_removetag_service_url(stream_id, tagname):
-    return '{0}/services/removestreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, urllib2.quote(tagname))
-
-
-def get_tagmod_url_noparm():
-    return '{0}/tagmod'.format(base_url)
-
-
-def get_tagged_streams_url(tagname):
-    return '{0}/service/taggedstreams?{1}={0}'.format(base_url, tag_name_parm, tagname)
-
-
-        # [END link-helpers}
+# [END service-link-helpers]

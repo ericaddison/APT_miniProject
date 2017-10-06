@@ -1,7 +1,7 @@
 import json
 from source.Framework.BaseHandler import BaseHandler
 import source.Framework.Framework_Helpers as fh
-from source.models.NdbClasses import StreamTag
+from source.models.NdbClasses import StreamTag, Stream
 
 
 # get streams for a given tag service
@@ -19,8 +19,12 @@ class StreamsForTagService(BaseHandler):
             return
 
         # query for all streams owned by user
-        tag_streams = StreamTag.get_batch_by_tag_name(tag_name)
+        streamtags = StreamTag.get_batch_by_tag_name(tag_name)
+        stream_ids = [st.get_stream_id() for st in streamtags]
+        streams = Stream.get_batch_by_ids(stream_ids)
 
         # write some stream info
-        response['streams'] = [s.get_stream_id() for s in tag_streams]
+        response[fh.stream_id_parm] = [id for id in stream_ids]
+        response[fh.cover_url_parm] = [s.coverImageURL for s in streams]
+        response[fh.stream_name_parm] = [s.name for s in streams]
         self.write_response(json.dumps(response))

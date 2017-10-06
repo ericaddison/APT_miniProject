@@ -21,6 +21,8 @@ handlers:
   script: Routes.app
 - url: /viewstream
   script: Routes.app
+- url: /viewtag
+  script: Routes.app
 - url: /create
   script: Routes.app
 - url: /delete.*

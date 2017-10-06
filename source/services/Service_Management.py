@@ -29,8 +29,6 @@ class ManagementService(BaseHandler):
         # query for all streams subscribed to by user
         sub_streams = StreamSubscriber.get_by_user(user)
 
-        print("\n\n{}\n\n".format(my_streams))
-
         # write some stream info
         response['owned_streams'] = [s for s in my_streams]
         response['subscribed_streams'] = [s.stream.id() for s in sub_streams]

@@ -42,7 +42,6 @@ class CreatePage(BaseHandler):
                                                                                   fh.user_id_parm,
                                                                                   fh.get_current_user(self).user_id(),
                                                                                   urllib.urlencode(parm_dict))
-        print("\n{}\n".format(len(create_stream_url)))
 
         try:
             result = urllib2.urlopen(create_stream_url)
