@@ -145,8 +145,55 @@ class ViewAllStreamsPage(webapp2.RequestHandler):
         self.response.write(template.render(path, template_values))
 
 
+class TrendingPage(webapp2.RequestHandler):
+    def post(self):
+        user = users.get_current_user()
+        stream_user = ndb.Key('StreamUser', user.user_id()).get()
+
+        param_string = self.request.get('freq')
+
+        stream_user.update_email_freq(param_string)
+
+        self.redirect("/trending")
+
+    def get(self):
+
+        user = users.get_current_user()
+
+        if user:
+            nickname = user.nickname()
+            login_url = users.create_logout_url('/')
+            login_text = 'Sign out'
+        else:
+            self.redirect("/")
+            return
+
+        response = urllib2.urlopen('http://{0}/services/crontrends'.format(os.environ['HTTP_HOST']))
+        returnValue = json.loads("".join(response.readlines()))
+
+        streamList = []
+        for stream in returnValue.get('trendingStreams'):
+            thisStream = Stream.get_by_id(stream.get('streamKeyID'))
+            streamDict = {'stream': thisStream, 'trendViews': int(stream.get('recentViews')),
+                          'id': thisStream.key.id()}
+            streamList.append(streamDict)
+
+        template_values = {
+            'html_template': 'MasterTemplate.html',
+            'user': user,
+            'login_url': login_url,
+            'login_text': login_text,
+            'trendingStreams': streamList,
+            'app': app_identity.get_application_id()}
+
+        self.response.content_type = 'text/html'
+        path = os.path.join(os.path.dirname(__file__), '../templates/Trends.html')
+        self.response.write(template.render(path, template_values))
+
+
 # define the "app" that will be referenced from app.yaml
 app = webapp2.WSGIApplication([
     ('/', MainPage),
-    ('/view', ViewAllStreamsPage)
+    ('/view', ViewAllStreamsPage),
+    ('/trending', TrendingPage)
 ], debug=True)

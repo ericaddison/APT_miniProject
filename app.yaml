@@ -17,7 +17,6 @@ handlers:
 # [START views]
 - url: /search.*
   script: Routes.app
-
 - url: /viewstream
   script: Routes.app
 - url: /create
