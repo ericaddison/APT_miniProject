@@ -21,6 +21,7 @@ class CreatePage(BaseHandler):
         template_values = {
             'html_template': 'MasterTemplate.html',
             'user': user.nickName,
+            'email': user.email,
             'login_url': login_url,
             'login_text': login_text,
             'stream_name_parm': fh.stream_name_parm,
