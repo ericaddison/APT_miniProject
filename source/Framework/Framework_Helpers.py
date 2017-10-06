@@ -145,24 +145,16 @@ def searchablize_tag_or_stream(item, index_name, response):
         response['errResult'] = str(result)
 
 
-def get_search_string_param(handler, response):
-    # request parameter error checking
-    search_string = handler.request.get(search_string_parm)
-    if search_string is None:
-        response['error'] = "No searchString found"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
+def remove_stream_from_search_index(stream, response):
+    index = search.Index(name=stream_index_name, namespace=search_index_namespace)
+    if stream is None:
         return
 
-    response[search_string_parm] = search_string
-    return search_string
-
-
-def get_search_results_param(handler, response):
-    # request parameter error checking
-    search_results = handler.request.get(search_results_parm)
-    response['search_results'] = search_results
-    return search_results
+    search_result = index.search("id: {}".format(str(stream.key.id())))
+    print("\n{}\n".format(search_result))
+    for doc in search_result.results:
+        index.delete(doc.doc_id)
+    return
 
 
 def get_image_range_param(handler):

@@ -17,7 +17,6 @@ class CreateStreamService(BaseHandler):
         owner = StreamUser.get_by_id(owner_id)
 
         if owner is None:
-            print("\n{}\n".format("LOG"))
             fh.bad_request_error(self, response, 'Not logged in')
             return
 
@@ -25,7 +24,6 @@ class CreateStreamService(BaseHandler):
         stream_name = self.get_request_param(fh.stream_name_parm)
         response[fh.stream_name_parm] = stream_name
         if stream_name is None or stream_name == "":
-            print("\n{}\n".format("SNAME"))
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_name_parm))
             return
 
@@ -40,7 +38,6 @@ class CreateStreamService(BaseHandler):
                                )
 
         if stream is None:
-            print("\n{}\n".format("NO S"))
             fh.bad_request_error(self, response, 'Stream {0} already exists for user {1}'.format(stream_name, owner.nickName))
             return
 

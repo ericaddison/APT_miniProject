@@ -16,7 +16,7 @@ class DeleteStreamService(BaseHandler):
         stream_id = self.get_request_param(fh.stream_id_parm)
         response[fh.stream_id_parm] = stream_id
         if stream_id is None or stream_id == "":
-            fh.bad_request_error(self, response, 'No parameter {} found'.format(FH.stream_id_parm))
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.stream_id_parm))
             return
 
         # get the stream
@@ -31,6 +31,9 @@ class DeleteStreamService(BaseHandler):
         if user_id != stream.get_owner_from_db().user_id():
             fh.bad_request_error(self, response, 'Not stream owner')
             return
+
+        # remove stream name entries from the search index
+        fh.remove_stream_from_search_index(stream, response)
 
         # delete the stream
         stream.delete()

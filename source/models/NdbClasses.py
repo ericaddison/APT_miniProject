@@ -64,7 +64,6 @@ class Stream(ndb.Model):
 
         # check for existing stream
         if Stream.get_by_owner_and_name(owner, name):
-            print("\n{}\n".format("FOUNR STRAMS!"))
             return None
 
         # create and return stream
