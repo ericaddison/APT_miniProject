@@ -56,11 +56,7 @@ class CronTrendsService(webapp2.RequestHandler):
         return top3StreamIDs
 
     def sendEmails(self, emailList, trendingStreams):
-        #email_sender_address = 'trending@apt17-miniproj-whiteteam.appspotmail.com'
-        print "SEND EMAILS"
-        print "emailList: ", emailList
-        print "trendingStreams: ", trendingStreams
-        email_sender_address = 'psigourney@gmail.com'
+        email_sender_address = 'trending@apt17-miniproj-whiteteam.appspotmail.com'
 
         for email_rcpt_address in emailList:
             try:
