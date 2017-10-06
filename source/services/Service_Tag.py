@@ -90,7 +90,6 @@ class RemoveTagFromStreamService(BaseHandler):
             # remove streamtags
             StreamTag.delete_tag_from_stream(stream, tag)
             if n_streams == 1:
-                print("\ndeleting empty tag: {}\n".format(tag_name))
                 fh.remove_tag_from_search_index(tag_name, {})
                 tag.delete()
 
