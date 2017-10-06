@@ -33,7 +33,6 @@ class TextSearchForm(BaseHandler):
 
         search_string = self.get_request_param(fh.search_string_parm)
         if search_string is not None:
-            print("\n\nsearch string: {}\n\n".format(search_string))
             template_values['search_string'] = search_string
 
         tags = self.get_request_param(fh.tags_parm)
@@ -46,7 +45,6 @@ class TextSearchForm(BaseHandler):
             s = urllib.unquote(stream_ids).decode('utf8')
             ids = eval(s)
             template_values['search_streams'] = Stream.get_batch_by_ids(ids)
-            print(template_values['search_streams'])
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/StreamSearch.html')
         self.set_content_text_html()

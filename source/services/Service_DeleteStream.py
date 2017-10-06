@@ -1,6 +1,6 @@
 import json
 import source.Framework.Framework_Helpers as fh
-from source.models.NdbClasses import Stream, StreamTag, StreamSubscriber
+from source.models.NdbClasses import Stream, StreamUser
 from source.Framework.BaseHandler import BaseHandler
 
 
@@ -26,14 +26,9 @@ class DeleteStreamService(BaseHandler):
             fh.bad_request_error(self, response, 'Invalid Stream ID')
             return
 
-        # get current user
-        user = fh.get_current_user(self)
-        if user is None:
-            fh.bad_request_error(self, response, 'Not logged in')
-            return
-
         # check that user is the owner of the stream
-        if user != stream.get_owner_from_db():
+        user_id = self.get_request_param(fh.user_id_parm)
+        if user_id != stream.get_owner_from_db().user_id():
             fh.bad_request_error(self, response, 'Not stream owner')
             return
 

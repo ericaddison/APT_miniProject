@@ -27,10 +27,13 @@ class SubscribeToStreamService(BaseHandler):
             return
 
         # get current user
-        user = fh.get_current_user(self)
-        if user is None:
-            fh.bad_request_error(self, response, 'Not logged in')
+        user_id = self.get_request_param(fh.user_id_parm)
+        if user_id is None:
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
             return
+
+        # get the user
+        user = StreamUser.get_by_id(user_id)
 
         # create new subscription
         sub = StreamSubscriber.create(stream, user)
@@ -61,10 +64,13 @@ class UnsubscribeFromStreamService(BaseHandler):
         stream = Stream.get_by_id(stream_id)
 
         # get current user
-        user = fh.get_current_user(self)
-        if user is None:
-            fh.bad_request_error(self, response, 'Not logged in')
+        user_id = self.get_request_param(fh.user_id_parm)
+        if user_id is None:
+            fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
             return
+
+        # get the user
+        user = StreamUser.get_by_id(user_id)
 
         # delete subscription
         result = StreamSubscriber.delete(stream, user)
@@ -72,5 +78,7 @@ class UnsubscribeFromStreamService(BaseHandler):
             response['status'] = "Subscription deleted"
         else:
             response['status'] = "Subscription not found"
+
+        print("\n{}\n".format(response))
 
         self.write_response(json.dumps(response))

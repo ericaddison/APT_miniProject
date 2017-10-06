@@ -1,0 +1,22 @@
+{% extends "ConfirmRemoveTemplate.html" %}
+
+{% block title %}Connexion: Confirm Unsubscribe{% endblock %}
+
+{% block warning_message %}
+You will be unsubscribed from the following streams!
+{% endblock %}
+
+{% block action_url %}
+/unsubscribeexe
+{% endblock %}
+
+{% block confirm_content %}
+    {% for stream in unsub_streams %}
+        <input type="hidden" name="{{ stream.0 }}">
+    <strong>{{ stream.1 }}</strong><br>
+    {% endfor %}
+{% endblock %}
+
+{% block submit_text %}
+UNSUBSCRIBE
+{% endblock %}
