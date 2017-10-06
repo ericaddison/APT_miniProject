@@ -31,18 +31,20 @@ class UploadFileHandler(FileUploadHandler):
             return
 
         upload = fh.get_upload_from_filehandler(self, 0)
-        image_url = fh.get_file_url(upload)
 
-        # create StreamItem entity
-        item = StreamItem.create(
-            owner=user,
-            file=upload,
-            URL=image_url,
-            name=upload.filename,
-            stream=stream)
+        if upload is not None:
+            image_url = fh.get_file_url(upload)
 
-        # update stream list of images
-        stream.add_item(item)
+            # create StreamItem entity
+            item = StreamItem.create(
+                owner=user,
+                file=upload,
+                URL=image_url,
+                name=upload.filename,
+                stream=stream)
+
+            # update stream list of images
+            stream.add_item(item)
 
         # go back to viewstream page
         redirect = self.get_request_param(fh.redirect_parm)
