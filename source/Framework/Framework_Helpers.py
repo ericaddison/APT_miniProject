@@ -98,24 +98,25 @@ def searchablize_stream(stream, response={}):
 def search_tag_index(search_string):
     index = search.Index(name=tag_index_name, namespace=search_index_namespace)
     search_results = index.search("string: {}".format(search_string))
-    tags = []
+    tags = set()
     for res in search_results:
         for fld in res.fields:
             if fld.name == "id":
-                tags.append(fld.value)
-    return tags
+                tags.add(fld.value)
+    return list(tags)
 
 
 # returns list of stream IDs of matching strings
 def search_stream_index(search_string):
     index = search.Index(name=stream_index_name, namespace=search_index_namespace)
     search_results = index.search("string: {}".format(search_string))
-    streams = []
+    streams = set()
     for res in search_results:
         for fld in res.fields:
             if fld.name == "id":
-                streams.append(fld.value)
-    return streams
+                streams.add(fld.value)
+
+    return list(streams)
 
 
 # meant to be called for a tag or stream object
