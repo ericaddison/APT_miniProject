@@ -67,7 +67,7 @@ class DeleteExe(BaseHandler):
                 result = urllib2.urlopen(delete_stream_url)
                 message = "{0}, {1}".format(message, result)
             except urllib2.HTTPError:
-                self.redirect('/error?{0}={1}'.format(fh.error_code_parm, 'Error deleting stream'))
+                self.redirect('/error?{0}={1}'.format(fh.message_parm, 'Error deleting stream'))
 
         # try to wait until streams are really gone...
         for id in stream_ids:

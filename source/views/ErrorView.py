@@ -8,15 +8,18 @@ class ErrorView(BaseHandler):
     def get(self):
 
         error_code = self.get_request_param(fh.error_code_parm)
+        error_string = self.get_request_param(fh.message_parm)
 
         # no error error_code in URL
-        if error_code == "":
+        if error_code in [None, '']:
             error_code = -1
+
+        if error_string in [None, '']:
             error_string = "No error code given in URL"
 
         else:
             # get error error_code from URL and convert unicode to integer
-            error_code = int(self.get_request_param(fh.error_code_parm))
+            error_code = int(error_code)
 
             # if error error_code in dictionary, look it up.
             if error_code in fh.error_codes:

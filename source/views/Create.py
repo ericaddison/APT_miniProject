@@ -49,4 +49,4 @@ class CreatePage(BaseHandler):
             redirect_url = fh.get_viewstream_url(response[fh.stream_id_parm], 1, 10)
             self.redirect(redirect_url)
         except urllib2.HTTPError:
-            self.redirect('/error?{0}={1}'.format(fh.error_code_parm, 'Error creating stream'))
+            self.redirect('/error?{0}={1}'.format(fh.message_parm, 'Error creating stream'))
