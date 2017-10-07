@@ -14,6 +14,7 @@
     {% if search_streams %}
         <br>
         <h3>Matching Streams</h3>
+            <div style="overflow-y: scroll; height: 400px">
             <table style="width:90%">
                  <tr>
                      <th>Stream Name</th>
@@ -24,6 +25,7 @@
                 </tr>
                 {% endfor %}
             </table>
+            </div>
     {% endif %}
 
     {% if search_tags %}
