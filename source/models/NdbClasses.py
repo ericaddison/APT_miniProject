@@ -13,7 +13,7 @@ class Stream(ndb.Model):
     viewList = ndb.DateTimeProperty(indexed=True, repeated=True)
 
     def add_item(self, item):
-        self.items.append(item.key)
+        self.items.insert(0, item.key)
         self.put()
 
     def get_items(self, ind1, ind2):
