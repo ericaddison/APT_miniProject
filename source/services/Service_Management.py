@@ -14,7 +14,7 @@ class ManagementService(BaseHandler):
 
         # get current user
         user_id = self.get_request_param(fh.user_id_parm)
-        if user_id is None:
+        if user_id in ['', None]:
             fh.bad_request_error(self, response, 'No parameter {} found'.format(fh.user_id_parm))
             return
 
@@ -28,8 +28,6 @@ class ManagementService(BaseHandler):
 
         # query for all streams subscribed to by user
         sub_streams = StreamSubscriber.get_by_user(user)
-
-        print("\n\n{}\n\n".format(my_streams))
 
         # write some stream info
         response['owned_streams'] = [s for s in my_streams]

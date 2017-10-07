@@ -64,6 +64,10 @@ tr.stream-checked {
     cursor: pointer;
 }
 
+.checkbox-div:hover {
+    background-color: #e9b8b8;
+}
+
 .checkbox {
     cursor: pointer;
     height: 15px;
@@ -84,4 +88,23 @@ tr.stream-checked {
 .mybtn {
     border: 3px solid black;
     cursor: pointer;
+}
+
+
+div.scrollmenu {
+    background-color: #333;
+    overflow: auto;
+    white-space: nowrap;
+}
+
+div.scrollmenu a {
+    display: inline-block;
+    color: white;
+    text-align: center;
+    padding: 14px;
+    text-decoration: none;
+}
+
+div.scrollmenu a:hover {
+    background-color: #777;
 }
