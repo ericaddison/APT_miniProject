@@ -57,7 +57,6 @@ class CronTrendsService(webapp2.RequestHandler):
 
     def sendEmails(self, emailList, trendingStreams):
         email_sender_address = 'trending@apt17-miniproj-whiteteam.appspotmail.com'
-
         for email_rcpt_address in emailList:
             try:
                 streams = []
@@ -79,11 +78,11 @@ class CronTrendsService(webapp2.RequestHandler):
                 
                     
                 
-                mail.send_mail_to_admins(sender=email_sender_address,
+                mail.send_mail(sender=email_sender_address,
                                          subject="WhiteTeam Trending Streams",
                                          body=messageString,
                                          html=messageString)
-                
+  
                 print "Email Message: ", messageString
                 
                 
@@ -113,6 +112,7 @@ class CronTrendsService(webapp2.RequestHandler):
                                          subject="WhiteTeam Trending Streams",
                                          body=messageString,
                                          html=messageString)
+
                 continue
 
         return
