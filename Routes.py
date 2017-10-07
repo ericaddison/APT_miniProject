@@ -59,4 +59,4 @@ app = webapp2.WSGIApplication([
     ('/services/taggedstreams', StreamsForTagService)
     # [END services]
 
-], config=config, debug=True)
+], config=config, debug=False)
