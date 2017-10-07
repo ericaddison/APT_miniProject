@@ -15,7 +15,7 @@ class ErrorView(BaseHandler):
             error_code = -1
 
         if error_string in [None, '']:
-            error_string = "No error code given in URL"
+            error_string = "An error has occurred!"
 
         else:
             # get error error_code from URL and convert unicode to integer
@@ -24,8 +24,6 @@ class ErrorView(BaseHandler):
             # if error error_code in dictionary, look it up.
             if error_code in fh.error_codes:
                 error_string = fh.error_codes[error_code]
-            else:
-                error_string = "An error has occurred!<br>{}".format(error_code)
 
         template_values = {
             'error_code': error_code,
