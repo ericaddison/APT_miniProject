@@ -1,7 +1,9 @@
 import json
 import re
 import datetime
+import urllib2
 
+import webapp2
 from google.appengine.api import images
 from google.appengine.api import search
 from google.appengine.api import users
@@ -21,7 +23,10 @@ tags_parm = 'tags'
 cover_url_parm = 'coverUrl'
 redirect_parm = 'redirect'
 error_code_parm = 'code'
-message_parm = 'code'
+message_parm = 'msg'
+owner_parm = 'owner'
+num_images_parm = 'num_images'
+url_parm = 'url'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]
@@ -39,6 +44,11 @@ stream_index_name = 'stream_index'
 # [START HTTP request methods]
 # currently using webapp2 request handlers
 
+
+def get_site_url(path, **kwargs):
+    webapp2.uri_for(path, **kwargs)
+
+
 def bad_request_error(handler, response_dict, error_msg):
     response_dict['error'] = error_msg
     handler.response.set_status(400)
@@ -52,7 +62,9 @@ def bad_request_error(handler, response_dict, error_msg):
 # currently using blobstore and images API for file handling
 
 def get_upload_from_filehandler(filehandler, index):
-    return filehandler.get_uploads()[index]
+    if 0 <= index < len(filehandler.get_uploads()):
+        return filehandler.get_uploads()[index]
+    return None
 
 
 def get_file_url(myfile):
@@ -98,24 +110,25 @@ def searchablize_stream(stream, response={}):
 def search_tag_index(search_string):
     index = search.Index(name=tag_index_name, namespace=search_index_namespace)
     search_results = index.search("string: {}".format(search_string))
-    tags = []
+    tags = set()
     for res in search_results:
         for fld in res.fields:
             if fld.name == "id":
-                tags.append(fld.value)
-    return tags
+                tags.add(fld.value)
+    return list(tags)
 
 
 # returns list of stream IDs of matching strings
 def search_stream_index(search_string):
     index = search.Index(name=stream_index_name, namespace=search_index_namespace)
     search_results = index.search("string: {}".format(search_string))
-    streams = []
+    streams = set()
     for res in search_results:
         for fld in res.fields:
             if fld.name == "id":
-                streams.append(fld.value)
-    return streams
+                streams.add(fld.value)
+
+    return list(streams)
 
 
 # meant to be called for a tag or stream object
@@ -131,7 +144,7 @@ def searchablize_tag_or_stream(item, index_name, response):
         for tok in toks:
             for i in range(len(tok)):
                 substr = tok[0:i+1]
-                doc = search.Document(fields=[search.TextField(name='id', value=str(item.key.id())),
+                doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
                                               search.TextField(name='name', value=item.name),
                                               search.TextField(name='string', value=substr),
                                               search.DateField(name='date_added', value=datetime.datetime.now().date())])
@@ -142,24 +155,26 @@ def searchablize_tag_or_stream(item, index_name, response):
         response['errResult'] = str(result)
 
 
-def get_search_string_param(handler, response):
-    # request parameter error checking
-    search_string = handler.request.get(search_string_parm)
-    if search_string is None:
-        response['error'] = "No searchString found"
-        handler.response.set_status(400)
-        handler.response.write(json.dumps(response))
+def remove_stream_from_search_index(stream, response):
+    index = search.Index(name=stream_index_name, namespace=search_index_namespace)
+    if stream is None:
         return
 
-    response[search_string_parm] = search_string
-    return search_string
+    search_result = index.search("id: {}".format(str(stream.key.id())))
+    for doc in search_result.results:
+        index.delete(doc.doc_id)
+    return
 
 
-def get_search_results_param(handler, response):
-    # request parameter error checking
-    search_results = handler.request.get(search_results_parm)
-    response['search_results'] = search_results
-    return search_results
+def remove_tag_from_search_index(tag_name, response):
+    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    if tag_name in ['', None]:
+        return
+
+    search_result = index.search("id: {}".format(str(tag_name)))
+    for doc in search_result.results:
+        index.delete(doc.doc_id)
+    return
 
 
 def get_image_range_param(handler):
@@ -179,3 +194,64 @@ def get_image_range_param(handler):
 
 def render_html_template(path, template_values_dict):
     return template.render(path, template_values_dict)
+
+
+
+# [START link-helpers}
+import os
+base_url = 'http://{0}'.format(os.environ['HTTP_HOST'])
+
+
+def get_viewstream_url(streamid, i1, i2):
+    return '{0}/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
+
+
+def get_viewstream_default_url(streamid):
+    return get_viewstream_url(streamid, 1, 10)
+
+
+def get_tagmod_url_noparm():
+    return '{0}/tagmod'.format(base_url)
+
+
+def get_tagged_streams_url(tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/services/taggedstreams?{1}={2}'.format(base_url, tag_name_parm, tagname)
+
+
+def get_viewtag_url(tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/viewtag?{1}={2};'.format(base_url, tag_name_parm, tagname)
+
+# [END link-helpers}
+
+
+# [START service-link-helpers]
+def get_addtag_service_url(stream_id, tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/services/addstreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, tagname)
+
+
+def get_removetag_service_url(stream_id, tagname):
+    tagname = urllib2.quote(tagname.strip())
+    return '{0}/services/removestreamtag?{1}={2};{3}={4}'.format(base_url, stream_id_parm, stream_id, tag_name_parm, tagname)
+
+
+def get_viewstream_service_url(streamid, i1, i2):
+    return '{0}/services/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
+
+
+def get_subscribed_service_url(userid, streamid):
+    return '{0}/services/subscribed?{1}={2};{3}={4};'.format(base_url, user_id_parm, userid, stream_id_parm, streamid)
+
+
+def get_subscribe_service_url(userid, streamid, redirect):
+    return '{0}/services/subscribe?{1}={2};{3}={4};{5}={6};'.format(base_url, user_id_parm, userid, stream_id_parm,
+                                                             streamid, redirect_parm, redirect)
+
+
+def get_unsubscribe_service_url(userid, streamid, redirect):
+    return '{0}/services/unsubscribe?{1}={2};{3}={4};{5}={6};'.format(base_url, user_id_parm, userid, stream_id_parm,
+                                                             streamid, redirect_parm, redirect)
+
+# [END service-link-helpers]

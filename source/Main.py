@@ -72,7 +72,6 @@ class ManagePage(BaseHandler):
         # call management service to get stream lists
         management_service_url = 'http://{0}/services/management?{1}={2}'.format(os.environ['HTTP_HOST'],
                                                                                  fh.user_id_parm, user.user_id())
-        print("\n\n{}\n\n".format(management_service_url))
         result = urllib2.urlopen(management_service_url)
         response = json.loads("".join(result.readlines()))
         user_streams = response['owned_streams']

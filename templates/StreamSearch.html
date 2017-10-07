@@ -7,24 +7,33 @@
 
     <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
         <br>
-      Search Text: <input name="searchString" value="{% if search_string %}{{ search_string }}{% endif %}">
+      Search Text: <input name="searchString" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
       <input type="submit" value="Submit">
     </form>
 
     {% if search_streams %}
         <br>
         <h3>Matching Streams</h3>
-        {% for stream in search_streams %}
-            <a href="/viewstream?streamID={{ stream.get_id }}"><img src="{{ stream.coverImageURL }}" height="100" ><br>{{ stream.name }}</a><br><br>
-        {% endfor %}
+            <table style="width:90%">
+                 <tr>
+                     <th>Stream Name</th>
+                 </tr>
+                    {% for stream in search_streams %}
+                 <tr>
+                    <td><a href="/viewstream?streamID={{ stream.get_id }}"><img src="{{ stream.coverImageURL }}" style="width:30%;"> {{ stream.name }}</a></td>
+                </tr>
+                {% endfor %}
+            </table>
     {% endif %}
 
     {% if search_tags %}
         <br>
         <h3>Matching Tags</h3>
-        {% for tag in search_tags %}
-            <a href="/viewtag?tagName={{ tag }}">{{ tag }}</a><br>
-        {% endfor %}
+        <div class="scrollmenu">
+            {% for tag in search_tags %}
+                <a href="{{ tag.url }}">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
     {% endif %}
 
 <br>

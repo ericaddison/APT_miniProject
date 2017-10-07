@@ -2,24 +2,116 @@
 
 {% block title %}Connexion: {{ stream.name }}{% endblock %}
 
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="css/bootstrap/carousel.css">
+<link rel="stylesheet" type="text/css" href="css/viewstream.css">
+
+<style>
+    .jumbotron-billboard .img {
+        margin-bottom: 0px;
+        opacity: 0.75;
+        color: #eee;
+        background: #000 url("{{ stream.coverImageURL }}") center center;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        overflow: hidden;
+
+        position:absolute;
+        top:0;left:0;
+        z-index:1;
+    }
+
+    .jumbotron {position:relative;padding:50px;}
+
+    .jumbotron .container {z-index:2;
+
+    position:relative;
+
+    z-index:2;
+    }
+</style>
+
+{% endblock %}
+
 {% block content %}
-<br><br>
-Here is stream: {{ stream.name }}!
-
-    <img style="width: 90%; height: 300px; object-fit: cover;" src="{{ stream.coverImageURL }}">
-
-    <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
-        <br>
-      Upload File: <br><input type="file" name="file"><br>
-      <input type="hidden" name="streamID" value="{{ stream.key.id }}"><br>
-      <input type="hidden" name="redirect" value="/viewstream?streamID={{ stream_id }}">
-      <input type="submit" name="submit" value="Submit">
-    </form>
-
-    <br><br>
-The first ten images are:<br><br>
-{% for url in image_urls %}
-<img src="{{url}}">
 <br>
-{% endfor %}
+    <div class="jumbotron jumbotron-billboard" style="position: relative">
+      <div class="img"></div>
+        <div class="container">
+            <div class="row">
+                <div style="background-color: black; display: inline-block; padding: 10px; color: #cccccc; opacity: 0.6; border-radius: 10px; border: 1px solid white">
+                    <h1>{{ stream.name }}</h1>
+                </div>
+            </div>
+            <a href="{{ sub_url }}">
+                <button class="btn btn-success btn-sm" style="position: absolute; bottom: 0; right: 0">{% if is_subscribed %}Unsubscribe{% else %}Subscribe{% endif %}</button>
+            </a>
+        </div>
+    </div>
+    <br>
+
+
+
+
+    <div style="text-align: center">
+        <a {% if prev_page_url %}href="{{ prev_page_url }}"{% endif %}><div class="arrow-div {% if prev_page_url %}enabled-arrow{% else %}disabled-arrow{% endif %}"><img src="/images/arrow.svg" style="margin-right: -13px" class="nav-arrow rotate-180"><img src="/images/arrow.svg" class="nav-arrow rotate-180"></div></a>
+        <a href="#myCarousel" data-slide="prev" class="a-nounder"><div class="arrow-div enabled-arrow"><img src="/images/arrow.svg" class="nav-arrow rotate-180"></div></a>
+        <a href="#myCarousel" data-slide="next"><div class="arrow-div enabled-arrow"><img src="/images/arrow.svg" class="nav-arrow "></div></a>
+        <a {% if next_page_url %}href="{{ next_page_url }}"{% endif %}><div class="arrow-div {% if next_page_url %}enabled-arrow{% else %}disabled-arrow{% endif %}"><img src="/images/arrow.svg" class="nav-arrow"><img src="/images/arrow.svg" style="margin-left: -13px" class="nav-arrow"></div></a>
+    </div>
+    <div id="myCarousel" class="carousel slide" data-ride="carousel" style="border: 3px solid gray">
+
+
+      <ol class="carousel-indicators">
+        {% for url in image_urls %}
+            <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}" {% if forloop.counter0 == 0 %}class="active"{% endif %}></li>
+        {% endfor %}
+      </ol>
+
+      <div class="carousel-inner">
+        {% for url in image_urls %}
+          <div class="carousel-item{% if forloop.counter0 == 0 %} active{% endif %}">
+            <img class="subsequent-slide" src="{{ url }}" style="max-width: 100%; max-height: 100%; object-fit: contain">
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+<div>
+    <div >
+    <h2>Add Image</h2>
+        <form action="{{ upload_url }}" method="POST" enctype="multipart/form-data">
+            Image URL: <input name="{{ url_parm }}">
+            ** OR **
+            <input type="file" name="file">
+            <br><br>
+            Make Cover Image? <input type="checkbox" name="iscover">
+            <br><br>
+          <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
+          <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
+          <input type="submit" name="submit" value="Submit">
+        </form>
+    </div>
+    <div>
+    </div>
+</div>
+
+
+<br><br>
+<h2>Tags</h2>
+<div class="scrollmenu">
+    {% for tag in tags %}
+        <a href="{{ tag.url }}">{{ tag.name }}</a>
+    {% endfor %}
+</div>
+<br>
+<form action="{{ tag_url }}" method="post">
+    Tag Name:
+    <input name="{{tag_name_parm}}">
+    <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
+    <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
+    <input type="submit" name="submit" value="Add Tag">
+    <input type="submit" name="submit" value="Remove Tag">
+</form>
 {% endblock %}

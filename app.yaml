@@ -21,6 +21,8 @@ handlers:
   script: Routes.app
 - url: /viewstream
   script: Routes.app
+- url: /viewtag
+  script: Routes.app
 - url: /create
   script: Routes.app
 - url: /delete.*
@@ -30,6 +32,8 @@ handlers:
 - url: /error
   script: Routes.app
 - url: /manage
+  script: Routes.app
+- url: /tagmod
   script: Routes.app
 - url: /social
   script: Routes.app
@@ -51,7 +55,7 @@ handlers:
   script: Routes.app
 - url: /services/deletestream
   script: Routes.app
-- url: /services/subcribe
+- url: /services/subscribe
   script: Routes.app
 - url: /services/unsubscribe
   script: Routes.app
@@ -59,12 +63,22 @@ handlers:
   script: Routes.app
 - url: /services/createstream
   script: Routes.app
+- url: /services/subscribed
+  script: Routes.app
+- url: /services/addstreamtag
+  script: Routes.app
+- url: /services/removestreamtag
+  script: Routes.app
+- url: /services/taggedstreams
+  script: Routes.app
 # [END services]
 
 - url: /css
   static_dir: templates/css
 - url: /js
   static_dir: templates/js
+- url: /images
+  static_dir: templates/images
 
 
 - url: /.*

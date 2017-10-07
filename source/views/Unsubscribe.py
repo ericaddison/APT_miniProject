@@ -66,10 +66,9 @@ class UnsubscribeExe(BaseHandler):
                                                              fh.get_current_user(self).user_id())
             try:
                 result = urllib2.urlopen(delete_stream_url)
-                print("\n\n{}\n\n".format(result))
                 message = "{0}, {1}".format(message, result)
             except urllib2.HTTPError:
-                self.redirect('/error?{0}={1}'.format(fh.error_code_parm, 'Error unsubscribing from stream'))
+                self.redirect('/error?{0}={1}'.format(fh.message_parm, 'Error unsubscribing from stream'))
 
         #try to wait until streams are really gone...
         for id in stream_ids:

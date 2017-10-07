@@ -42,12 +42,11 @@ class CreatePage(BaseHandler):
                                                                                   fh.user_id_parm,
                                                                                   fh.get_current_user(self).user_id(),
                                                                                   urllib.urlencode(parm_dict))
-        print("\n{}\n".format(len(create_stream_url)))
 
         try:
             result = urllib2.urlopen(create_stream_url)
             response = json.loads("".join(result.readlines()))
-            redirect_url = 'http://{0}/viewstream?{1}={2}'.format(os.environ['HTTP_HOST'], fh.stream_id_parm, response[fh.stream_id_parm])
+            redirect_url = fh.get_viewstream_url(response[fh.stream_id_parm], 1, 10)
             self.redirect(redirect_url)
         except urllib2.HTTPError:
-            self.redirect('/Error')
+            self.redirect('/error?{0}={1}'.format(fh.message_parm, 'Error creating stream'))

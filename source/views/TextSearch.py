@@ -38,7 +38,8 @@ class TextSearchForm(BaseHandler):
         tags = self.get_request_param(fh.tags_parm)
         if tags not in [None, '']:
             s = urllib.unquote(tags).decode('utf8')
-            template_values['search_tags'] = eval(s)
+            tags = eval(s)
+            template_values['search_tags'] = [{'name': tag, 'url': fh.get_viewtag_url(tag)} for tag in tags]
 
         stream_ids = self.get_request_param(fh.stream_id_parm)
         if stream_ids not in [None, '']:
