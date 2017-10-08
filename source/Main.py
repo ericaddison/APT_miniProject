@@ -29,7 +29,7 @@ class MainPage(webapp2.RequestHandler):
             login_text = 'Sign out'
 
         else:
-            login_url = fh.get_logout_url('/manage')
+            login_url = fh.get_login_url(self, '/manage')
             login_text = 'Sign in'
 
         template_values = {
