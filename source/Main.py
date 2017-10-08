@@ -22,14 +22,14 @@ CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleuserconten
 class MainPage(webapp2.RequestHandler):
     def get(self):
 
-        user = users.get_current_user()
+        user = fh.get_current_user(self)
 
         if user:
-            login_url = users.create_logout_url('/')
+            login_url = fh.get_logout_url(self, '/')
             login_text = 'Sign out'
 
         else:
-            login_url = users.create_login_url('/manage')
+            login_url = fh.get_logout_url('/manage')
             login_text = 'Sign in'
 
         template_values = {
@@ -69,43 +69,13 @@ class ManagePage(BaseHandler):
             self.redirect("/")
             return
 
-        # call management service to get stream lists
-        management_service_url = 'http://{0}/services/management?{1}={2}'.format(os.environ['HTTP_HOST'],
-                                                                                 fh.user_id_parm, user.user_id())
-        result = urllib2.urlopen(management_service_url)
-        response = json.loads("".join(result.readlines()))
-        user_streams = response['owned_streams']
-        subby_streams = response['subscribed_streams']
-
-        owned_streams = []
-        for stream_id in user_streams:
-            stream = Stream.get_by_id(stream_id)
-            newestDate = ""
-            if len(stream.items) > 0:
-                newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
-            streamDict = {'streamName': stream.name, 'counter': len(stream.items), 'newestDate': newestDate,
-                          'id': stream.key.id()}
-            owned_streams.append(streamDict)
-
-        # get streams subscribed by this user
-        subbed_streams = []
-        for stream_id in subby_streams:
-            stream = Stream.get_by_id(stream_id)
-            newestDate = ""
-            if len(stream.items) > 0:
-                newestDate = ndb.Key('StreamItem', stream.items[-1].id()).get().dateAdded
-            streamDict = {'streamName': stream.name, 'counter': len(stream.items), 'newestDate': newestDate,
-                          'id': stream.key.id(), 'views': stream.numViews}
-            subbed_streams.append(streamDict)
-
         template_values = {
             'html_template': 'MasterTemplate.html',
             'user': user,
+            'user_id': user.user_id(),
             'isAdmin': users.IsCurrentUserAdmin(),
             'login_url': login_url,
             'login_text': login_text,
-            'streams': owned_streams,
-            'subscribe': subbed_streams,
             'app': app_identity.get_application_id()
         }
 
