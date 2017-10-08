@@ -14,6 +14,7 @@ function management_call(){
                 $('#ownedtable tr:last').after(newrow)
                 newrow.fadeIn()
             }
+            $('#deleteform').find('.loader').fadeOut().remove()
             $('#ownedtable').find('.checkbox-div').click(toggleCheck);
         });
 
@@ -26,6 +27,7 @@ function management_call(){
                 $('#subscribedtable tr:last').after(newrow)
                 newrow.fadeIn()
             }
+            $('#unsubscribeform').find('.loader').fadeOut().remove()
             $('#subscribedtable').find('.checkbox-div').click(toggleCheck);
         });
       })
