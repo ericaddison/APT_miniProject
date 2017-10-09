@@ -2,6 +2,43 @@
 
 {% block title %}Connexion: Search{% endblock %}
 
+{% block extrahead %}
+<link rel="stylesheet" type="text/css" href="css/jqueryui/jquery-ui.css">
+<script src="js/jqueryui/jquery-ui.js"></script>
+<script>
+  $( function() {
+    var availableTags = [
+      "ActionScript",
+      "AppleScript",
+      "Asp",
+      "BASIC",
+      "C",
+      "C++",
+      "Clojure",
+      "COBOL",
+      "ColdFusion",
+      "Erlang",
+      "Fortran",
+      "Groovy",
+      "Haskell",
+      "Java",
+      "JavaScript",
+      "Lisp",
+      "Perl",
+      "PHP",
+      "Python",
+      "Ruby",
+      "Scala",
+      "Scheme"
+    ];
+    $( "#tags" ).autocomplete({
+      source: availableTags
+    });
+  } );
+  </script>
+
+{% endblock %}
+
 {% block content %}
 <br><br>
 
@@ -10,6 +47,11 @@
       Search Text: <input name="searchString" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
       <input type="submit" value="Submit">
     </form>
+
+    <div class="ui-widget">
+      <label for="tags">Tags: </label>
+      <input id="tags">
+    </div>
 
     {% if search_streams %}
         <br>
