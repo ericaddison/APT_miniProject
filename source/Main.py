@@ -17,6 +17,7 @@ from source.Framework.BaseHandler import BaseHandler
 
 # If we use Google Sign-in authentication
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
+#Google Maps API Key = "AIzaSyCStEwgkRB940lMpKTV6OzmMVkUmTb2g4U"
 
 
 class MainPage(webapp2.RequestHandler):

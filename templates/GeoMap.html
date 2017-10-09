@@ -1,22 +1,49 @@
 {% extends html_template %}
 
-{% block title %}Connexion: View All Streams{% endblock %}
+{% block title %}Connexion: GeoMap{% endblock %}
+{% block extrahead %}
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <style>
+      /* Always set the map height explicitly to define the size of the div
+       * element that contains the map. */
+      #map {
+        height: 400px;
+      }
+      /* Optional: Makes the sample page fill the window. */
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+{% endblock %}
+
 
 {% block content %}
 
-    <br>
+    <script>
+      function initMap() {
+        var uluru = {lat: -25.363, lng: 131.044};
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 4,
+          center: uluru
+        });
 
-    <p>
-    Connex.us is a great way for you to share your favorite pictures with your friends!
-    <br>
-    We'd love for you to be able to share your content on Facebook.
-    <br>
-    That's why this feature is coming soon.
+          
+        var marker = new google.maps.Marker({
+          position: uluru,
+          map: map
+        });
+      }
+    </script>
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCStEwgkRB940lMpKTV6OzmMVkUmTb2g4U&callback=initMap" async defer></script>
 
-    </p>
+G'Day Mayt!
+<div id="map"></div>
+
 
 
     <footer>Copyright &copy; Footnote Here</footer>
-
-
 {% endblock %}

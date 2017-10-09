@@ -21,8 +21,8 @@ class GeoMapPage(BaseHandler):
             self.redirect("/")
             return
 
-        # get all users
-        all_streams = Stream.query().fetch()
+        # get all items
+        all_streamItems = StreamItem.query().fetch()
 
         template_values = {
             'html_template': 'MasterTemplate.html',
@@ -30,7 +30,7 @@ class GeoMapPage(BaseHandler):
             'login_url': login_url,
             'login_text': login_text,
             'app': app_identity.get_application_id(),
-            'streams': all_streams}
+            'streamItems': all_streamItems}
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/GeoMap.html')
         self.set_content_text_html()
