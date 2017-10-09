@@ -5,37 +5,7 @@
 {% block extrahead %}
 <link rel="stylesheet" type="text/css" href="css/jqueryui/jquery-ui.css">
 <script src="js/jqueryui/jquery-ui.js"></script>
-<script>
-  $( function() {
-    var availableTags = [
-      "ActionScript",
-      "AppleScript",
-      "Asp",
-      "BASIC",
-      "C",
-      "C++",
-      "Clojure",
-      "COBOL",
-      "ColdFusion",
-      "Erlang",
-      "Fortran",
-      "Groovy",
-      "Haskell",
-      "Java",
-      "JavaScript",
-      "Lisp",
-      "Perl",
-      "PHP",
-      "Python",
-      "Ruby",
-      "Scala",
-      "Scheme"
-    ];
-    $( "#search_tags" ).autocomplete({
-      source: "services/autocomplete"
-    });
-  } );
-  </script>
+<script src="js/SearchPage.js"></script>
 
 {% endblock %}
 
@@ -45,7 +15,7 @@
     <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
         <br>
       Search Text: <input name="searchString" id="search_tags" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
-      <input type="submit" value="Submit">
+      <input type="submit" value="Submit" id="searchSubmit">
     </form>
 
     {% if search_streams %}
