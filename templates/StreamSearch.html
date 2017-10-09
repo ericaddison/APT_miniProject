@@ -31,7 +31,7 @@
       "Scala",
       "Scheme"
     ];
-    $( "#tags" ).autocomplete({
+    $( "#search_tags" ).autocomplete({
       source: "services/autocomplete"
     });
   } );
@@ -44,14 +44,9 @@
 
     <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
         <br>
-      Search Text: <input name="searchString" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
+      Search Text: <input name="searchString" id="search_tags" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
       <input type="submit" value="Submit">
     </form>
-
-    <div class="ui-widget">
-      <label for="tags">Tags: </label>
-      <input id="tags">
-    </div>
 
     {% if search_streams %}
         <br>

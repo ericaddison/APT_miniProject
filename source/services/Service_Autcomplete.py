@@ -9,6 +9,10 @@ class AutocompleteService(BaseHandler):
 
         self.set_content_text_plain()
         term = self.get_request_param(fh.autocomplete_parm)
+
         match_streams = fh.search_stream_index(term.lower())
-        names = [s.name for s in Stream.get_batch_by_ids(match_streams)]
-        self.write_response(json.dumps(names))
+        stream_names = [s.name for s in Stream.get_batch_by_ids(match_streams)]
+
+        match_tags = fh.search_tag_index(term.lower())
+
+        self.write_response(json.dumps(stream_names+match_tags))
