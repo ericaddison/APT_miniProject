@@ -122,7 +122,7 @@ class StreamItem(ndb.Model):
     blobKey = ndb.BlobKeyProperty(indexed=False)
     URL = ndb.StringProperty(indexed=False)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
-    longitude = ndb.StringProperty(indexed=False),
+    longitude = ndb.StringProperty(indexed=False)
     latitude = ndb.StringProperty(indexed=False)
 
     def delete(self):
