@@ -40,6 +40,7 @@ app = webapp2.WSGIApplication([
     ('/manage', ManagePage),
     ('/tagmod', TagMod),
     ('/social', SocialPage),
+    ('/geomap', GeoMapPage),
     # [END views]
 
     # [START services]

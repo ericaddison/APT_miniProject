@@ -37,6 +37,8 @@ handlers:
   script: Routes.app
 - url: /social
   script: Routes.app
+- url: /geomap
+  script: Routes.app
 # [START views]
 
 
