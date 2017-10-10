@@ -2,22 +2,9 @@
 
 {% block title %}Connexion: Search{% endblock %}
 
-{% block extrahead %}
-<link rel="stylesheet" type="text/css" href="css/jqueryui/jquery-ui.css">
-<script src="js/jqueryui/jquery-ui.js"></script>
-<script src="js/SearchPage.js"></script>
-
-{% endblock %}
-
 {% block content %}
 <br><br>
-
-    <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
-        <br>
-      Search Text: <input name="searchString" id="search_tags" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
-      <input type="submit" value="Submit" id="searchSubmit">
-    </form>
-
+    <h2>Search Results for {{search_string}}</h2>
     {% if search_streams %}
         <br>
         <h3>Matching Streams</h3>

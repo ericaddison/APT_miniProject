@@ -27,8 +27,7 @@ class TextSearchForm(BaseHandler):
             'stream_name_parm': fh.stream_name_parm,
             'tags_parm': fh.tags_parm,
             'cover_url_parm': fh.cover_url_parm,
-            'subs_parm': fh.subscribers_parm,
-            'search_url': '/searchexe'
+            'subs_parm': fh.subscribers_parm
         }
 
         search_string = self.get_request_param(fh.search_string_parm)

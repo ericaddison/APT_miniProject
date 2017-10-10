@@ -108,3 +108,8 @@ div.scrollmenu a {
 div.scrollmenu a:hover {
     background-color: #777;
 }
+
+/* search bar stuff */
+.noEntryYet {
+    color: lightgray
+}
