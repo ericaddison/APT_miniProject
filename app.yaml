@@ -14,6 +14,7 @@ handlers:
   script: source.Admin.app
 
 
+
 # [START views]
 - url: /search.*
   script: Routes.app
@@ -36,6 +37,8 @@ handlers:
 - url: /tagmod
   script: Routes.app
 - url: /social
+  script: Routes.app
+- url: /geomap
   script: Routes.app
 # [START views]
 

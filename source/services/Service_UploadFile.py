@@ -33,6 +33,7 @@ class UploadFileHandler(FileUploadHandler):
 
         upload = fh.get_upload_from_filehandler(self, 0)
         url = self.get_request_param(fh.url_parm)
+        
 
         if upload is not None:
             image_url = fh.get_file_url(upload)
@@ -53,6 +54,11 @@ class UploadFileHandler(FileUploadHandler):
             if iscover:
                 stream.set_cover_image_url(image_url)
             else:
+                
+                lat = self.get_request_param('lat')
+                print "Latitude = ", lat
+                lng = self.get_request_param('lng')
+                print "Longitude = ", lng
 
                 # create StreamItem entity
                 item = StreamItem.create(
@@ -60,7 +66,9 @@ class UploadFileHandler(FileUploadHandler):
                     file=upload,
                     URL=image_url,
                     name=name,
-                    stream=stream)
+                    stream=stream,
+                    latitude=lat,
+                    longitude=lng)
 
                 # update stream list of images
                 stream.add_item(item)
