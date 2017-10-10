@@ -140,6 +140,12 @@ class Stream(ndb.Model):
             return None
         return [s.key.id() for s in stream_result]
 
+    @classmethod
+    def get_all_names_and_ids(cls):
+        stream_query0 = Stream.query()
+        all_streams = stream_query0.fetch()
+        return [(s.name, s.key.id()) for s in all_streams]
+
 
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
