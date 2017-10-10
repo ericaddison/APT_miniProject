@@ -24,26 +24,42 @@
 
     <script>
       function initMap() {
-        var uluru = {lat: -25.363, lng: 131.044};
+        var ut = {lat: 30.2893746, lng: -97.7349663};
         
         var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 4,
-          center: uluru
+          zoom: 2,
+          center: ut
         });
 
-          
-        var marker = new google.maps.Marker({
-          position: uluru,
-          map: map
-        });
+         var markers = new Array();
+          {% for loc in streamItemsLoc %}
+            var lat1 = {{ loc.lat }};
+            var lng1 = {{ loc.lng }};
+            var marker = new google.maps.Marker({position: {lat: lat1, lng: lng1}, map: map});
+            markers.push(marker);
+          {% endfor %}
+
+        var markerCluster = new MarkerClusterer(map, markers);
+        
+
+         
+         
+         
       }
+
     </script>
+     <script src="./js/markerclusterer.js"></script>
      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCStEwgkRB940lMpKTV6OzmMVkUmTb2g4U&callback=initMap" async defer></script>
 
-G'Day Mayt!
-<div id="map"></div>
-{{ streamItems }}
 
+<div id="map"></div>
+<br>...<br>
+{{ streamItems }}
+<br>...<br>
+{{ streamItemsLoc }}
+<br>...<br>
+{{ testing2.lat }}
+<br>...<br>
 
     <footer>Copyright &copy; Footnote Here</footer>
 {% endblock %}

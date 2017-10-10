@@ -134,8 +134,11 @@ class StreamItem(ndb.Model):
         
         
     def getLatLng(self):
-        dict = {'lat':self.latitude, 'lng':self.longitude}
-        return dict
+        if self.latitude is not None and self.longitude is not None:
+            dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
+            return dict
+        else:
+            return None
         
         
 
@@ -152,6 +155,8 @@ class StreamItem(ndb.Model):
         stream = kwargs['stream']
         blob = kwargs['file'] if 'file' in kwargs.keys() else None
         blobkey = blob.key() if blob is not None else None
+        lat = kwargs['latitude']
+        lng = kwargs['longitude']
 
         # create and return stream
         item = StreamItem(
@@ -159,7 +164,9 @@ class StreamItem(ndb.Model):
                 blobKey=blobkey,
                 URL=url,
                 name=name,
-                stream=stream.key)
+                stream=stream.key,
+                latitude=lat,
+                longitude=lng)
         item.put()
         return item
     

@@ -23,6 +23,12 @@ class GeoMapPage(BaseHandler):
 
         # get all items
         all_streamItems = StreamItem.query().fetch()
+        item_loc = []
+        for item in all_streamItems:
+            if item.getLatLng() is not None:
+                item_loc.append(item.getLatLng())
+        
+        testing2 = all_streamItems[0].getLatLng()
 
         template_values = {
             'html_template': 'MasterTemplate.html',
@@ -30,7 +36,10 @@ class GeoMapPage(BaseHandler):
             'login_url': login_url,
             'login_text': login_text,
             'app': app_identity.get_application_id(),
-            'streamItems': all_streamItems}
+            'streamItems': all_streamItems,
+            'streamItemsLoc': item_loc,
+            'testing': "{lat: 30.2893746, lng: -97.7349663}",
+            'testing2': testing2}
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/GeoMap.html')
         self.set_content_text_html()
