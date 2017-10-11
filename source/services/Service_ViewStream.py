@@ -47,6 +47,29 @@ class ViewStreamService(BaseHandler):
         # get the tags
         stream_tags = StreamTag.get_batch_by_stream(stream)
         response[fh.tags_parm] = [t.get_tag_name() for t in stream_tags]
+        
+        
+        #get lat/lng data for GeoMap
+        item_loc = []
+        for item in items:
+            if item.getLatLng() is not None:
+                oneItem = []
+                
+                oneItem.append(item.stream.id())
+                oneItem.append(item.dateAdded.strftime("%Y-%m-%d %H:%M:%S"))
+                
+                if item.URL is None:
+                    imageURL = fh.get_file_url(item.blobKey)
+                else:
+                    imageURL = item.URL
+                
+                oneItem.append(imageURL)
+                oneItem.append(item.latitude)
+                oneItem.append(item.longitude)
+                
+                item_loc.append(oneItem)
+                
+        response['streamItemsLoc'] = item_loc
 
         response['urls'] = image_urls
         self.write_response(json.dumps(response))

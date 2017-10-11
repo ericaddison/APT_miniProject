@@ -65,6 +65,9 @@ class ViewStream(BaseHandler):
         image_urls = response['urls']
         tags = response[fh.tags_parm]
         tags = [{'name': tag, 'url': fh.get_viewtag_url(tag)} for tag in tags]
+        
+        #Values for GeoMap
+        streamItemsLoc = response['streamItemsLoc']
 
         # get total number of images and make links
         num_images = response[fh.num_images_parm]
@@ -110,7 +113,8 @@ class ViewStream(BaseHandler):
                     'redirect_url': self.get_current_url(),
                     'stream_id_parm': fh.stream_id_parm,
                     'redirect_parm': fh.redirect_parm,
-                    'url_parm': fh.url_parm
+                    'url_parm': fh.url_parm,
+                    'streamItemsLoc': json.dumps(streamItemsLoc)
                 }
 
         if next_page_url:
