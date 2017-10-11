@@ -31,6 +31,8 @@ class UploadFileHandler(FileUploadHandler):
             fh.bad_request_error(self, response, 'Invalid Stream ID')
             return
 
+        print('\nThere were {} uploads\n'.format(fh.get_num_uploads(self)))
+
         upload = fh.get_upload_from_filehandler(self, 0)
         url = self.get_request_param(fh.url_parm)
 
