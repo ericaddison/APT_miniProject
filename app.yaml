@@ -74,6 +74,10 @@ handlers:
   script: Routes.app
 - url: /services/taggedstreams
   script: Routes.app
+- url: /services/autocomplete
+  script: Routes.app
+- url: /services/streaminfo
+  script: Routes.app
 # [END services]
 
 - url: /css

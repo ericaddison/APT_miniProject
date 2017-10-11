@@ -13,7 +13,7 @@ class Stream(ndb.Model):
     viewList = ndb.DateTimeProperty(indexed=True, repeated=True)
 
     def add_item(self, item):
-        self.items.append(item.key)
+        self.items.insert(0, item.key)
         self.put()
 
     def get_items(self, ind1, ind2):
@@ -27,6 +27,11 @@ class Stream(ndb.Model):
     def set_cover_image_url(self, url):
         self.coverImageURL = url
         self.put()
+
+    def get_most_recent_image(self):
+        if len(self.items) == 0:
+            return None
+        return self.items[-1].get()
 
     def stream_id(self):
         return self.key.id()
@@ -53,6 +58,27 @@ class Stream(ndb.Model):
 
         # delete the stream itself
         self.key.delete()
+
+    @classmethod
+    # return a dictionary of the non-image information from this stream
+    def get_meta_dict_by_id(cls, stream_id):
+        stream = Stream.get_by_id(stream_id)
+        if stream is None:
+            return None
+
+        last_update = stream.get_most_recent_image()
+        last_update_date = None if last_update is None else last_update.dateAdded
+
+        return {
+            'id': stream.stream_id(),
+            'owner': StreamUser.get_nickName_by_key(stream.owner),
+            'name': stream.name,
+            'coverImageURL': stream.coverImageURL,
+            'numViews': stream.numViews,
+            'numItems': len(stream.items),
+            'newestDate': str(last_update_date),
+            'dateAdded': str(stream.dateAdded)
+        }
 
     @classmethod
     # argument owner should be a StreamUser
@@ -113,6 +139,12 @@ class Stream(ndb.Model):
         if stream_result is None:
             return None
         return [s.key.id() for s in stream_result]
+
+    @classmethod
+    def get_all_names_and_ids(cls):
+        stream_query0 = Stream.query()
+        all_streams = stream_query0.fetch()
+        return [(s.name, s.key.id()) for s in all_streams]
 
 
 class StreamItem(ndb.Model):
@@ -389,8 +421,11 @@ class StreamUser(ndb.Model):
         self.trendEmails = freq
         self.put()
         return freq
-        
     
     @classmethod
     def get_by_id(cls, user_id):
         return ndb.Key('StreamUser', user_id).get()
+
+    @classmethod
+    def get_nickName_by_key(cls, user_key):
+        return user_key.get().nickName

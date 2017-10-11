@@ -27,6 +27,7 @@ message_parm = 'msg'
 owner_parm = 'owner'
 num_images_parm = 'num_images'
 url_parm = 'url'
+autocomplete_parm = 'term'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]
@@ -144,12 +145,16 @@ def searchablize_tag_or_stream(item, index_name, response):
         for tok in toks:
             for i in range(len(tok)):
                 substr = tok[0:i+1]
-                doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
-                                              search.TextField(name='name', value=item.name),
-                                              search.TextField(name='string', value=substr),
-                                              search.DateField(name='date_added', value=datetime.datetime.now().date())])
-                # Index the document.
-                index.put(doc)
+                add_strs = [substr]
+                add_strs.append(" ".join(toks[0:i]) + substr)
+
+                for s in add_strs:
+                    doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
+                                                  search.TextField(name='name', value=item.name),
+                                                  search.TextField(name='string', value=s),
+                                                  search.DateField(name='date_added', value=datetime.datetime.now().date())])
+                    # Index the document.
+                    index.put(doc)
     except search.PutError, e:
         result = e.results[0]
         response['errResult'] = str(result)
