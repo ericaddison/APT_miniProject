@@ -17,49 +17,86 @@
         padding: 0;
       }
     </style>
-{% endblock %}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
+{% endblock %}
 
 {% block content %}
 
-    <script>
-      function initMap() {
-        var ut = {lat: 30.2893746, lng: -97.7349663};
-        
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 2,
-          center: ut
-        });
+  <script>
+            var markerArr = [];
+              
+            function initMap() {                
+                
+                var locationJSON = "{{ streamItemsLoc }}";
+                locationJSON = locationJSON.replace(/&quot;/g, "\"");
+                var locations = JSON.parse(locationJSON);
+                
+                var myOptions = {
+                    center: new google.maps.LatLng(30.2893746, -97.7349663),
+                    zoom: 2
+                    };
+                
+                var map = new google.maps.Map(document.getElementById("map"),  myOptions)
+                setMarkers(map,locations)
+                
+            }
 
-         var markers = new Array();
-          {% for loc in streamItemsLoc %}
-            var lat1 = {{ loc.lat }};
-            var lng1 = {{ loc.lng }};
-            var marker = new google.maps.Marker({position: {lat: lat1, lng: lng1}, map: map});
-            markers.push(marker);
-          {% endfor %}
 
-        var markerCluster = new MarkerClusterer(map, markers);
-        
+            function setMarkers(map,locations){
+                var markerArr = new Array();
+                var marker, i
+                for (i = 0; i < locations.length; i++){  
+                    var streamID = parseInt(locations[i][0]);
+                    var dateAdded = new Date(locations[i][1]);
+                    var imageURL = locations[i][2];
+                    var lat =  locations[i][3];
+                    var lng =  locations[i][4];
 
-         
-         
-         
-      }
+                    latlngset = new google.maps.LatLng(lat, lng);
 
+                    var marker = new google.maps.Marker({  
+                        map: map, 
+                        position: latlngset  
+                        });
+                    
+                    markerArr.push(marker);
+                    
+                    map.setCenter(marker.getPosition())
+
+                    var content = '<a href="/viewstream?streamID=' + streamID + '"><img src="' + imageURL + '" style="width:100px;height:100px;">';
+                    var infowindow = new google.maps.InfoWindow()
+
+                    google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
+                        return function() {
+                            infowindow.setContent(content);
+                            infowindow.open(map,marker);
+                        };
+                    })(marker,content,infowindow)); 
+                }
+                var markerCluster = new MarkerClusterer(map, markerArr)
+            }
+            
     </script>
+
+
+
      <script src="./js/markerclusterer.js"></script>
      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCStEwgkRB940lMpKTV6OzmMVkUmTb2g4U&callback=initMap" async defer></script>
 
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $( "#slider" ).slider();
+  } );
+  </script>
+
 
 <div id="map"></div>
-<br>...<br>
-{{ streamItems }}
-<br>...<br>
-{{ streamItemsLoc }}
-<br>...<br>
-{{ testing2.lat }}
-<br>...<br>
+<div id="slider"></div>
+
+
 
     <footer>Copyright &copy; Footnote Here</footer>
 {% endblock %}

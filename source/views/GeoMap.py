@@ -7,6 +7,7 @@ from source.models.NdbClasses import *
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
 from google.appengine.ext.webapp import template
+import json
 
 
 class GeoMapPage(BaseHandler):
@@ -21,15 +22,31 @@ class GeoMapPage(BaseHandler):
             self.redirect("/")
             return
 
+        # 100x100 image on pin mouseover.
+        # Need: StreamID, Lat, Long, ImageURL, DateAdded
         # get all items
+        
         all_streamItems = StreamItem.query().fetch()
         item_loc = []
         for item in all_streamItems:
             if item.getLatLng() is not None:
-                item_loc.append(item.getLatLng())
-        
-        testing2 = all_streamItems[0].getLatLng()
+                oneItem = []
+                
+                oneItem.append(item.stream.id())
+                oneItem.append(item.dateAdded.strftime("%Y-%m-%d %H:%M:%S"))
+                
+                if item.URL is None:
+                    imageURL = fh.get_file_url(item.blobKey)
+                else:
+                    imageURL = item.URL
+                
+                oneItem.append(imageURL)
+                oneItem.append(item.latitude)
+                oneItem.append(item.longitude)
+                
+                item_loc.append(oneItem)
 
+        
         template_values = {
             'html_template': 'MasterTemplate.html',
             'user': user,
@@ -37,9 +54,7 @@ class GeoMapPage(BaseHandler):
             'login_text': login_text,
             'app': app_identity.get_application_id(),
             'streamItems': all_streamItems,
-            'streamItemsLoc': item_loc,
-            'testing': "{lat: 30.2893746, lng: -97.7349663}",
-            'testing2': testing2}
+            'streamItemsLoc': json.dumps(item_loc)}
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/GeoMap.html')
         self.set_content_text_html()
