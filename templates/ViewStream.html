@@ -3,6 +3,8 @@
 {% block title %}Connexion: {{ stream.name }}{% endblock %}
 
 {% block extrahead %}
+<script src="js/dropzone.js"></script>
+<script src="js/ViewStreamPage.js"></script>
 <link rel="stylesheet" type="text/css" href="css/bootstrap/carousel.css">
 <link rel="stylesheet" type="text/css" href="css/viewstream.css">
 <link rel="stylesheet" href="css/dropzone.css">
@@ -118,8 +120,6 @@
 
 
 
-<script src="js/dropzone.js"></script>
-
 
 <p>
   This is the most minimal example of Dropzone. The upload in this example
@@ -127,9 +127,10 @@
 </p>
 
 <!-- Change /upload-target to your upload address -->
-<form action="{{ upload_url }}" class="dropzone" method="POST" enctype="multipart/form-data">
+<form action="{{ upload_url }}" class="dropzone" method="POST" enctype="multipart/form-data" id = "upform">
     <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
     <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
+    <input type="submit" name="submit" class="btn" value="Submit" id="dzUploadSubmit">
 </form>
 
 

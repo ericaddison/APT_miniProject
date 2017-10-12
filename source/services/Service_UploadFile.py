@@ -31,39 +31,42 @@ class UploadFileHandler(FileUploadHandler):
             fh.bad_request_error(self, response, 'Invalid Stream ID')
             return
 
-        upload = fh.get_upload_from_filehandler(self, 0)
-        url = self.get_request_param(fh.url_parm)
+        n_ups = fh.get_num_uploads(self)
+        print('\nThere were {} uploads\n'.format(n_ups))
+        for i in range(n_ups):
+            upload = fh.get_upload_from_filehandler(self, i)
+            url = self.get_request_param(fh.url_parm)
 
-        if upload is not None:
-            image_url = fh.get_file_url(upload)
-            name = upload.filename
-        elif url not in [None, '']:
-            try:
-                urllib2.urlopen(url)
-                image_url = url
-                name = upload
-            except:
-                image_url = None
-        else:
-            image_url = None
-
-        if image_url is not None:
-
-            iscover = self.get_request_param('iscover')
-            if iscover:
-                stream.set_cover_image_url(image_url)
+            if upload is not None:
+                image_url = fh.get_file_url(upload)
+                name = upload.filename
+            elif url not in [None, '']:
+                try:
+                    urllib2.urlopen(url)
+                    image_url = url
+                    name = upload
+                except:
+                    image_url = None
             else:
+                image_url = None
 
-                # create StreamItem entity
-                item = StreamItem.create(
-                    owner=user,
-                    file=upload,
-                    URL=image_url,
-                    name=name,
-                    stream=stream)
+            if image_url is not None:
 
-                # update stream list of images
-                stream.add_item(item)
+                iscover = self.get_request_param('iscover')
+                if iscover:
+                    stream.set_cover_image_url(image_url)
+                else:
+
+                    # create StreamItem entity
+                    item = StreamItem.create(
+                        owner=user,
+                        file=upload,
+                        URL=image_url,
+                        name=name,
+                        stream=stream)
+
+                    # update stream list of images
+                    stream.add_item(item)
 
         # go back to viewstream page
         redirect = str(self.get_request_param(fh.redirect_parm))
