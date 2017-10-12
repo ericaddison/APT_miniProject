@@ -142,19 +142,23 @@ def searchablize_tag_or_stream(item, index_name, response):
     toks = item.name.split()
 
     try:
+        full_str = ""
         for tok in toks:
-            for i in range(len(tok)):
-                substr = tok[0:i+1]
-                add_strs = [substr]
-                add_strs.append(" ".join(toks[0:i]) + substr)
+            for i in range(len(tok)+1):
+                for j in range(i):
+                    substr = tok[j:i]
+                    add_strs = [substr]
+                    if j == 0:
+                        add_strs.append(full_str + " " + substr)
 
-                for s in add_strs:
-                    doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
-                                                  search.TextField(name='name', value=item.name),
-                                                  search.TextField(name='string', value=s),
-                                                  search.DateField(name='date_added', value=datetime.datetime.now().date())])
-                    # Index the document.
-                    index.put(doc)
+                    for s in add_strs:
+                        doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
+                                                      search.TextField(name='name', value=item.name),
+                                                      search.TextField(name='string', value=s),
+                                                      search.DateField(name='date_added', value=datetime.datetime.now().date())])
+                        # Index the document.
+                        index.put(doc)
+            full_str += " " + tok
     except search.PutError, e:
         result = e.results[0]
         response['errResult'] = str(result)
