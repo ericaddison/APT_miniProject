@@ -203,15 +203,31 @@
 
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-  <script>
+   <script>
   $( function() {
-    $( "#slider" ).slider();
-  } );
+      
+      var minDate = new Date(Date.now());
+      minDate.setFullYear( minDate.getFullYear() - 1 );
+      var maxDate = new Date(Date.now());;
+      
+    $( "#slider" ).slider({ 
+        value: maxDate.getTime() / 1000,
+        min: minDate.getTime() / 1000,  
+        max: maxDate.getTime() / 1000,
+        slide: function( event, ui ) {
+          $( "#slideDate" ).val( new Date(1000*ui.value).toDateString() );
+
+       }
+    
+    });
+    document.getElementById("slideDate").value = maxDate.toDateString();
+
+  });
   </script>
 
 
 <div id="map"></div>
-<div id="slider"></div>
+<div id="slider"></div><input type="text" id="slideDate"/>
 <p>
 
 
