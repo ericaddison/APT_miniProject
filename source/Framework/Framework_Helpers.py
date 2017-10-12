@@ -119,6 +119,27 @@ def search_tag_index(search_string):
     return list(tags)
 
 
+def search_tag_index_alpha(search_string, limit):
+    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    search_results = index.search(
+                        query=search.Query(
+                            "string: {}".format(search_string),
+                            options=search.QueryOptions(
+                                limit=limit,
+                                sort_options=search.SortOptions(
+                                    expressions=[
+                                        search.SortExpression(expression='id', default_value='')],
+                                    limit=1000),
+                                returned_fields=['id']
+                            )
+                        )
+                    )
+    tags = set()
+    for res in search_results:
+        tags.add(res.fields[0].value)
+    return list(tags)
+
+
 # returns list of stream IDs of matching strings
 def search_stream_index(search_string):
     index = search.Index(name=stream_index_name, namespace=search_index_namespace)
@@ -128,6 +149,29 @@ def search_stream_index(search_string):
         for fld in res.fields:
             if fld.name == "id":
                 streams.add(fld.value)
+
+    return list(streams)
+
+
+# returns list of stream IDs of matching strings - with a limit and sort alpha
+def search_stream_index_alpha_return_names(search_string, limit):
+    index = search.Index(name=stream_index_name, namespace=search_index_namespace)
+    search_results = index.search(
+                        query=search.Query(
+                            "string: {}".format(search_string),
+                            options=search.QueryOptions(
+                                limit=limit,
+                                sort_options=search.SortOptions(
+                                    expressions=[
+                                        search.SortExpression(expression='name', default_value='')],
+                                    limit=1000),
+                                returned_fields=['name']
+                                )
+                        )
+    )
+    streams = set()
+    for res in search_results:
+        streams.add(res.fields[0].value)
 
     return list(streams)
 
@@ -184,6 +228,16 @@ def remove_tag_from_search_index(tag_name, response):
     for doc in search_result.results:
         index.delete(doc.doc_id)
     return
+
+
+def set_stream_index_name(new_name):
+    global stream_index_name
+    stream_index_name = new_name
+
+
+def set_tag_index_name(new_name):
+    global tag_index_name
+    tag_index_name = new_name
 
 
 def get_image_range_param(handler):

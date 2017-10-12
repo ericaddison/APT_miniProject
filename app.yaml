@@ -73,6 +73,8 @@ handlers:
   script: Routes.app
 - url: /services/autocomplete
   script: Routes.app
+- url: /services/rebuildindices
+  script: Routes.app
 # [END services]
 
 - url: /css

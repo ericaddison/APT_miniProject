@@ -11,6 +11,7 @@ from source.services.Service_Management import ManagementService
 from source.services.Service_StreamsForTag import StreamsForTagService
 from source.services.Service_Tag import AddTagToStreamService, RemoveTagFromStreamService
 from source.services.Service_Autcomplete import AutocompleteService
+from source.services.Service_CronRebuildSearchIndex import CronRebuildSearchIndexService
 from source.views.Create import CreatePage
 from source.views.Delete import DeletePage, DeleteExe
 from source.views.Unsubscribe import UnsubscribePage, UnsubscribeExe
@@ -58,7 +59,8 @@ app = webapp2.WSGIApplication([
     ('/services/addstreamtag', AddTagToStreamService),
     ('/services/removestreamtag', RemoveTagFromStreamService),
     ('/services/taggedstreams', StreamsForTagService),
-    ('/services/autocomplete', AutocompleteService)
+    ('/services/autocomplete', AutocompleteService),
+    ('/services/rebuildindices', CronRebuildSearchIndexService)
     # [END services]
 
 ], config=config, debug=True)
