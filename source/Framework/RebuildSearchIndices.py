@@ -8,7 +8,7 @@ def rebuild_stream_index():
     all_streams = Stream.get_all()
 
     # define new tag search index name
-    if fh.stream_index_name == "stream_index":
+    if fh.get_stream_index_name() == "stream_index":
         new_index_name = "stream_index_alt"
     else:
         new_index_name = "stream_index"
@@ -18,7 +18,7 @@ def rebuild_stream_index():
         fh.searchablize_tag_or_stream(stream, new_index_name, {})
 
     # switch primary search
-    old_index_name = fh.stream_index_name
+    old_index_name = fh.get_stream_index_name()
     fh.set_stream_index_name(new_index_name)
 
     # empty old index
@@ -30,7 +30,7 @@ def rebuild_tag_index():
     all_tags = Tag.get_all()
 
     # define new tag search index name
-    if fh.tag_index_name == "tag_index":
+    if fh.get_tag_index_name() == "tag_index":
         new_index_name = "tag_index_alt"
     else:
         new_index_name = "tag_index"
@@ -40,7 +40,7 @@ def rebuild_tag_index():
         fh.searchablize_tag_or_stream(tag, new_index_name, {})
 
     # switch primary search
-    old_index_name = fh.tag_index_name
+    old_index_name = fh.get_tag_index_name()
     fh.set_tag_index_name(new_index_name)
 
     # empty old index

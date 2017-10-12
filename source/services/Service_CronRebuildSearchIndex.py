@@ -12,5 +12,4 @@ class CronRebuildSearchIndexService(BaseHandler):
     def get(self):
         rb.rebuild_tag_index()
         rb.rebuild_stream_index()
-        print("\nDONY DONSERS\n")
         self.write_response(json.dumps("{'reponse': 'Done rebuilding indices'}"))
