@@ -5,9 +5,14 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/css/BaseStyle.css">
-    <script src="js/bootstrap/popper.min.js"></script>
     <script src="/js/jQuery/jquery-3.2.1.min.js"></script>
+    <script src="js/bootstrap/popper.min.js"></script>
     <script src="js/bootstrap/bootstrap.min.js"></script>
+
+    <!-- for search bar -->
+    <link rel="stylesheet" type="text/css" href="css/jqueryui/jquery-ui.css">
+    <script src="js/jqueryui/jquery-ui.js"></script>
+    <script src="js/SearchPage.js"></script>
 
     <title>{% block title %}{% endblock %}</title>
 
@@ -31,10 +36,13 @@
             <a href="manage">Manage</a>
             <a href="create">Create</a>
             <a href="viewall">View All</a>
-            <a href="search">Search</a>
             <a href="trending">Trending</a>
             <a href="social">Social</a>
             <a href="geomap">GeoMap</a>
+
+          <div style="display: block; margin: 1%">
+                {% include "SearchForm.html" %}
+          </div>
         </div>
         <div id="content">
             {% block content %}

@@ -93,7 +93,7 @@ class ClearSearchIndexes(webapp2.RequestHandler):
 
 class DisplayTagIndex(webapp2.RequestHandler):
     def get(self):
-        index = search.Index(name=fh.tag_index_name, namespace=fh.search_index_namespace)
+        index = fh.get_tag_index()
 
         res = index.get_range(limit=1000)
         prints = "<table>"
@@ -110,7 +110,7 @@ class DisplayTagIndex(webapp2.RequestHandler):
 
 class DisplayStreamIndex(webapp2.RequestHandler):
     def get(self):
-        index = search.Index(name=fh.stream_index_name, namespace=fh.search_index_namespace)
+        index = fh.get_stream_index()
 
         res = index.get_range(limit=1000)
         prints = "<table>"

@@ -4,17 +4,22 @@
 
 {% block content %}
 <br><br>
+    <h2>Search Results for {{search_string}}</h2>
 
-    <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
+    {% if search_tags %}
         <br>
-      Search Text: <input name="searchString" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
-      <input type="submit" value="Submit">
-    </form>
+        <h3>Matching Tags</h3>
+        <div class="scrollmenu">
+            {% for tag in search_tags %}
+                <a href="{{ tag.url }}">{{ tag.name }}</a>
+            {% endfor %}
+        </div>
+    {% endif %}
 
     {% if search_streams %}
         <br>
         <h3>Matching Streams</h3>
-            <div style="overflow-y: scroll; height: 400px">
+            <div>
             <table style="width:90%">
                  <tr>
                      <th>Stream Name</th>
@@ -26,16 +31,6 @@
                 {% endfor %}
             </table>
             </div>
-    {% endif %}
-
-    {% if search_tags %}
-        <br>
-        <h3>Matching Tags</h3>
-        <div class="scrollmenu">
-            {% for tag in search_tags %}
-                <a href="{{ tag.url }}">{{ tag.name }}</a>
-            {% endfor %}
-        </div>
     {% endif %}
 
 <br>

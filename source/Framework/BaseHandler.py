@@ -38,6 +38,9 @@ class BaseHandler(webapp2.RequestHandler):
     def set_content_text_plain(self):
         self.response.content_type = 'text/plain'
 
+    def set_content_text_json(self):
+        self.response.content_type = 'application/json'
+
     def set_content_text_html(self):
         self.response.content_type = 'text/html'
 

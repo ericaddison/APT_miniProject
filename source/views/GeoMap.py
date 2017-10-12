@@ -22,39 +22,31 @@ class GeoMapPage(BaseHandler):
             self.redirect("/")
             return
 
-        # 100x100 image on pin mouseover.
-        # Need: StreamID, Lat, Long, ImageURL, DateAdded
-        # get all items
-        
-        all_streamItems = StreamItem.query().fetch()
-        item_loc = []
-        for item in all_streamItems:
-            if item.getLatLng() is not None:
-                oneItem = []
-                
-                oneItem.append(item.stream.id())
-                oneItem.append(item.dateAdded.strftime("%Y-%m-%d %H:%M:%S"))
-                
-                if item.URL is None:
-                    imageURL = fh.get_file_url(item.blobKey)
-                else:
-                    imageURL = item.URL
-                
-                oneItem.append(imageURL)
-                oneItem.append(item.latitude)
-                oneItem.append(item.longitude)
-                
-                item_loc.append(oneItem)
-
+        all_streams = Stream.get_all_streams()
+        item_data = []
+        for stream in all_streams:
+            items = stream.get_all_items()
+            for i in range(len(items)):
+                item = items[i]
+                prev_ind = i - (i % 10) + 1
+                stream_url = fh.get_viewstream_url(stream.get_id(), prev_ind, prev_ind+9, i-prev_ind+1)
+                if item.getLatLng() is not None:
+                    item_data.append({
+                                        "lat": item.latitude,
+                                        "lng": item.longitude,
+                                        "url": item.URL,
+                                        "stream_name": stream.name,
+                                        "stream_url": stream_url,
+                                        "date_added": str(item.dateAdded)
+                                    })
         
         template_values = {
             'html_template': 'MasterTemplate.html',
             'user': user,
             'login_url': login_url,
             'login_text': login_text,
-            'app': app_identity.get_application_id(),
-            'streamItems': all_streamItems,
-            'streamItemsLoc': json.dumps(item_loc)}
+            'item_data': item_data
+        }
 
         path = os.path.join(os.path.dirname(__file__), '../../templates/GeoMap.html')
         self.set_content_text_html()
