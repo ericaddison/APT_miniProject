@@ -1,6 +1,7 @@
-from google.appengine.ext import ndb
 import source.Framework.Framework_Helpers as fh
+from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
+
 
 
 class Stream(ndb.Model):
@@ -150,7 +151,7 @@ class Stream(ndb.Model):
         return [(s.name, s.key.id()) for s in all_streams]
 
     @classmethod
-    def get_all_streams(cls):
+    def get_all(cls):
         return Stream.query().fetch()
 
 
@@ -259,6 +260,10 @@ class Tag(ndb.Model):
         tag_name = tag_name.strip().lower()
         key = ndb.Key('Tag', tag_name)
         return key
+
+    @classmethod
+    def get_all(cls):
+        return Tag.query().fetch()
 
 
 class StreamTag(ndb.Model):
