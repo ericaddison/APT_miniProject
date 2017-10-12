@@ -140,60 +140,59 @@
 <p>
 
 
-  <script>
-            var markerArr = [];
-              
-            function initMap() {                
-                
-                var locationJSON = "{{ streamItemsLoc }}";
-                locationJSON = locationJSON.replace(/&quot;/g, "\"");
-                var locations = JSON.parse(locationJSON);
-                
-                var myOptions = {
-                    center: new google.maps.LatLng(30.2893746, -97.7349663),
-                    zoom: 2
-                    };
-                
-                var map = new google.maps.Map(document.getElementById("map"),  myOptions)
-                setMarkers(map,locations)
-                
-            }
+    <script>
+      var markers = new Array();  
+        
+      function initMap() {
+        var ut = {lat: 30.2893746, lng: -97.7349663};
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 2,
+          center: ut
+        });
 
+         var sliderDate = document.getElementById("slideDate");
+          
+          {% for data in item_data %}
+          (function(){
+                var lat1 = {{ data.lat }};
+                var lng1 = {{ data.lng }};
+                var dateAdded = new Date('{{ data.date_added }}')
+                var marker = new google.maps.Marker({position: {lat: lat1, lng: lng1}, map: map, dateAdded: dateAdded});
 
-            function setMarkers(map,locations){
-                var markerArr = new Array();
-                var marker, i
-                for (i = 0; i < locations.length; i++){  
-                    var streamID = parseInt(locations[i][0]);
-                    var dateAdded = new Date(locations[i][1]);
-                    var imageURL = locations[i][2];
-                    var lat =  locations[i][3];
-                    var lng =  locations[i][4];
+                var infowindow = new google.maps.InfoWindow({
+                    content: "<div><img width='100' height='100' style='object-fit: contain' src='{{ data.url }}'><br>{{ data.stream_name }}</div>"
+                });
 
-                    latlngset = new google.maps.LatLng(lat, lng);
-
-                    var marker = new google.maps.Marker({  
-                        map: map, 
-                        position: latlngset  
-                        });
+                google.maps.event.addListener(marker, 'mouseover', function () {
+                    infowindow.open(map, marker);
+                });
+                google.maps.event.addListener(marker, 'mouseout', function () {
+                    infowindow.close(map, marker);
+                });
+                google.maps.event.addListener(marker, 'click', function () {
+                    window.location = '{{data.stream_url}}'
+                });
+           
                     
-                    markerArr.push(marker);
+                google.maps.event.addDomListener( $( "#slider" ), "change", function() {
+                    if (new Date(sliderDate.value) <=  dateAdded){
+                        marker.setVisible(false);                        
+                    }
+                    else if (new Date(sliderDate.value) > dateAdded){
+                        marker.setVisible(true);
+                    }
                     
-                    map.setCenter(marker.getPosition())
+                });           
+           
+                markers.push(marker);
+            })();
+          {% endfor %}
 
-                    var content = '<a href="/viewstream?streamID=' + streamID + '"><img src="' + imageURL + '" style="width:100px;height:100px;">';
-                    var infowindow = new google.maps.InfoWindow()
+        var markerCluster = new MarkerClusterer(map, markers);
 
-                    google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
-                        return function() {
-                            infowindow.setContent(content);
-                            infowindow.open(map,marker);
-                        };
-                    })(marker,content,infowindow)); 
-                }
-                var markerCluster = new MarkerClusterer(map, markerArr)
-            }
-            
+      }
+
     </script>
 
 
@@ -203,7 +202,7 @@
 
   <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
   <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-   <script>
+  <script>
   $( function() {
       
       var minDate = new Date(Date.now());
@@ -216,14 +215,23 @@
         max: maxDate.getTime() / 1000,
         slide: function( event, ui ) {
           $( "#slideDate" ).val( new Date(1000*ui.value).toDateString() );
-
+            for(x = 0; x < markers.length; x++){
+                if(markers[x].dateAdded <= new Date(1000*ui.value) && markers[x].getVisible()){
+                    markers[x].setVisible(false);   
+                }
+                else if(markers[x].dateAdded > new Date(1000*ui.value) && !markers[x].getVisible()){
+                    markers[x].setVisible(true);   
+                }
+            }
        }
     
     });
     document.getElementById("slideDate").value = maxDate.toDateString();
+ 
 
   });
   </script>
+
 
 
 <div id="map"></div>

@@ -24,6 +24,8 @@
 {% block content %}
 
     <script>
+      var markers = new Array();  
+        
       function initMap() {
         var ut = {lat: 30.2893746, lng: -97.7349663};
         
@@ -32,13 +34,14 @@
           center: ut
         });
 
-         var markers = new Array();
+         var sliderDate = document.getElementById("slideDate");
+          
           {% for data in item_data %}
           (function(){
                 var lat1 = {{ data.lat }};
                 var lng1 = {{ data.lng }};
                 var dateAdded = new Date('{{ data.date_added }}')
-                var marker = new google.maps.Marker({position: {lat: lat1, lng: lng1}, map: map});
+                var marker = new google.maps.Marker({position: {lat: lat1, lng: lng1}, map: map, dateAdded: dateAdded});
 
                 var infowindow = new google.maps.InfoWindow({
                     content: "<div><img width='100' height='100' style='object-fit: contain' src='{{ data.url }}'><br>{{ data.stream_name }}</div>"
@@ -53,6 +56,18 @@
                 google.maps.event.addListener(marker, 'click', function () {
                     window.location = '{{data.stream_url}}'
                 });
+           
+                    
+                google.maps.event.addDomListener( $( "#slider" ), "change", function() {
+                    if (new Date(sliderDate.value) <=  dateAdded){
+                        marker.setVisible(false);                        
+                    }
+                    else if (new Date(sliderDate.value) > dateAdded){
+                        marker.setVisible(true);
+                    }
+                    
+                });           
+           
                 markers.push(marker);
             })();
           {% endfor %}
@@ -83,11 +98,19 @@
         max: maxDate.getTime() / 1000,
         slide: function( event, ui ) {
           $( "#slideDate" ).val( new Date(1000*ui.value).toDateString() );
-
+            for(x = 0; x < markers.length; x++){
+                if(markers[x].dateAdded <= new Date(1000*ui.value) && markers[x].getVisible()){
+                    markers[x].setVisible(false);   
+                }
+                else if(markers[x].dateAdded > new Date(1000*ui.value) && !markers[x].getVisible()){
+                    markers[x].setVisible(true);   
+                }
+            }
        }
     
     });
     document.getElementById("slideDate").value = maxDate.toDateString();
+ 
 
   });
   </script>
