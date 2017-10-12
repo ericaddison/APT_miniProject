@@ -151,7 +151,7 @@ class Stream(ndb.Model):
         return [(s.name, s.key.id()) for s in all_streams]
 
     @classmethod
-    def get_all(cls):
+    def get_all_streams(cls):
         return Stream.query().fetch()
 
 
