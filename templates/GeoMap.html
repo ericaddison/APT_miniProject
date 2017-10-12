@@ -29,12 +29,11 @@
       function initMap() {
         var ut = {lat: 30.2893746, lng: -97.7349663};
         
-        var map = new google.maps.Map(document.getElementById('map'), {
+         var map = new google.maps.Map(document.getElementById('map'), {
           zoom: 2,
           center: ut
         });
 
-         var sliderDate = document.getElementById("slideDate");
           
           {% for data in item_data %}
           (function(){
@@ -56,23 +55,12 @@
                 google.maps.event.addListener(marker, 'click', function () {
                     window.location = '{{data.stream_url}}'
                 });
-           
-                    
-                google.maps.event.addDomListener( $( "#slider" ), "change", function() {
-                    if (new Date(sliderDate.value) <=  dateAdded){
-                        marker.setVisible(false);                        
-                    }
-                    else if (new Date(sliderDate.value) > dateAdded){
-                        marker.setVisible(true);
-                    }
-                    
-                });           
-           
+
                 markers.push(marker);
             })();
           {% endfor %}
 
-        var markerCluster = new MarkerClusterer(map, markers);
+           var markerCluster = new MarkerClusterer(map, markers, { ignoreHiddenMarkers: 'true' });
 
       }
 
@@ -90,26 +78,29 @@
       
       var minDate = new Date(Date.now());
       minDate.setFullYear( minDate.getFullYear() - 1 );
-      var maxDate = new Date(Date.now());;
+      var maxDate = new Date(Date.now());
+      var lastMonth = new Date(Date.now());
+      lastMonth.setMonth( minDate.getMonth() - 1);
       
-    $( "#slider" ).slider({ 
-        value: maxDate.getTime() / 1000,
+    $( "#slider" ).slider({
+        range: true,
+        values: [lastMonth.getTime() /1000, maxDate.getTime() / 1000],
         min: minDate.getTime() / 1000,  
         max: maxDate.getTime() / 1000,
         slide: function( event, ui ) {
-          $( "#slideDate" ).val( new Date(1000*ui.value).toDateString() );
+          $( "#slideDate" ).val( new Date(1000*ui.values[0]).toDateString() + " - " + new Date(1000*ui.values[1]).toDateString() );
             for(x = 0; x < markers.length; x++){
-                if(markers[x].dateAdded <= new Date(1000*ui.value) && markers[x].getVisible()){
-                    markers[x].setVisible(false);   
+                if(markers[x].dateAdded > new Date(1000*ui.values[0]) && markers[x].dateAdded <= new Date(1000*ui.values[1])){
+                    markers[x].setVisible(true);  
                 }
-                else if(markers[x].dateAdded > new Date(1000*ui.value) && !markers[x].getVisible()){
-                    markers[x].setVisible(true);   
+                else if(markers[x].dateAdded < new Date(1000*ui.values[0]) || markers[x].dateAdded > new Date(1000*ui.values[1])){
+                    markers[x].setVisible(false);   
                 }
             }
        }
     
     });
-    document.getElementById("slideDate").value = maxDate.toDateString();
+    document.getElementById("slideDate").value = lastMonth.toDateString() + " - " + maxDate.toDateString();
  
 
   });
@@ -119,7 +110,7 @@
 
 
 <div id="map"></div>
-<div id="slider"></div><input type="text" id="slideDate"/>
+<div id="slider"></div><input type="text" id="slideDate" style="width: 300px;">
 
     <footer>Copyright &copy; Footnote Here</footer>
 {% endblock %}
