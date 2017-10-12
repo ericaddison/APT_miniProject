@@ -44,6 +44,12 @@ class ViewStream(BaseHandler):
             self.redirect('/')
             return
 
+        active_image = self.get_request_param(fh.active_image_parm)
+        try:
+            active_image = int(active_image)
+        except (TypeError, ValueError):
+            active_image = 0
+
         #Increment view counter
         stream.viewList.append(datetime.now())
         stream.numViews = stream.numViews+1
@@ -115,6 +121,7 @@ class ViewStream(BaseHandler):
                     'redirect_parm': fh.redirect_parm,
                     'url_parm': fh.url_parm,
                     'streamItemsLoc': json.dumps(streamItemsLoc)
+                    'active_image': active_image
                 }
 
         if next_page_url:

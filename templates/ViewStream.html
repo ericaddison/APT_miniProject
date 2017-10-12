@@ -84,13 +84,13 @@
 
       <ol class="carousel-indicators">
         {% for url in image_urls %}
-            <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}" {% if forloop.counter0 == 0 %}class="active"{% endif %}></li>
+            <li data-target="#myCarousel" data-slide-to="{{ forloop.counter0 }}" {% if forloop.counter0 == active_image %}class="active"{% endif %}></li>
         {% endfor %}
       </ol>
 
       <div class="carousel-inner">
         {% for url in image_urls %}
-          <div class="carousel-item{% if forloop.counter0 == 0 %} active{% endif %}">
+          <div class="carousel-item{% if forloop.counter0 == active_image %} active{% endif %}">
             <img class="subsequent-slide" src="{{ url }}" style="max-width: 100%; max-height: 100%; object-fit: contain">
           </div>
         {% endfor %}

@@ -24,6 +24,9 @@ class Stream(ndb.Model):
         item_keys = self.items[(ind1-1):ind2]
         return ndb.get_multi(item_keys), ind1, ind2
 
+    def get_all_items(self):
+        return ndb.get_multi(self.items)
+
     def set_cover_image_url(self, url):
         self.coverImageURL = url
         self.put()
@@ -145,6 +148,10 @@ class Stream(ndb.Model):
         stream_query0 = Stream.query()
         all_streams = stream_query0.fetch()
         return [(s.name, s.key.id()) for s in all_streams]
+
+	@classmethod
+    def get_all_streams(cls):
+        return Stream.query().fetch()
 
 
 class StreamItem(ndb.Model):

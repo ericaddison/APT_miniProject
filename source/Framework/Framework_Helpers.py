@@ -28,6 +28,7 @@ owner_parm = 'owner'
 num_images_parm = 'num_images'
 url_parm = 'url'
 autocomplete_parm = 'term'
+active_image_parm = 'activeImage'
 # [END HTTP request parameter names]
 
 # [START ERROR CODES]
@@ -207,8 +208,11 @@ import os
 base_url = 'http://{0}'.format(os.environ['HTTP_HOST'])
 
 
-def get_viewstream_url(streamid, i1, i2):
-    return '{0}/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
+def get_viewstream_url(streamid, i1, i2, active=-1):
+    if active < 0:
+        return '{0}/viewstream?{1}={2};{3}={4}-{5};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2)
+    else:
+        return '{0}/viewstream?{1}={2};{3}={4}-{5};{6}={7};'.format(base_url, stream_id_parm, streamid, image_range_parm, i1, i2, active_image_parm, active)
 
 
 def get_viewstream_default_url(streamid):
