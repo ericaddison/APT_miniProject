@@ -36,7 +36,8 @@ class GeoMapPage(BaseHandler):
                                         "lng": item.longitude,
                                         "url": item.URL,
                                         "stream_name": stream.name,
-                                        "stream_url": stream_url
+                                        "stream_url": stream_url,
+                                        "date_added": str(item.dateAdded)
                                     })
         
         template_values = {

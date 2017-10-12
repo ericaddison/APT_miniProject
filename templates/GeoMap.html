@@ -37,6 +37,7 @@
           (function(){
                 var lat1 = {{ data.lat }};
                 var lng1 = {{ data.lng }};
+                var dateAdded = new Date('{{ data.date_added }}')
                 var marker = new google.maps.Marker({position: {lat: lat1, lng: lng1}, map: map});
 
                 var infowindow = new google.maps.InfoWindow({
@@ -60,19 +61,6 @@
 
       }
 
-                    var content = '<a href="/viewstream?streamID=' + streamID + '"><img src="' + imageURL + '" style="width:100px;height:100px;">';
-                    var infowindow = new google.maps.InfoWindow()
-
-                    google.maps.event.addListener(marker,'click', (function(marker,content,infowindow){ 
-                        return function() {
-                            infowindow.setContent(content);
-                            infowindow.open(map,marker);
-                        };
-                    })(marker,content,infowindow)); 
-                }
-                var markerCluster = new MarkerClusterer(map, markerArr)
-            }
-            
     </script>
 
 

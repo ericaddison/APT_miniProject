@@ -149,7 +149,7 @@ class Stream(ndb.Model):
         all_streams = stream_query0.fetch()
         return [(s.name, s.key.id()) for s in all_streams]
 
-	@classmethod
+    @classmethod
     def get_all_streams(cls):
         return Stream.query().fetch()
 

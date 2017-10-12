@@ -120,7 +120,7 @@ class ViewStream(BaseHandler):
                     'stream_id_parm': fh.stream_id_parm,
                     'redirect_parm': fh.redirect_parm,
                     'url_parm': fh.url_parm,
-                    'streamItemsLoc': json.dumps(streamItemsLoc)
+                    'streamItemsLoc': json.dumps(streamItemsLoc),
                     'active_image': active_image
                 }
 
