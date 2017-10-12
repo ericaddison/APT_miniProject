@@ -38,8 +38,11 @@ error_codes = {
 
 
 search_index_namespace = 'connexion'
-tag_index_name = 'tag_index'
-stream_index_name = 'stream_index'
+
+
+class SearchInfo(ndb.Model):
+    tag_index_name = ndb.StringProperty()
+    stream_index_name = ndb.StringProperty()
 
 
 # [START HTTP request methods]
@@ -101,15 +104,15 @@ def get_login_url(handler, redirect):
 
 
 def searchablize_tag(tag, response={}):
-    searchablize_tag_or_stream(tag, tag_index_name, response)
+    searchablize_tag_or_stream(tag, get_tag_index_name(), response)
 
 
 def searchablize_stream(stream, response={}):
-    searchablize_tag_or_stream(stream, stream_index_name, response)
+    searchablize_tag_or_stream(stream, get_stream_index_name(), response)
 
 
 def search_tag_index(search_string):
-    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    index = get_tag_index()
     search_results = index.search("string: {}".format(search_string))
     tags = set()
     for res in search_results:
@@ -119,15 +122,59 @@ def search_tag_index(search_string):
     return list(tags)
 
 
+def search_tag_index_alpha(search_string, limit):
+    index = get_tag_index()
+    search_results = index.search(
+                        query=search.Query(
+                            "string: {}".format(search_string),
+                            options=search.QueryOptions(
+                                limit=limit,
+                                sort_options=search.SortOptions(
+                                    expressions=[
+                                        search.SortExpression(expression='id', default_value='')],
+                                    limit=1000),
+                                returned_fields=['id']
+                            )
+                        )
+                    )
+    tags = set()
+    for res in search_results:
+        tags.add(res.fields[0].value)
+    return list(tags)
+
+
 # returns list of stream IDs of matching strings
 def search_stream_index(search_string):
-    index = search.Index(name=stream_index_name, namespace=search_index_namespace)
+    index = get_stream_index()
     search_results = index.search("string: {}".format(search_string))
     streams = set()
     for res in search_results:
         for fld in res.fields:
             if fld.name == "id":
                 streams.add(fld.value)
+
+    return list(streams)
+
+
+# returns list of stream IDs of matching strings - with a limit and sort alpha
+def search_stream_index_alpha_return_names(search_string, limit):
+    index = get_stream_index()
+    search_results = index.search(
+                        query=search.Query(
+                            "string: {}".format(search_string),
+                            options=search.QueryOptions(
+                                limit=limit,
+                                sort_options=search.SortOptions(
+                                    expressions=[
+                                        search.SortExpression(expression='name', default_value='')],
+                                    limit=1000),
+                                returned_fields=['name']
+                                )
+                        )
+    )
+    streams = set()
+    for res in search_results:
+        streams.add(res.fields[0].value)
 
     return list(streams)
 
@@ -142,26 +189,28 @@ def searchablize_tag_or_stream(item, index_name, response):
     toks = item.name.split()
 
     try:
+        full_str = ""
         for tok in toks:
-            for i in range(len(tok)):
-                substr = tok[0:i+1]
-                add_strs = [substr]
-                add_strs.append(" ".join(toks[0:i]) + substr)
+            for i in range(len(tok)+1):
+                for j in range(i):
+                    substr = tok[j:i]
+                    add_strs = [substr]
 
-                for s in add_strs:
-                    doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
-                                                  search.TextField(name='name', value=item.name),
-                                                  search.TextField(name='string', value=s),
-                                                  search.DateField(name='date_added', value=datetime.datetime.now().date())])
-                    # Index the document.
-                    index.put(doc)
+                    for s in add_strs:
+                        doc = search.Document(fields=[search.AtomField(name='id', value=str(item.key.id())),
+                                                      search.TextField(name='name', value=item.name),
+                                                      search.TextField(name='string', value=s),
+                                                      search.DateField(name='date_added', value=datetime.datetime.now().date())])
+                        # Index the document.
+                        index.put(doc)
+            full_str += " " + tok
     except search.PutError, e:
         result = e.results[0]
         response['errResult'] = str(result)
 
 
 def remove_stream_from_search_index(stream, response):
-    index = search.Index(name=stream_index_name, namespace=search_index_namespace)
+    index = get_stream_index()
     if stream is None:
         return
 
@@ -172,7 +221,7 @@ def remove_stream_from_search_index(stream, response):
 
 
 def remove_tag_from_search_index(tag_name, response):
-    index = search.Index(name=tag_index_name, namespace=search_index_namespace)
+    index = get_tag_index()
     if tag_name in ['', None]:
         return
 
@@ -180,6 +229,46 @@ def remove_tag_from_search_index(tag_name, response):
     for doc in search_result.results:
         index.delete(doc.doc_id)
     return
+
+
+def get_tag_index():
+    return search.Index(name=get_tag_index_name(), namespace=search_index_namespace)
+
+
+def get_stream_index():
+    return search.Index(name=get_stream_index_name(), namespace=search_index_namespace)
+
+
+def set_stream_index_name(new_name):
+    search_info = SearchInfo.get_by_id(search_index_namespace)
+    if search_info is None:
+        search_info = SearchInfo(id=search_index_namespace, tag_index_name='tag_index', stream_index_name='stream_index')
+    search_info.stream_index_name = new_name
+    search_info.put()
+
+
+def set_tag_index_name(new_name):
+    search_info = SearchInfo.get_by_id(search_index_namespace)
+    if search_info is None:
+        search_info = SearchInfo(id = search_index_namespace, tag_index_name='tag_index', stream_index_name='stream_index')
+    search_info.tag_index_name = new_name
+    search_info.put()
+
+
+def get_stream_index_name():
+    search_info = SearchInfo.get_by_id(search_index_namespace)
+    if search_info is None:
+        search_info = SearchInfo(id=search_index_namespace, tag_index_name='tag_index', stream_index_name='stream_index')
+        search_info.put()
+    return search_info.stream_index_name
+
+
+def get_tag_index_name():
+    search_info = SearchInfo.get_by_id(search_index_namespace)
+    if search_info is None:
+        search_info = SearchInfo(id=search_index_namespace, tag_index_name='tag_index', stream_index_name='stream_index')
+        search_info.put()
+    return search_info.tag_index_name
 
 
 def get_image_range_param(handler):

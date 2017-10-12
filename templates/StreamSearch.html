@@ -6,7 +6,7 @@
 <br><br>
     <h2>Search Results for {{search_string}}</h2>
 
-    <form action="{{ search_url }}" method="POST" enctype="multipart/form-data">
+    <form action="{{ search_url }}" method="GET" enctype="multipart/form-data">
         <br>
       Search Text: <input name="searchString" value="{% if search_string %}{{ search_string }}{% endif %}" autofocus>
       <input type="submit" value="Submit">
