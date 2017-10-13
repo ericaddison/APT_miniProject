@@ -91,7 +91,7 @@ handlers:
 
 
 - url: /.*
-  script: Routes.app
+  script: source.Main.app
 
 
 # [START libraries]

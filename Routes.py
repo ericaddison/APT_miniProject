@@ -64,9 +64,7 @@ app = webapp2.WSGIApplication([
     ('/services/taggedstreams', StreamsForTagService),
     ('/services/autocomplete', AutocompleteService),
     ('/services/rebuildindices', CronRebuildSearchIndexService),
-    ('/services/streaminfo', BatchStreamInfoService),
+    ('/services/streaminfo', BatchStreamInfoService)
     # [END services]
-
-    ('/.*', ManagePage)
 
 ], config=config, debug=True)

@@ -19,6 +19,34 @@ from source.Framework.BaseHandler import BaseHandler
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
 
 
+class MainPage(webapp2.RequestHandler):
+    def get(self):
+
+        user = fh.get_current_user(self)
+
+        if user:
+            login_url = fh.get_logout_url(self, '/')
+            login_text = 'Sign out'
+            name = user.nickName
+
+        else:
+            login_url = fh.get_login_url(self, '/manage')
+            login_text = 'Sign in'
+            name = ""
+
+        template_values = {
+            'html_template': 'MasterTemplate.html',
+            'user': name,
+            'login_url': login_url,
+            'login_text': login_text,
+            'app': app_identity.get_application_id()}
+
+        self.response.content_type = 'text/html'
+
+        path = os.path.join(os.path.dirname(__file__), '../templates/Index.html')
+        self.response.out.write(template.render(path, template_values))
+
+
 class ManagePage(BaseHandler):
     def get(self):
 
@@ -107,3 +135,10 @@ class TrendingPage(webapp2.RequestHandler):
         self.response.content_type = 'text/html'
         path = os.path.join(os.path.dirname(__file__), '../templates/Trends.html')
         self.response.write(template.render(path, template_values))
+
+
+# define the "app" that will be referenced from app.yaml
+app = webapp2.WSGIApplication([
+    ('/', MainPage),
+    ('/trending', TrendingPage)
+], debug=True)
