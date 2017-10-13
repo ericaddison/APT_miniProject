@@ -44,6 +44,12 @@ class ViewStream(BaseHandler):
             self.redirect('/')
             return
 
+        active_image = self.get_request_param(fh.active_image_parm)
+        try:
+            active_image = int(active_image)
+        except (TypeError, ValueError):
+            active_image = 0
+
         #Increment view counter
         stream.viewList.append(datetime.now())
         stream.numViews = stream.numViews+1
@@ -65,6 +71,9 @@ class ViewStream(BaseHandler):
         image_urls = response['urls']
         tags = response[fh.tags_parm]
         tags = [{'name': tag, 'url': fh.get_viewtag_url(tag)} for tag in tags]
+        
+        #Values for GeoMap
+        streamItemsLoc = response['streamItemsLoc']
 
         # get total number of images and make links
         num_images = response[fh.num_images_parm]
@@ -93,6 +102,24 @@ class ViewStream(BaseHandler):
         else:
             sub_url = fh.get_subscribe_service_url(user.user_id(), stream_id, redirect_url)
 
+            
+            
+            item_data = []
+            items = stream.get_all_items()
+            for i in range(len(items)):
+                item = items[i]
+                prev_ind = i - (i % 10) + 1
+                stream_url = fh.get_viewstream_url(stream.get_id(), prev_ind, prev_ind+9, i-prev_ind+1)
+                if item.getLatLng() is not None:
+                    item_data.append({
+                                        "lat": item.latitude,
+                                        "lng": item.longitude,
+                                        "url": item.URL,
+                                        "stream_name": stream.name,
+                                        "stream_url": stream_url,
+                                        "date_added": str(item.dateAdded)
+                                    })    
+            
         template_values = {
                     'html_template': 'MasterTemplate.html',
                     'stream': stream,
@@ -110,7 +137,9 @@ class ViewStream(BaseHandler):
                     'redirect_url': self.get_current_url(),
                     'stream_id_parm': fh.stream_id_parm,
                     'redirect_parm': fh.redirect_parm,
-                    'url_parm': fh.url_parm
+                    'url_parm': fh.url_parm,
+                    'item_data': item_data,
+                    'active_image': active_image
                 }
 
         if next_page_url:
