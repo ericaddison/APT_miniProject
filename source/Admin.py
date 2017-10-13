@@ -67,8 +67,8 @@ class ListStreams(webapp2.RequestHandler):
 class ClearSearchIndexes(webapp2.RequestHandler):
     def get(self):
         """Delete all the docs in the given index."""
-        tagindex = search.Index(name=fh.tag_index_name, namespace=fh.search_index_namespace)
-        streamindex = search.Index(name=fh.stream_index_name, namespace=fh.search_index_namespace)
+        tagindex = fh.get_tag_index()
+        streamindex = fh.get_stream_index()
         msg = 'Deleted all documents from indexes'
         for index in [tagindex, streamindex]:
             try:
@@ -96,7 +96,8 @@ class DisplayTagIndex(webapp2.RequestHandler):
         index = fh.get_tag_index()
 
         res = index.get_range(limit=1000)
-        prints = "<table>"
+        prints = "<h2>Tag index name: {}</h2>".format(fh.get_tag_index_name())
+        prints += "<table>"
         prints += "".join(['<tr><td>{0}</td><td>--</td><td>{1}</td></tr>'.format(r.fields[1].value, r.fields[2].value) for r in res.results])
         prints += "</table>"
 
@@ -113,7 +114,8 @@ class DisplayStreamIndex(webapp2.RequestHandler):
         index = fh.get_stream_index()
 
         res = index.get_range(limit=1000)
-        prints = "<table>"
+        prints = "<h2>Stream index name: {}</h2>".format(fh.get_stream_index_name())
+        prints += "<table>"
         prints += "".join(['{}<br><br>'.format(r.fields) for r in res.results])
         prints += "</table>"
 

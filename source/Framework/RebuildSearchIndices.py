@@ -13,16 +13,15 @@ def rebuild_stream_index():
     else:
         new_index_name = "stream_index"
 
+    # empty the new index
+    empty_index(new_index_name)
+
     # add all tags to new index
     for stream in all_streams:
         fh.searchablize_tag_or_stream(stream, new_index_name, {})
 
     # switch primary search
-    old_index_name = fh.get_stream_index_name()
     fh.set_stream_index_name(new_index_name)
-
-    # empty old index
-    empty_index(old_index_name)
 
 
 def rebuild_tag_index():
@@ -35,16 +34,15 @@ def rebuild_tag_index():
     else:
         new_index_name = "tag_index"
 
+    # empty the new index
+    empty_index(new_index_name)
+
     # add all tags to new index
     for tag in all_tags:
         fh.searchablize_tag_or_stream(tag, new_index_name, {})
 
     # switch primary search
-    old_index_name = fh.get_tag_index_name()
     fh.set_tag_index_name(new_index_name)
-
-    # empty old index
-    empty_index(old_index_name)
 
 
 def empty_index(index_name):
