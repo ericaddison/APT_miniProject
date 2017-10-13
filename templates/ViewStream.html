@@ -3,8 +3,11 @@
 {% block title %}Connexion: {{ stream.name }}{% endblock %}
 
 {% block extrahead %}
+<script src="js/dropzone.js"></script>
+<script src="js/ViewStreamPage.js"></script>
 <link rel="stylesheet" type="text/css" href="css/bootstrap/carousel.css">
 <link rel="stylesheet" type="text/css" href="css/viewstream.css">
+<link rel="stylesheet" href="css/dropzone.css">
 
 <style>
     .jumbotron-billboard .img {
@@ -110,7 +113,7 @@
             Image Location:<br>
             Latitude: <input type="text" name="lat"><br>
             Longitude: <input type="text" name="lng"><br>
-            <br><br>
+            <br>
           <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
           <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
           <input type="submit" name="submit" value="Submit">
@@ -122,6 +125,20 @@
 
 
 <br><br>
+
+
+    <!-- DROPZONE FORM -->
+
+<form action="{{ upload_url }}" class="dropzone" method="POST" enctype="multipart/form-data" id = "upform">
+    <input type="hidden" name="{{ stream_id_parm }}" value="{{ stream_id }}">
+    <input type="hidden" name="{{ redirect_parm }}" value="{{ redirect_url }}">
+    <input type="submit" name="submit" class="btn" value="Submit" id="dzUploadSubmit">
+</form>
+
+
+<BR><BR>
+
+
 <h2>Tags</h2>
 <div class="scrollmenu">
     {% for tag in tags %}
@@ -138,6 +155,12 @@
     <input type="submit" name="submit" value="Remove Tag">
 </form>
 <p>
+
+
+<br><br>
+
+
+
 
 
     <script>

@@ -71,6 +71,9 @@ def get_upload_from_filehandler(filehandler, index):
         return filehandler.get_uploads()[index]
     return None
 
+def get_num_uploads(filehandler):
+    return len(filehandler.get_uploads())
+
 
 def get_file_url(myfile):
     return images.get_serving_url(myfile.key())
