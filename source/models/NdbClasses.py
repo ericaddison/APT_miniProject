@@ -25,6 +25,9 @@ class Stream(ndb.Model):
         item_keys = self.items[(ind1-1):ind2]
         return ndb.get_multi(item_keys), ind1, ind2
 
+    def get_all_items(self):
+        return ndb.get_multi(self.items)
+
     def set_cover_image_url(self, url):
         self.coverImageURL = url
         self.put()
@@ -148,7 +151,7 @@ class Stream(ndb.Model):
         return [(s.name, s.key.id()) for s in all_streams]
 
     @classmethod
-    def get_all(cls):
+    def get_all_streams(cls):
         return Stream.query().fetch()
 
 
@@ -159,6 +162,8 @@ class StreamItem(ndb.Model):
     blobKey = ndb.BlobKeyProperty(indexed=False)
     URL = ndb.StringProperty(indexed=False)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+    longitude = ndb.StringProperty(indexed=False)
+    latitude = ndb.StringProperty(indexed=False)
 
     def delete(self):
         # remove the blob
@@ -166,6 +171,16 @@ class StreamItem(ndb.Model):
 
         # delete self
         self.key.delete()
+        
+        
+    def getLatLng(self):
+        if self.latitude is not None and self.longitude is not None:
+            dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
+            return dict
+        else:
+            return None
+        
+        
 
     @classmethod
     def create(cls, **kwargs):
@@ -180,6 +195,8 @@ class StreamItem(ndb.Model):
         stream = kwargs['stream']
         blob = kwargs['file'] if 'file' in kwargs.keys() else None
         blobkey = blob.key() if blob is not None else None
+        lat = kwargs['latitude']
+        lng = kwargs['longitude']
 
         # create and return stream
         item = StreamItem(
@@ -187,9 +204,12 @@ class StreamItem(ndb.Model):
                 blobKey=blobkey,
                 URL=url,
                 name=name,
-                stream=stream.key)
+                stream=stream.key,
+                latitude=lat,
+                longitude=lng)
         item.put()
         return item
+    
 
 
 class Tag(ndb.Model):
