@@ -119,7 +119,7 @@ class ViewStream(BaseHandler):
                                     "stream_url": stream_url,
                                     "date_added": str(item.dateAdded)
                                 })
-            
+
         template_values = {
                     'html_template': 'MasterTemplate.html',
                     'stream': stream,
