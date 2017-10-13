@@ -178,7 +178,7 @@
             })();
           {% endfor %}
 
-        var markerCluster = new MarkerClusterer(map, markers, { ignoreHiddenMarkers: true });
+        var markerCluster = new MarkerClusterer(map, markers);
 
       }
 
@@ -208,7 +208,7 @@
         slide: function( event, ui ) {
           $( "#slideDate" ).val( new Date(1000*ui.values[0]).toDateString() + " - " + new Date(1000*ui.values[1]).toDateString() );
             for(x = 0; x < markers.length; x++){
-                if(markers[x].dateAdded > new Date(1000*ui.values[0]) && markers[x].dateAdded <= new Date(1000*ui.values[1])){
+                if(markers[x].dateAdded >= new Date(1000*ui.values[0]) && markers[x].dateAdded <= new Date(1000*ui.values[1])){
                     markers[x].setVisible(true);   
                 }
                 else if(markers[x].dateAdded < new Date(1000*ui.values[0]) || markers[x].dateAdded > new Date(1000*ui.values[1])){
