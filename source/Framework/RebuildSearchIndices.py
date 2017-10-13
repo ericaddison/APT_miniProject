@@ -5,7 +5,7 @@ import Framework_Helpers as fh
 
 def rebuild_stream_index():
     # get all existing stream names
-    all_streams = Stream.get_all()
+    all_streams = Stream.get_all_streams()
 
     # define new tag search index name
     if fh.get_stream_index_name() == "stream_index":
