@@ -3,14 +3,13 @@ from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 
 
-
 class Stream(ndb.Model):
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
     name = ndb.StringProperty(indexed=True)
     coverImageURL = ndb.StringProperty(indexed=False)
     numViews = ndb.IntegerProperty(indexed=False)
     items = ndb.KeyProperty(indexed=False, kind='StreamItem', repeated=True)
-    dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+    dateAdded = ndb.DateTimeProperty(indexed=True, auto_now_add=True)
     viewList = ndb.DateTimeProperty(indexed=True, repeated=True)
 
     def add_item(self, item):
@@ -156,6 +155,10 @@ class Stream(ndb.Model):
     def get_all_streams(cls):
         return Stream.query().fetch()
 
+    @classmethod
+    def get_all_streams_by_date(cls):
+        return Stream.query().order(-cls.dateAdded).fetch()
+
 
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
@@ -174,15 +177,12 @@ class StreamItem(ndb.Model):
         # delete self
         self.key.delete()
         
-        
     def getLatLng(self):
         if self.latitude is not None and self.longitude is not None:
             dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
             return dict
         else:
             return None
-        
-        
 
     @classmethod
     def create(cls, **kwargs):
@@ -211,7 +211,6 @@ class StreamItem(ndb.Model):
                 longitude=lng)
         item.put()
         return item
-    
 
 
 class Tag(ndb.Model):
