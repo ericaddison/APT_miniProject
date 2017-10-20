@@ -63,26 +63,28 @@ class Stream(ndb.Model):
         # delete the stream itself
         self.key.delete()
 
+    def get_meta_dict(self):
+        last_update = self.get_most_recent_image()
+        last_update_date = None if last_update is None else last_update.dateAdded
+
+        return {
+            'id': self.stream_id(),
+            'owner': StreamUser.get_nickName_by_key(self.owner),
+            'name': self.name,
+            'coverImageURL': self.coverImageURL,
+            'numViews': self.numViews,
+            'numItems': len(self.items),
+            'newestDate': str(last_update_date),
+            'dateAdded': str(self.dateAdded)
+        }
+
     @classmethod
     # return a dictionary of the non-image information from this stream
     def get_meta_dict_by_id(cls, stream_id):
         stream = Stream.get_by_id(stream_id)
         if stream is None:
             return None
-
-        last_update = stream.get_most_recent_image()
-        last_update_date = None if last_update is None else last_update.dateAdded
-
-        return {
-            'id': stream.stream_id(),
-            'owner': StreamUser.get_nickName_by_key(stream.owner),
-            'name': stream.name,
-            'coverImageURL': stream.coverImageURL,
-            'numViews': stream.numViews,
-            'numItems': len(stream.items),
-            'newestDate': str(last_update_date),
-            'dateAdded': str(stream.dateAdded)
-        }
+        return stream.get_meta_dict()
 
     @classmethod
     # argument owner should be a StreamUser
