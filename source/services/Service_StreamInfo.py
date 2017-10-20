@@ -16,7 +16,7 @@ class BatchStreamInfoService(BaseHandler):
         # if none found, return all
         stream_id = self.get_request_param(fh.stream_id_parm)
         if stream_id in ['', None]:
-            all_streams = Stream.get_all_streams_by_date()
+            all_streams = Stream.get_all_streams_by_updated()
             for stream in all_streams:
                 response.append(stream.get_meta_dict())
         else:

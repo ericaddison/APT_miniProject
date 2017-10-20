@@ -9,10 +9,12 @@ class Stream(ndb.Model):
     coverImageURL = ndb.StringProperty(indexed=False)
     numViews = ndb.IntegerProperty(indexed=False)
     items = ndb.KeyProperty(indexed=False, kind='StreamItem', repeated=True)
-    dateAdded = ndb.DateTimeProperty(indexed=True, auto_now_add=True)
+    dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+    dateUpdated = ndb.DateTimeProperty(indexed=True, auto_now_add=True)
     viewList = ndb.DateTimeProperty(indexed=True, repeated=True)
 
     def add_item(self, item):
+        self.dateUpdated = item.dateAdded
         self.items.insert(0, item.key)
         self.put()
 
@@ -63,9 +65,6 @@ class Stream(ndb.Model):
         self.key.delete()
 
     def get_meta_dict(self):
-        last_update = self.get_most_recent_image()
-        last_update_date = None if last_update is None else last_update.dateAdded
-
         return {
             'id': self.stream_id(),
             'owner': StreamUser.get_nickName_by_key(self.owner),
@@ -73,7 +72,7 @@ class Stream(ndb.Model):
             'coverImageURL': self.coverImageURL,
             'numViews': self.numViews,
             'numItems': len(self.items),
-            'newestDate': str(last_update_date),
+            'newestDate': str(self.dateUpdated),
             'dateAdded': str(self.dateAdded)
         }
 
@@ -156,8 +155,8 @@ class Stream(ndb.Model):
         return Stream.query().fetch()
 
     @classmethod
-    def get_all_streams_by_date(cls):
-        return Stream.query().order(-cls.dateAdded).fetch()
+    def get_all_streams_by_updated(cls):
+        return Stream.query().order(-cls.dateUpdated).fetch()
 
 
 class StreamItem(ndb.Model):

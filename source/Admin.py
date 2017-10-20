@@ -141,8 +141,12 @@ class RedateStreamNDB(webapp2.RequestHandler):
 
         to_put = []
         for stream in streams:
-            prev_date = stream.dateAdded    # THIS IS THE MEAT! Re-add the date so it becomes an indexed property...
-            stream.dateAdded = prev_date
+            if len(stream.items) == 0:
+                updated = stream.dateAdded
+            else:
+                updated = stream.items[0].get().dateAdded
+
+            stream.dateUpdated = updated
             to_put.append(stream)
 
         # Save the updated entities.
