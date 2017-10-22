@@ -80,6 +80,8 @@ handlers:
   script: Routes.app
 - url: /services/streaminfo
   script: Routes.app
+- url: /services/streamiteminfo
+  script: Routes.app
 # [END services]
 
 - url: /css
