@@ -2,6 +2,7 @@ import json
 from source.Framework.BaseHandler import BaseHandler
 import source.Framework.Framework_Helpers as fh
 from source.models.NdbClasses import StreamItem
+from source.models.NdbClasses import Stream
 
 
 #('/services/streamiteminfo', StreamItemInfoService)
@@ -16,6 +17,7 @@ class StreamItemInfoService(BaseHandler):
         all_stream_items = StreamItem.get_all_stream_items()
         for item in all_stream_items:
             dictItem = {"streamid": item.stream.id(),
+                        "streamname": Stream.get_by_id(item.stream.id()).name,
                         "imageurl": item.URL,
                         "dateadded": item.dateAdded.strftime('%Y-%m-%d %H:%M:%S'),
                         "lat": item.latitude,
