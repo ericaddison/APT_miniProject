@@ -175,6 +175,10 @@ class StreamItem(ndb.Model):
 
         # delete self
         self.key.delete()
+                
+    @classmethod
+    def get_all_stream_items(cls):
+        return StreamItem.query().fetch()
         
     def getLatLng(self):
         if self.latitude is not None and self.longitude is not None:
