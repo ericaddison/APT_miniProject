@@ -31,7 +31,7 @@ class UploadFileHandler(FileUploadHandler):
             fh.bad_request_error(self, response, 'Invalid Stream ID')
             return
 
-        n_ups = fh.get_num_uploads(self)
+        n_ups = max(1, fh.get_num_uploads(self))
         print('\nThere were {} uploads\n'.format(n_ups))
         for i in range(n_ups):
             upload = fh.get_upload_from_filehandler(self, i)

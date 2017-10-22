@@ -3,7 +3,6 @@ from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 
 
-
 class Stream(ndb.Model):
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
     name = ndb.StringProperty(indexed=True)
@@ -11,9 +10,11 @@ class Stream(ndb.Model):
     numViews = ndb.IntegerProperty(indexed=False)
     items = ndb.KeyProperty(indexed=False, kind='StreamItem', repeated=True)
     dateAdded = ndb.DateTimeProperty(indexed=False, auto_now_add=True)
+    dateUpdated = ndb.DateTimeProperty(indexed=True, auto_now_add=True)
     viewList = ndb.DateTimeProperty(indexed=True, repeated=True)
 
     def add_item(self, item):
+        self.dateUpdated = item.dateAdded
         self.items.insert(0, item.key)
         self.put()
 
@@ -63,26 +64,25 @@ class Stream(ndb.Model):
         # delete the stream itself
         self.key.delete()
 
+    def get_meta_dict(self):
+        return {
+            'id': self.stream_id(),
+            'owner': StreamUser.get_nickName_by_key(self.owner),
+            'name': self.name,
+            'coverImageURL': self.coverImageURL,
+            'numViews': self.numViews,
+            'numItems': len(self.items),
+            'newestDate': str(self.dateUpdated),
+            'dateAdded': str(self.dateAdded)
+        }
+
     @classmethod
     # return a dictionary of the non-image information from this stream
     def get_meta_dict_by_id(cls, stream_id):
         stream = Stream.get_by_id(stream_id)
         if stream is None:
             return None
-
-        last_update = stream.get_most_recent_image()
-        last_update_date = None if last_update is None else last_update.dateAdded
-
-        return {
-            'id': stream.stream_id(),
-            'owner': StreamUser.get_nickName_by_key(stream.owner),
-            'name': stream.name,
-            'coverImageURL': stream.coverImageURL,
-            'numViews': stream.numViews,
-            'numItems': len(stream.items),
-            'newestDate': str(last_update_date),
-            'dateAdded': str(stream.dateAdded)
-        }
+        return stream.get_meta_dict()
 
     @classmethod
     # argument owner should be a StreamUser
@@ -154,6 +154,10 @@ class Stream(ndb.Model):
     def get_all_streams(cls):
         return Stream.query().fetch()
 
+    @classmethod
+    def get_all_streams_by_updated(cls):
+        return Stream.query().order(-cls.dateUpdated).fetch()
+
 
 class StreamItem(ndb.Model):
     stream = ndb.KeyProperty(indexed=True, kind='Stream')
@@ -172,15 +176,12 @@ class StreamItem(ndb.Model):
         # delete self
         self.key.delete()
         
-        
     def getLatLng(self):
         if self.latitude is not None and self.longitude is not None:
             dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
             return dict
         else:
             return None
-        
-        
 
     @classmethod
     def create(cls, **kwargs):
@@ -209,7 +210,6 @@ class StreamItem(ndb.Model):
                 longitude=lng)
         item.put()
         return item
-    
 
 
 class Tag(ndb.Model):
