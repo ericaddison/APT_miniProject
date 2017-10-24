@@ -4,6 +4,8 @@ import webapp2
 from google.appengine.api import users
 from google.appengine.api import search
 from google.appengine.ext.webapp import template
+import source.models.NdbClasses as models
+from google.appengine.ext import ndb
 
 from source.models.NdbClasses import *
 import source.Framework.Framework_Helpers as fh
@@ -126,13 +128,51 @@ class DisplayStreamIndex(webapp2.RequestHandler):
 
         self.response.write(template.render(templatepath, template_values))
 
+
+class RedateStreamNDB(webapp2.RequestHandler):
+    def update_schema_task(self):
+
+        # Force ndb to use v2 of the model by re-loading it.
+        reload(models)
+
+        # Get all of the entities for this Model.
+        query = models.Stream.query()
+        streams = query.fetch()
+
+        to_put = []
+        for stream in streams:
+            if len(stream.items) == 0:
+                updated = stream.dateAdded
+            else:
+                updated = stream.items[0].get().dateAdded
+
+            stream.dateUpdated = updated
+            to_put.append(stream)
+
+        # Save the updated entities.
+        if to_put:
+            ndb.put_multi(to_put)
+            return 'Put {} stream entities to Datastore'.format(len(to_put))
+
+    def get(self):
+        msg = self.update_schema_task()
+        template_values = {
+            'simple_content': msg,
+            'rebuildStreamNDB_active': True
+        }
+
+        self.response.write(template.render(templatepath, template_values))
+
+
+
 app = webapp2.WSGIApplication([
     ('/admin/dashboard', AdminDashboard),
     ('/admin/listusers', ListUsers),
     ('/admin/liststreams', ListStreams),
     ('/admin/cleartagindex', ClearSearchIndexes),
     ('/admin/displaytagindex', DisplayTagIndex),
-    ('/admin/displaystreamindex', DisplayStreamIndex)
+    ('/admin/displaystreamindex', DisplayStreamIndex),
+    ('/admin/redatestreamndb', RedateStreamNDB)
 ], debug=True)
 
 

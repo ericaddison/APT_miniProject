@@ -13,6 +13,7 @@ from source.services.Service_Tag import AddTagToStreamService, RemoveTagFromStre
 from source.services.Service_Autcomplete import AutocompleteService
 from source.services.Service_CronRebuildSearchIndex import CronRebuildSearchIndexService
 from source.services.Service_StreamInfo import BatchStreamInfoService
+from source.services.Service_StreamItemInfo import StreamItemInfoService
 from source.views.Create import CreatePage
 from source.views.Delete import DeletePage, DeleteExe
 from source.views.Unsubscribe import UnsubscribePage, UnsubscribeExe
@@ -64,7 +65,8 @@ app = webapp2.WSGIApplication([
     ('/services/taggedstreams', StreamsForTagService),
     ('/services/autocomplete', AutocompleteService),
     ('/services/rebuildindices', CronRebuildSearchIndexService),
-    ('/services/streaminfo', BatchStreamInfoService)
+    ('/services/streaminfo', BatchStreamInfoService),
+    ('/services/streamiteminfo', StreamItemInfoService)
     # [END services]
 
 ], config=config, debug=True)
