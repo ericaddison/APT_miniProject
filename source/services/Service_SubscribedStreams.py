@@ -2,10 +2,11 @@ import json
 from source.Framework.BaseHandler import BaseHandler
 import source.Framework.Framework_Helpers as fh
 from source.models.NdbClasses import StreamSubscriber, Stream, StreamUser
-from oauth2client import client
-import httplib2
 
-CLIENT_SECRET_FILE = "./client_secret_567910868038-cmb1ces0165uuhd7crp4ibfub2efj14t.apps.googleusercontent.com.json"
+from google.oauth2 import id_token
+from google.auth.transport import requests
+
+CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
 
 
 class SubscribedStreamsService(BaseHandler):
@@ -15,21 +16,33 @@ class SubscribedStreamsService(BaseHandler):
         response = {}
 
         # get auth token, if present
-        auth_code = self.get_request_param(fh.auth_token_parm)
+        auth_token = self.get_request_param(fh.auth_token_parm)
 
-        print("I got auth token " + auth_code)
+        print("I got auth token " + auth_token)
 
-        credentials = client.credentials_from_clientsecrets_and_code(
-            CLIENT_SECRET_FILE,
-            ['https://www.googleapis.com/auth/drive.appdata', 'profile', 'email'],
-            auth_code)
+        try:
+            idinfo = id_token.verify_oauth2_token(auth_token, requests.Request(), CLIENT_ID)
 
-        # Call Google API
-        http_auth = credentials.authorize(httplib2.Http())
+            # Or, if multiple clients access the backend server:
+            # idinfo = id_token.verify_oauth2_token(token, requests.Request())
+            # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
+            #     raise ValueError('Could not verify audience.')
 
-        # Get profile info from ID token
-        userid = credentials.id_token['sub']
-        email = credentials.id_token['email']
+            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                raise ValueError('Wrong issuer.')
+
+            # If auth request is from a G Suite domain:
+            # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
+            #     raise ValueError('Wrong hosted domain.')
+
+            # ID token is valid. Get the user's Google Account ID from the decoded token.
+            userid = idinfo['sub']
+        except ValueError:
+            # Invalid token
+            print('BALUEAEORJ!!!')
+            pass
+
+        print('\n\nemail={}\n\n'.format(idinfo))
 
 
         # get current user
