@@ -451,5 +451,9 @@ class StreamUser(ndb.Model):
         return ndb.Key('StreamUser', user_id).get()
 
     @classmethod
+    def get_by_email(cls, user_email):
+        return StreamUser.query(StreamUser.email == user_email).get()
+
+    @classmethod
     def get_nickName_by_key(cls, user_key):
         return user_key.get().nickName
