@@ -196,14 +196,10 @@ class StreamItem(ndb.Model):
     def get_all_stream_items(cls):
         return StreamItem.query().fetch()
 
-    
-    
     @classmethod
     def get_stream_items_by_key(cls, stream_id):
         return StreamItem.query(StreamItem.stream == ndb.Key('Stream', long(stream_id))).fetch()
 
-    
-    
     def getLatLng(self):
         if self.latitude is not None and self.longitude is not None and self.latitude.strip() != "" and self.longitude.strip() != "":
             dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
