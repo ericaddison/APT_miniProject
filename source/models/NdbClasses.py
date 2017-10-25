@@ -76,6 +76,22 @@ class Stream(ndb.Model):
             'dateAdded': str(self.dateAdded)
         }
 
+    def get_meta_dict_with_most_recent_image_url(self):
+        if len(self.items) > 0:
+            newest_url = self.items[0].get().URL
+        else:
+            newest_url = ""
+        return {
+            'id': self.stream_id(),
+            'owner': StreamUser.get_nickName_by_key(self.owner),
+            'name': self.name,
+            'coverImageURL': newest_url,
+            'numViews': self.numViews,
+            'numItems': len(self.items),
+            'newestDate': str(self.dateUpdated),
+            'dateAdded': str(self.dateAdded)
+        }
+
     @classmethod
     # return a dictionary of the non-image information from this stream
     def get_meta_dict_by_id(cls, stream_id):
@@ -180,14 +196,10 @@ class StreamItem(ndb.Model):
     def get_all_stream_items(cls):
         return StreamItem.query().fetch()
 
-    
-    
     @classmethod
     def get_stream_items_by_key(cls, stream_id):
         return StreamItem.query(StreamItem.stream == ndb.Key('Stream', long(stream_id))).fetch()
 
-    
-    
     def getLatLng(self):
         if self.latitude is not None and self.longitude is not None and self.latitude.strip() != "" and self.longitude.strip() != "":
             dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
@@ -449,6 +461,10 @@ class StreamUser(ndb.Model):
     @classmethod
     def get_by_id(cls, user_id):
         return ndb.Key('StreamUser', user_id).get()
+
+    @classmethod
+    def get_by_email(cls, user_email):
+        return StreamUser.query(StreamUser.email == user_email).get()
 
     @classmethod
     def get_nickName_by_key(cls, user_key):

@@ -164,6 +164,38 @@ class RedateStreamNDB(webapp2.RequestHandler):
         self.response.write(template.render(templatepath, template_values))
 
 
+# clean Nones out of Stream item lists
+class CleanStreamNDB(webapp2.RequestHandler):
+    def clean_streams(self):
+
+        # Force ndb to use v2 of the model by re-loading it.
+        reload(models)
+
+        # Get all of the entities for this Model.
+        query = models.Stream.query()
+        streams = query.fetch()
+
+        to_put = []
+        for stream in streams:
+            if len(stream.items) > 0:
+                stream.items = [s for s in stream.items if s.get() is not None]
+                to_put.append(stream)
+
+        # Save the updated entities.
+        if to_put:
+            ndb.put_multi(to_put)
+            return 'Put {} stream entities to Datastore'.format(len(to_put))
+
+    def get(self):
+        msg = self.clean_streams()
+        template_values = {
+            'simple_content': msg,
+            'cleanStreamNDB_active': True
+        }
+
+        self.response.write(template.render(templatepath, template_values))
+
+
 
 app = webapp2.WSGIApplication([
     ('/admin/dashboard', AdminDashboard),
@@ -172,7 +204,8 @@ app = webapp2.WSGIApplication([
     ('/admin/cleartagindex', ClearSearchIndexes),
     ('/admin/displaytagindex', DisplayTagIndex),
     ('/admin/displaystreamindex', DisplayStreamIndex),
-    ('/admin/redatestreamndb', RedateStreamNDB)
+    ('/admin/redatestreamndb', RedateStreamNDB),
+    ('/admin/cleanstreamndb', CleanStreamNDB)
 ], debug=True)
 
 

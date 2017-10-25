@@ -14,6 +14,7 @@ from google.appengine.ext.webapp import template
 stream_id_parm = 'streamID'
 stream_name_parm = 'streamname'
 user_id_parm = 'userID'
+auth_token_parm = 'authToken'
 image_range_parm = 'imageRange'
 tag_name_parm = 'tagName'
 search_string_parm = 'searchString'
