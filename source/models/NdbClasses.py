@@ -205,7 +205,7 @@ class StreamItem(ndb.Model):
     
     
     def getLatLng(self):
-        if self.latitude is not None and self.longitude is not None:
+        if self.latitude is not None and self.longitude is not None and self.latitude.strip() != "" and self.longitude.strip() != "":
             dict = {'lat':str(self.latitude), 'lng':str(self.longitude)}
             return dict
         else:
