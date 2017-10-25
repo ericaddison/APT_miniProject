@@ -31,5 +31,6 @@ class SubscribedStreamsService(BaseHandler):
         sub_streams = StreamSubscriber.get_by_user(user)
 
         # write some stream info
-        response = [s.stream.get().get_meta_dict() for s in sub_streams]
+        response = [s.stream.get().get_meta_dict_with_most_recent_image_url() for s in sub_streams]
+
         self.write_response(json.dumps(response))

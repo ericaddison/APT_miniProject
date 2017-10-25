@@ -76,6 +76,22 @@ class Stream(ndb.Model):
             'dateAdded': str(self.dateAdded)
         }
 
+    def get_meta_dict_with_most_recent_image_url(self):
+        if len(self.items) > 0:
+            newest_url = self.items[0].get().URL
+        else:
+            newest_url = ""
+        return {
+            'id': self.stream_id(),
+            'owner': StreamUser.get_nickName_by_key(self.owner),
+            'name': self.name,
+            'coverImageURL': newest_url,
+            'numViews': self.numViews,
+            'numItems': len(self.items),
+            'newestDate': str(self.dateUpdated),
+            'dateAdded': str(self.dateAdded)
+        }
+
     @classmethod
     # return a dictionary of the non-image information from this stream
     def get_meta_dict_by_id(cls, stream_id):
