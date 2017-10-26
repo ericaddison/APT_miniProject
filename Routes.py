@@ -3,6 +3,7 @@ import webapp2
 from source.services.Service_CreateStream import CreateStreamService
 from source.services.Service_CreateTag import CreateTagService
 from source.services.Service_DeleteStream import DeleteStreamService
+from source.services.Service_GetUploadURL import GetUploadURL
 from source.services.Service_Subscribe import SubscribeToStreamService, UnsubscribeFromStreamService, CheckSubscribedService
 from source.services.Service_UploadFile import UploadFileHandler
 from source.services.Service_ViewStream import ViewStreamService
@@ -68,7 +69,8 @@ app = webapp2.WSGIApplication([
     ('/services/rebuildindices', CronRebuildSearchIndexService),
     ('/services/streaminfo', BatchStreamInfoService),
     ('/services/streamiteminfo', StreamItemInfoService),
-    ('/services/subscribedstreams', SubscribedStreamsService)
+    ('/services/subscribedstreams', SubscribedStreamsService),
+    ('/services/getuploadurl', GetUploadURL)
     # [END services]
 
 ], config=config, debug=True)

@@ -52,6 +52,8 @@ handlers:
   script: Routes.app
 - url: /services/search.*
   script: Routes.app
+- url: /services/getuploadurl
+  script: Routes.app
 - url: /services/viewstream
   script: Routes.app
 - url: /services/upload.*
