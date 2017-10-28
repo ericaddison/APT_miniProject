@@ -14,7 +14,11 @@ class UploadFileHandler(FileUploadHandler):
         response = {}
 
         # get current user
-        user = StreamUser.get_current_user(self)
+        try:
+            user = StreamUser.get_current_user(self)
+        except urllib2.HTTPError:
+            fh.bad_request_error(self, response, 'HTTPERROR... authToken = {}'.format(self.get_request_param(fh.auth_token_parm)))
+            return
         if user is None:
             fh.bad_request_error(self, response, 'Not logged in')
             return

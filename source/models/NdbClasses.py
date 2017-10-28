@@ -2,6 +2,7 @@ import source.Framework.Framework_Helpers as fh
 import json
 import urllib
 import urllib2
+import quopri
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
 from google.appengine.api import users
@@ -490,10 +491,11 @@ class StreamUser(ndb.Model):
 
         else:
             # if no user, look for auth token
-            auth_token = urllib.quote(str(handler.get_request_param(fh.auth_token_parm)))
+            auth_token = handler.get_request_param(fh.auth_token_parm)
+            auth_token = unicode(quopri.decodestring(auth_token), 'iso_8859-2')
+            auth_token = urllib.quote(str(auth_token))
             if auth_token in [None, ""]:
                 return None
-
             user_data_str = urllib2.urlopen(
                 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + auth_token).read()
             user_data = json.loads(user_data_str)
