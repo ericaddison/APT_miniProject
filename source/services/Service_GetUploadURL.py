@@ -7,6 +7,6 @@ class GetUploadURL(BaseHandler):
     def get(self):
         self.set_content_text_json()
 
-        upload_url = blobstore.create_upload_url('/')
+        upload_url = blobstore.create_upload_url('/services/upload')
 
         self.write_response(upload_url)

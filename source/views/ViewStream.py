@@ -12,6 +12,7 @@ from google.appengine.api import users
 
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import StreamUser
 
 DEFAULT_IMAGES_PER_PAGE = 10
 images_per_page = DEFAULT_IMAGES_PER_PAGE

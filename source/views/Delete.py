@@ -4,13 +4,13 @@ import urllib2
 import os
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
-from source.models.NdbClasses import Stream
+from source.models.NdbClasses import Stream, StreamUser
 
 
 class DeletePage(BaseHandler):
     def post(self):
 
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
 
         if user:
             login_url = fh.get_logout_url(self, '/')
@@ -38,7 +38,7 @@ class DeletePage(BaseHandler):
 
 class DeleteExe(BaseHandler):
     def post(self):
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
 
         if user is None:
             self.redirect("/")
@@ -62,7 +62,7 @@ class DeleteExe(BaseHandler):
                                                                                           fh.stream_id_parm,
                                                                                           id,
                                                                                           fh.user_id_parm,
-                                                                                          fh.get_current_user(self).user_id())
+                                                                                          StreamUser.get_current_user(self).user_id())
             try:
                 result = urllib2.urlopen(delete_stream_url)
                 message = "{0}, {1}".format(message, result)

@@ -4,13 +4,12 @@ import urllib2
 import os
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
-from source.models.NdbClasses import Stream
-
+from source.models.NdbClasses import Stream, StreamUser
 
 class TextSearchForm(BaseHandler):
     def get(self):
 
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
 
         if user:
             login_url = fh.get_logout_url(self, '/')

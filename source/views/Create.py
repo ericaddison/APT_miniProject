@@ -4,12 +4,13 @@ import urllib2
 import os
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import StreamUser
 
 
 class CreatePage(BaseHandler):
     def get(self):
 
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
 
         if user:
             login_url = fh.get_logout_url(self, '/')
@@ -40,7 +41,7 @@ class CreatePage(BaseHandler):
 
         create_stream_url = 'http://{0}/services/createstream?{1}={2};{3}'.format(os.environ['HTTP_HOST'],
                                                                                   fh.user_id_parm,
-                                                                                  fh.get_current_user(self).user_id(),
+                                                                                  StreamUser.get_current_user(self).user_id(),
                                                                                   urllib.urlencode(parm_dict))
 
         try:

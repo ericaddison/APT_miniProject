@@ -6,8 +6,6 @@ from source.models.NdbClasses import StreamSubscriber, Stream, StreamUser
 import urllib2
 import urllib
 
-CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
-
 
 class SubscribedStreamsService(BaseHandler):
     def get(self):

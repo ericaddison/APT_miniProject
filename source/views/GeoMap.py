@@ -12,10 +12,10 @@ import json
 
 class GeoMapPage(BaseHandler):
     def get(self):
-        user = users.get_current_user()
+        user = StreamUser.get_current_user(self)
 
         if user:
-            nickname = user.nickname()
+            nickname = user.nickName
             login_url = users.create_logout_url('/')
             login_text = 'Sign out'
         else:
@@ -42,7 +42,7 @@ class GeoMapPage(BaseHandler):
         
         template_values = {
             'html_template': 'MasterTemplate.html',
-            'user': user,
+            'user': nickname,
             'login_url': login_url,
             'login_text': login_text,
             'item_data': item_data

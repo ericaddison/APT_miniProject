@@ -1,7 +1,10 @@
 import source.Framework.Framework_Helpers as fh
+import json
+import urllib
+import urllib2
 from google.appengine.ext import ndb
 from google.appengine.ext import blobstore
-
+from google.appengine.api import users
 
 class Stream(ndb.Model):
     owner = ndb.KeyProperty(indexed=True, kind='StreamUser')
@@ -469,3 +472,37 @@ class StreamUser(ndb.Model):
     @classmethod
     def get_nickName_by_key(cls, user_key):
         return user_key.get().nickName
+
+    @classmethod
+    # returns the current google user for now
+    # but could be extended to work with non-google user types
+    # e.g. Facebook login, plain email login, etc
+    # return a StreamUser
+    def get_current_user(cls, handler):
+        # get google user
+        google_user = users.get_current_user()
+
+        print('\n{}\n'.format(google_user))
+
+        if google_user is not None:
+            # look up our user
+            stream_user = ndb.Key('StreamUser', google_user.user_id()).get()
+
+        else:
+            # if no user, look for auth token
+            auth_token = urllib.quote(str(handler.get_request_param(fh.auth_token_parm)))
+            if auth_token in [None, ""]:
+                return None
+
+            user_data_str = urllib2.urlopen(
+                'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=' + auth_token).read()
+            user_data = json.loads(user_data_str)
+
+            # get user from auth token
+            if user_data is None or 'email' not in user_data.keys():
+                return None
+
+            stream_user = StreamUser.get_by_email(user_data['email'])
+
+        # return
+        return stream_user

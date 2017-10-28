@@ -19,10 +19,10 @@ from source.Framework.BaseHandler import BaseHandler
 CLIENT_ID = "567910868038-rj3rdk31k9mbcf4ftder0rhfqr1vrld4.apps.googleusercontent.com"
 
 
-class MainPage(webapp2.RequestHandler):
+class MainPage(BaseHandler):
     def get(self):
 
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
 
         if user:
             login_url = fh.get_logout_url(self, '/')

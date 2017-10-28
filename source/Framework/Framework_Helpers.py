@@ -2,6 +2,7 @@ import json
 import re
 import datetime
 import urllib2
+import urllib
 
 import webapp2
 from google.appengine.api import images
@@ -80,24 +81,6 @@ def get_file_url(myfile):
     return images.get_serving_url(myfile.key())
 
 # [END file handling]
-
-
-# returns the current google user for now
-# but could be extended to work with non-google user types
-# e.g. Facebook login, plain email login, etc
-# return a StreamUser
-def get_current_user(handler):
-    # get google user
-    google_user = users.get_current_user()
-
-    if google_user is None:
-        return None
-
-    # look up our user
-    stream_user = ndb.Key('StreamUser', google_user.user_id()).get()
-
-    # return
-    return stream_user
 
 
 def get_logout_url(handler, redirect):

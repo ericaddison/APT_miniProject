@@ -3,7 +3,7 @@ import urllib2
 from source.Framework.BaseHandler import FileUploadHandler
 
 import source.Framework.Framework_Helpers as fh
-from source.models.NdbClasses import Stream, StreamItem
+from source.models.NdbClasses import Stream, StreamItem, StreamUser
 
 
 # expects a POST parameter 'streamID' containing the stream ID
@@ -14,7 +14,7 @@ class UploadFileHandler(FileUploadHandler):
         response = {}
 
         # get current user
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
         if user is None:
             fh.bad_request_error(self, response, 'Not logged in')
             return

@@ -4,6 +4,7 @@ import urllib2
 
 import source.Framework.Framework_Helpers as fh
 from source.Framework.BaseHandler import BaseHandler
+from source.models.NdbClasses import StreamUser
 
 DEFAULT_IMAGES_PER_PAGE = 10
 images_per_page = DEFAULT_IMAGES_PER_PAGE
@@ -11,7 +12,7 @@ images_per_page = DEFAULT_IMAGES_PER_PAGE
 
 class ViewTag(BaseHandler):
     def get(self):
-        user = fh.get_current_user(self)
+        user = StreamUser.get_current_user(self)
 
         if user:
             login_url = fh.get_logout_url(self, '/')
